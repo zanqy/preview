@@ -3,181 +3,401 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Alur Kerja Tharra (Katakan)</title>
-<meta name="description" content="Visualisasi alur kerja Tharra/Katakan: dari menulis aspirasi anonim hingga pelacakan status.">
+<title>Alur Kerja Tharra (Katakan) — Animasi Interaktif</title>
+<meta name="description" content="Animasi interaktif alur kerja Tharra/Katakan: amplop, tulis anonim, draf lokal, kirim API, kode tiket, cek status, dan jalur AKAR.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#F2ECDE; --paper2:#EDE4CF; --card:#FBF7EC; --ink:#221D15; --ink60:rgba(34,29,21,.62);
+  --paper:#F2ECDE; --paper2:#E8DEC8; --card:#FBF7EC; --ink:#221D15; --ink60:rgba(34,29,21,.62);
   --muted:rgba(34,29,21,.45); --red:#C03B21; --line:rgba(34,29,21,.16); --ok:#2f6b3f; --plan:#6b5a2f;
+  --blue:#2a5f7a; --glow:rgba(192,59,33,.18);
   --fd:'Fraunces',serif; --fs:'Spectral',serif; --fm:'IBM Plex Mono',monospace;
 }
 *,*::before,*::after{box-sizing:border-box} html,body{margin:0}
-body{font-family:var(--fs);color:var(--ink);background:var(--paper);line-height:1.6;font-size:17px}
+body{font-family:var(--fs);color:var(--ink);background:var(--paper);line-height:1.55;font-size:16px;overflow-x:hidden}
 :focus-visible{outline:2px dashed var(--red);outline-offset:3px}
-.wrap{max-width:980px;margin:0 auto;padding:28px 20px 60px}
-header{padding:10px 0 18px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.wrap{max-width:1120px;margin:0 auto;padding:24px 18px 70px}
+
+/* bg */
+.bg{position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.55;
+  background:
+    radial-gradient(900px 420px at 10% -5%, rgba(192,59,33,.08), transparent 60%),
+    radial-gradient(700px 360px at 95% 10%, rgba(47,107,63,.08), transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");}
+
+header{padding:8px 0 18px}
 .kicker{font:500 10px var(--fm);letter-spacing:.28em;text-transform:uppercase;color:var(--red);margin:0 0 8px}
-h1{font:800 clamp(2rem,5vw,3.2rem)/.95 var(--fd);margin:0 0 10px;letter-spacing:-.02em}
+h1{font:800 clamp(2.1rem,5.5vw,3.6rem)/.93 var(--fd);margin:0 0 10px;letter-spacing:-.02em}
 h1 span{color:var(--red)}
-.lead{color:var(--ink60);max-width:60ch;margin:0}
-.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-.tag{font:500 10.5px var(--fm);letter-spacing:.08em;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink60);display:inline-flex;align-items:center;gap:7px}
-.tag i{width:8px;height:8px;border-radius:50%;display:inline-block}
-.i-main{background:var(--red)} .i-local{background:var(--ok)} .i-plan{background:var(--plan)}
+.lead{color:var(--ink60);max-width:62ch;margin:0}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px}
+.btn{font:600 .95rem var(--fd);background:var(--ink);color:var(--paper);border:0;border-radius:10px;padding:11px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--red)}
+.btn:active{transform:none;box-shadow:none}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font:500 11px var(--fm);letter-spacing:.08em;text-transform:uppercase}
+.btn.ghost:hover{box-shadow:none;transform:none;border-color:var(--ink)}
+.hint{font:500 11px var(--fm);color:var(--muted)}
 
-.flow{position:relative;margin-top:10px}
-.step{display:grid;grid-template-columns:56px 1fr;gap:16px;align-items:flex-start;position:relative;padding:18px 0}
-.step:not(:last-child)::before{content:"";position:absolute;left:27px;top:62px;bottom:-6px;width:2px;background:linear-gradient(var(--line),rgba(34,29,21,.08));}
-.node{width:54px;height:54px;border-radius:16px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;position:relative;z-index:1;box-shadow:0 10px 24px -18px rgba(34,29,21,.5)}
-.node svg{width:24px;height:24px}
-.n1{border-color:rgba(192,59,33,.35);background:#fffaf0}
-.n2{border-color:rgba(47,107,63,.35);background:#f6fbf4}
-.n3{border-color:rgba(192,59,33,.35);background:#fffaf0}
-.n4{border-color:rgba(47,107,63,.35);background:#f6fbf4}
-.n5{border-color:rgba(107,90,47,.35);background:#fbf7ea}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;box-shadow:0 14px 34px -26px rgba(34,29,21,.45)}
-.ch{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between;margin-bottom:6px}
-.ey{font:500 10px var(--fm);letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
-.badge{font:500 10px var(--fm);letter-spacing:.08em;padding:4px 8px;border-radius:999px;border:1px solid var(--line);color:var(--ink60);background:var(--paper2)}
-.badge.main{color:#7a2314;border-color:rgba(192,59,33,.3);background:#f7e6df}
-.badge.local{color:#214d2d;border-color:rgba(47,107,63,.3);background:#e7f0e6}
-.badge.plan{color:#5a4a22;border-color:rgba(107,90,47,.3);background:#f1ead8}
-h2{font:700 1.35rem/1.1 var(--fd);margin:0 0 6px}
-.card p{margin:0 0 8px;color:var(--ink60)}
-ul{margin:0;padding-left:18px;color:var(--ink60)}
-li{margin:4px 0}
-code{font:500 .9em var(--fm);background:rgba(34,29,21,.06);padding:1px 6px;border-radius:6px;color:var(--ink)}
-.path{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.pill{font:500 10.5px var(--fm);padding:5px 9px;border-radius:8px;border:1px dashed var(--line);background:var(--paper);color:var(--ink60)}
+/* board */
+.board{margin-top:18px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#fffdf8,var(--card));box-shadow:0 24px 60px -40px rgba(34,29,21,.5);overflow:hidden}
+.board-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--paper2)}
+.lights{display:flex;gap:6px}.lights i{width:10px;height:10px;border-radius:50%;background:#d8cdb8;border:1px solid var(--line)}
+.status{font:500 11px var(--fm);color:var(--ink60);letter-spacing:.06em}
+.status b{color:var(--red)}
 
-/* reveal animation */
-.reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease, transform .55s cubic-bezier(.2,.8,.2,1)}
-.reveal.on{opacity:1;transform:none}
-.step.reveal .node{transform:scale(.92);transition:transform .5s cubic-bezier(.2,.8,.2,1) .05s}
-.step.reveal.on .node{transform:scale(1)}
-.pulse{animation:pulse 2.4s infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(192,59,33,.0)}50%{box-shadow:0 0 0 6px rgba(192,59,33,.08)}}
+/* pipeline svg */
+.pipe-wrap{padding:14px 14px 4px;position:relative}
+svg#pipe{width:100%;height:auto;display:block}
+.p-node{cursor:pointer}
+.p-node circle.bg{fill:#fffaf0;stroke:rgba(34,29,21,.22);stroke-width:1.5;transition:all .35s}
+.p-node text.n{font:600 11px 'IBM Plex Mono',monospace;fill:rgba(34,29,21,.55)}
+.p-node text.lbl{font:600 13px 'Fraunces',serif;fill:#221D15}
+.p-node text.sub{font:400 10.5px 'IBM Plex Mono',monospace;fill:rgba(34,29,21,.55)}
+.p-node.active circle.bg{fill:#fff;stroke:var(--red);stroke-width:2.2;filter:drop-shadow(0 0 6px rgba(192,59,33,.25))}
+.p-node.done circle.bg{fill:#f1f8f1;stroke:var(--ok);stroke-width:2}
+.p-node.plan circle.bg{fill:#fbf7ea;stroke:var(--plan)}
+.track{stroke:rgba(34,29,21,.18);stroke-width:3;fill:none;stroke-linecap:round}
+.track.flow{stroke:rgba(192,59,33,.35);stroke-dasharray:8 10;animation:dash 18s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-400}}
+.packet{filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}
+.server{fill:#f4efe3;stroke:rgba(34,29,21,.25);stroke-width:1.5}
+.pulse-ring{fill:none;stroke:var(--red);stroke-width:2;opacity:0}
+.pulse-ring.run{animation:ring 1.8s ease-out infinite}
+@keyframes ring{0%{r:18;opacity:.7}100%{r:38;opacity:0}}
 
-.note{margin-top:22px;padding:14px 16px;border:1px dashed var(--line);border-radius:12px;background:#f7f1e3;color:var(--ink60);font-size:15px}
-footer{margin-top:18px;font:500 10.5px var(--fm);letter-spacing:.08em;color:var(--muted)}
+/* stage area */
+.stage-area{display:grid;grid-template-columns:1.05fr .95fr;gap:14px;padding:6px 14px 16px}
+.panel{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px;min-height:320px;position:relative;overflow:hidden}
+.panel h3{font:600 1.05rem var(--fd);margin:0 0 4px}
+.panel .meta{font:500 10.5px var(--fm);color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.scene{border:1px dashed var(--line);border-radius:12px;background:var(--paper);min-height:230px;position:relative;overflow:hidden;padding:14px}
+
+/* scenes */
+.env-scene{display:grid;place-items:center;height:220px}
+.mini-env{width:150px;height:100px;position:relative;perspective:500px}
+.me-back{position:absolute;inset:18% 0 0;background:linear-gradient(160deg,#efe6d2,#e6d8bc);border:1px solid rgba(34,29,21,.3);border-radius:6px}
+.me-letter{position:absolute;left:8%;right:8%;top:22%;bottom:22%;background:#fcf8ed;border:1px solid rgba(34,29,21,.25);border-radius:3px;display:grid;place-items:center;font:italic .8rem var(--fs);color:var(--muted);transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.me-front{position:absolute;inset:18% 0 0;border-radius:6px;overflow:hidden}
+.me-front::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 48%, rgba(34,29,21,.06) 48%);clip-path:polygon(0 40%,50% 78%,100% 40%,100% 100%,0 100%);background:linear-gradient(160deg,#e8dcc0,#dfd0ad)}
+.me-flap{position:absolute;left:0;right:0;top:18%;height:45%;background:linear-gradient(180deg,#e2d3af,#d9c89e);clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .6s ease;z-index:3;border-top-left-radius:6px;border-top-right-radius:6px}
+.me-seal{position:absolute;left:50%;top:40%;width:18px;height:18px;margin:-9px;background:var(--red);border-radius:50%;z-index:4;transition:opacity .3s}
+.mini-env.open .me-flap{transform:rotateX(170deg);z-index:0}
+.mini-env.open .me-seal{opacity:0}
+.mini-env.open .me-letter{transform:translateY(-55%)}
+.cap{position:absolute;bottom:8px;left:0;right:0;text-align:center;font:500 10.5px var(--fm);color:var(--muted)}
+
+/* form sim */
+.form-sim .row{margin-bottom:10px}
+.form-sim label{display:block;font:500 9.5px var(--fm);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.fake-ta{width:100%;min-height:84px;border:1px solid var(--line);border-radius:8px;padding:10px;background:#fffdf6;font:400 .95rem/1.6 var(--fs);color:var(--ink)}
+.cursor{display:inline-block;width:2px;height:1em;background:var(--red);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.draft{font:500 10px var(--fm);color:var(--ok);margin-top:6px;opacity:0;transform:translateY(4px);transition:.3s}
+.draft.show{opacity:1;transform:none}
+.mini-btn{display:inline-block;margin-top:8px;background:var(--ink);color:var(--paper);font:600 .85rem var(--fd);padding:8px 12px;border-radius:8px}
+
+/* network */
+.net-scene{height:220px;position:relative}
+.net-scene svg{width:100%;height:100%}
+.fly{offset-path:path("M 40 170 C 120 170, 140 90, 210 80");offset-rotate:0deg;opacity:0}
+.fly.run{animation:fly 1.8s ease-in-out forwards}
+@keyframes fly{0%{offset-distance:0%;opacity:0}10%{opacity:1}90%{opacity:1}100%{offset-distance:100%;opacity:0}}
+.glow-dot{opacity:0}.glow-dot.run{animation:gdot 1.8s ease-in-out forwards}
+@keyframes gdot{0%,70%{opacity:0;r:4}85%{opacity:1;r:7}100%{opacity:0;r:4}}
+
+/* ticket */
+.ticket-scene{display:grid;place-items:center;height:220px}
+.ticket{width:min(320px,100%);background:#fffdf6;border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;position:relative;transform:scale(.96);opacity:.4;transition:.5s cubic-bezier(.2,.8,.2,1)}
+.ticket.show{transform:scale(1);opacity:1}
+.stamp{display:inline-block;color:var(--red);border:2px solid var(--red);border-radius:8px;padding:6px 14px;font:800 1.1rem var(--fd);letter-spacing:.08em;transform:rotate(-10deg) scale(2);opacity:0}
+.ticket.show .stamp{animation:stamp .55s cubic-bezier(.2,1.4,.3,1) .15s forwards}
+@keyframes stamp{to{transform:rotate(-10deg) scale(1);opacity:1}}
+.tcode{font:600 1.05rem var(--fm);margin:10px 0 4px;letter-spacing:.04em}
+.tsub{font:500 10.5px var(--fm);color:var(--muted)}
+.qr{width:70px;height:70px;margin:10px auto 4px;border:1px solid var(--line);border-radius:6px;background:
+  linear-gradient(90deg,#221D15 50%,transparent 0),linear-gradient(#221D15 50%,transparent 0),#fbf7ec;
+  background-size:10px 10px;background-position:0 0,0 5px;image-rendering:pixelated;opacity:.85}
+.actions-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.chip{font:500 10px var(--fm);padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--paper)}
+
+/* detail */
+.detail h4{font:700 1rem var(--fd);margin:0 0 6px}
+.detail p{margin:0 0 8px;color:var(--ink60);font-size:15px}
+.detail ul{margin:0 0 4px;padding-left:18px;color:var(--ink60);font-size:15px}
+.detail li{margin:4px 0}
+.kv{display:grid;gap:6px;margin-top:8px}
+.kv div{font:500 11px var(--fm);color:var(--ink60);padding:7px 9px;border:1px dashed var(--line);border-radius:8px;background:var(--paper)}
+.kv b{color:var(--ink);font-weight:600}
+
+/* timeline list */
+.timeline{margin-top:16px;display:grid;gap:10px}
+.trow{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);transition:.3s}
+.trow.active{border-color:rgba(192,59,33,.4);background:#fffaf2}
+.tn{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);display:grid;place-items:center;font:600 12px var(--fm);color:var(--muted);background:var(--paper)}
+.trow.active .tn{color:var(--red);border-color:rgba(192,59,33,.4);background:#fff}
+.trow.done .tn{color:var(--ok);border-color:rgba(47,107,63,.35);background:#f1f8f1}
+.trow h4{margin:0;font:700 1rem var(--fd)} .trow p{margin:2px 0 0;color:var(--ink60);font-size:14.5px}
+
+.note{margin-top:18px;padding:14px 16px;border:1px dashed var(--line);border-radius:12px;background:#f7f1e3;color:var(--ink60)}
+footer{margin-top:16px;font:500 10.5px var(--fm);letter-spacing:.06em;color:var(--muted)}
+
 @media (prefers-reduced-motion:reduce){
-  .reveal,.step.reveal .node{opacity:1;transform:none;transition:none;animation:none}
+  .track.flow,.pulse-ring.run,.fly.run,.glow-dot.run,.cursor,.mini-env.open .me-flap,.mini-env.open .me-letter,.ticket.show .stamp{animation:none !important;transition:none !important}
+  .ticket{opacity:1;transform:none}.stamp{opacity:1;transform:rotate(-10deg) scale(1)}
 }
-@media (max-width:640px){.step{grid-template-columns:48px 1fr;gap:12px}.node{width:46px;height:46px;border-radius:14px}.step:not(:last-child)::before{left:22px;top:56px}}
+@media (max-width:900px){.stage-area{grid-template-columns:1fr}.panel{min-height:auto}}
 </style>
 </head>
 <body>
+<div class="bg" aria-hidden="true"></div>
 <div class="wrap">
-  <header class="reveal">
+  <header>
     <p class="kicker">Tharra · Katakan — Gerakan Aspirasi Siswa</p>
-    <h1>Alur Kerja <span>Tharra</span></h1>
-    <p class="lead">Visualisasi end-to-end: dari siswa menulis surat (anonim) sampai aspirasi tercatat, bisa dilacak, dan (rencana) dibalas lewat jalur bernama.</p>
-    <div class="legend" aria-label="Legenda">
-      <span class="tag"><i class="i-main"></i>alur utama</span>
-      <span class="tag"><i class="i-local"></i>di perangkat (lokal)</span>
-      <span class="tag"><i class="i-plan"></i>jalur AKAR (segera hadir)</span>
+    <h1>Alur Kerja <span>Tharra</span>, dianimasikan</h1>
+    <p class="lead">Bukan cuma daftar langkah: ini simulasi visual alur end-to-end — dari amplop dibuka, aspirasi ditulis & tersimpan lokal, dikirim ke server, dapat kode tiket, sampai bisa dilacak (plus jalur AKAR yang direncanakan).</p>
+    <div class="controls">
+      <button class="btn" id="playBtn" type="button">▶ Putar animasi alur</button>
+      <button class="btn ghost" id="resetBtn" type="button">Ulang</button>
+      <span class="hint" id="hint">Klik node di peta atau “Putar”.</span>
     </div>
   </header>
 
-  <main class="flow" aria-label="Langkah alur kerja">
-    <section class="step reveal">
-      <div class="node n1 pulse" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#C03B21" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
-      </div>
-      <div class="card">
-        <div class="ch"><span class="ey">Langkah 1</span><span class="badge main">Mulai</span></div>
-        <h2>Buka amplop &amp; masuk ke kartu surat</h2>
-        <p>Halaman intro menampilkan amplop “KATAKAN”. Siswa mengklik amplop → animasi terbuka → formulir (kartu surat) tampil. Gerakan hanya merespons aksi pengguna.</p>
-        <div class="path"><span class="pill">Intro (amplop tertutup)</span><span class="pill">→</span><span class="pill">Kartu terbuka (form)</span></div>
-      </div>
-    </section>
+  <section class="board" aria-label="Peta alur animasi">
+    <div class="board-top">
+      <div class="lights" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="status">Tahap aktif: <b id="statusText">— siap —</b></div>
+      <div class="hint" id="stepCount">0/6</div>
+    </div>
 
-    <section class="step reveal">
-      <div class="node n2" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#2f6b3f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-      </div>
-      <div class="card">
-        <div class="ch"><span class="ey">Langkah 2</span><span class="badge local">Lokal (perangkat)</span></div>
-        <h2>Tulis aspirasi (anonim)</h2>
-        <ul>
-          <li>Siswa menulis isi aspirasi (minimal 20 karakter, batas 600). <b>Sepenuhnya anonim</b> — tanpa nama, tanpa kelas.</li>
-          <li><b>Draf tersimpan otomatis</b> di perangkat (localStorage) saat mengetik, jadi tidak hilang bila halaman ditutup sebelum kirim.</li>
-        </ul>
-      </div>
-    </section>
+    <div class="pipe-wrap">
+      <svg id="pipe" viewBox="0 0 1000 210" role="img" aria-label="Diagram alur Tharra">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L7,3 z" fill="rgba(34,29,21,.35)"></path>
+          </marker>
+          <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#221D15" flood-opacity=".15"/>
+          </filter>
+        </defs>
+        <!-- tracks -->
+        <path id="t1" class="track flow" d="M120 105 C 170 105, 190 105, 240 105" marker-end="url(#arr)"/>
+        <path id="t2" class="track" d="M320 105 C 360 105, 380 105, 420 105" marker-end="url(#arr)"/>
+        <path id="t3" class="track" d="M500 105 C 540 105, 560 105, 600 105" marker-end="url(#arr)"/>
+        <path id="t4" class="track" d="M700 105 C 740 105, 760 105, 800 105" marker-end="url(#arr)"/>
+        <path id="t5" class="track" d="M700 125 C 740 150, 760 165, 800 170" marker-end="url(#arr)"/>
 
-    <section class="step reveal">
-      <div class="node n3" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#C03B21" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
-      </div>
-      <div class="card">
-        <div class="ch"><span class="ey">Langkah 3</span><span class="badge main">Kirim ke server</span></div>
-        <h2>Kirim surat → API Tharra</h2>
-        <ul>
-          <li>Validasi sisi klien (isi cukup panjang). Jika lolos, formulir mengirim <code>POST</code> berisi aspirasi ke endpoint <code>/api/aspirasi</code> (server Tharra).</li>
-          <li>Jika gagal terhubung, pengguna diminta coba lagi (di host demo statis, pengiriman asli diarahkan ke situs Tharra).</li>
-        </ul>
-      </div>
-    </section>
+        <!-- moving packet -->
+        <g id="packet" class="packet" transform="translate(120,105)" opacity="0">
+          <rect x="-10" y="-7" width="20" height="14" rx="3" fill="#C03B21"/>
+          <path d="M-10 -7 L0 2 L10 -7" fill="none" stroke="#F2ECDE" stroke-width="1.5"/>
+        </g>
 
-    <section class="step reveal">
-      <div class="node n4" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#2f6b3f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-      </div>
-      <div class="card">
-        <div class="ch"><span class="ey">Langkah 4</span><span class="badge main">Tercatat</span></div>
-        <h2>Server terima → kode tiket &amp; bukti</h2>
-        <ul>
-          <li>Respons sukses mengembalikan <b>kode tiket</b> (<code>kode_tiket</code>). Tampilan berubah ke status “TERCATAT” (stempel, kutipan, nomor).</li>
-          <li>Aspirasi juga dicatat di perangkat (riwayat lokal). Siswa bisa <b>simpan kartu</b> (PNG, berisi QR ke cek status), <b>salin kode</b>, atau tulis surat lain (draf dibersihkan).</li>
-          <li>Tujuan produk (sesuai salinan): surat dibaca pengurus OSIS dan dirangkum berkala.</li>
-        </ul>
-        <div class="path"><span class="pill">Nomor tiket</span><span class="pill">Simpan kartu (QR)</span><span class="pill">Salin kode</span></div>
-      </div>
-    </section>
+        <!-- nodes -->
+        <g class="p-node active" data-step="0" transform="translate(80,105)">
+          <circle class="bg" r="34"></circle>
+          <text class="n" text-anchor="middle" y="-2">01</text>
+          <text class="lbl" text-anchor="middle" y="54">Buka Amplop</text>
+          <text class="sub" text-anchor="middle" y="70">intro → form</text>
+        </g>
+        <g class="p-node" data-step="1" transform="translate(280,105)">
+          <circle class="bg" r="34"></circle>
+          <text class="n" text-anchor="middle" y="-2">02</text>
+          <text class="lbl" text-anchor="middle" y="54">Tulis Anonim</text>
+          <text class="sub" text-anchor="middle" y="70">draf lokal</text>
+        </g>
 
-    <section class="step reveal">
-      <div class="node n4" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#2f6b3f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      </div>
-      <div class="card">
-        <div class="ch"><span class="ey">Langkah 5</span><span class="badge main">Lacak</span></div>
-        <h2>Cek status aspirasi</h2>
-        <p>Dengan kode tiket (atau tautan/QR), siswa membuka halaman <code>/cek-aspirasi</code> untuk melihat status aspirasinya. Ini menutup loop: kirim → tercatat → bisa dipantau.</p>
-      </div>
-    </section>
+        <!-- server -->
+        <g transform="translate(650,105)">
+          <circle id="ring" class="pulse-ring" r="18" cx="0" cy="0"></circle>
+          <rect class="server" x="-48" y="-34" width="96" height="68" rx="12"></rect>
+          <rect x="-34" y="-18" width="68" height="10" rx="4" fill="#e3dac4"/>
+          <rect x="-34" y="-2" width="68" height="10" rx="4" fill="#e3dac4"/>
+          <circle id="sled" cx="26" cy="-13" r="3.5" fill="#9aa08a"/>
+          <text class="lbl" text-anchor="middle" y="54">Kirim API</text>
+          <text class="sub" text-anchor="middle" y="70">/api/aspirasi</text>
+        </g>
+        <g class="p-node" data-step="2" transform="translate(650,105)" opacity="0"><circle r="36" fill="transparent"></circle></g>
 
-    <section class="step reveal">
-      <div class="node n5" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#6b5a2f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg>
-      </div>
-      <div class="card">
-        <div class="ch"><span class="ey">Jalur kedua</span><span class="badge plan">AKAR · segera hadir</span></div>
-        <h2>Jalur bernama (rencana)</h2>
-        <ul>
-          <li>Menyertakan identitas (NIS &amp; nama) sebagai kunci pembicara.</li>
-          <li>Ruang bicara dengan humas OSIS (bisa menunggu balasan/berdiskusi, tidak berhenti di kotak masuk).</li>
-          <li>Nomor tiket untuk melacak percakapan. Saat ini ditandai “sedang dibangun”; jalur anonim utama tetap berjalan.</li>
-        </ul>
-      </div>
-    </section>
-  </main>
+        <g class="p-node" data-step="3" transform="translate(840,105)">
+          <circle class="bg" r="34"></circle>
+          <text class="n" text-anchor="middle" y="-2">04</text>
+          <text class="lbl" text-anchor="middle" y="54">Tercatat</text>
+          <text class="sub" text-anchor="middle" y="70">kode tiket</text>
+        </g>
+        <g class="p-node" data-step="4" transform="translate(840,175)">
+          <circle class="bg" r="30"></circle>
+          <text class="n" text-anchor="middle" y="-2">05</text>
+          <text class="lbl" text-anchor="middle" y="48" font-size="12">Cek Status</text>
+          <text class="sub" text-anchor="middle" y="62">/cek-aspirasi</text>
+        </g>
+        <g class="p-node plan" data-step="5" transform="translate(460,175)">
+          <circle class="bg" r="28"></circle>
+          <text class="n" text-anchor="middle" y="-2">06</text>
+          <text class="lbl" text-anchor="middle" y="46" font-size="12">AKAR</text>
+          <text class="sub" text-anchor="middle" y="60">segera hadir</text>
+        </g>
+        <path class="track" d="M840 139 C 840 150, 840 150, 840 145" />
+      </svg>
+    </div>
 
-  <p class="note"><b>Catatan:</b> Diagram ini merangkum alur yang terlihat di antarmuka <i>Katakan</i> (Tharra) — pengiriman anonim ke server, penerbitan kode tiket, penyimpanan lokal (draf/riwayat), dan pelacakan status. Detail proses internal OSIS di balik server tidak ditampilkan di UI.</p>
-  <footer>Alur Kerja Tharra · HTML vanila · animasi reveal (CSS + IntersectionObserver)</footer>
+    <div class="stage-area">
+      <div class="panel">
+        <div class="meta" id="sceneMeta">Simulasi visual</div>
+        <h3 id="sceneTitle">1. Buka amplop</h3>
+        <div class="scene" id="scene">
+          <!-- injected -->
+        </div>
+      </div>
+      <div class="panel detail">
+        <div class="meta">Penjelasan alur</div>
+        <h4 id="detailTitle">Dari intro ke formulir</h4>
+        <div id="detailBody"></div>
+        <div class="kv" id="detailKv"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="timeline" aria-label="Rincian langkah">
+    <div class="trow active" data-row="0"><div class="tn">01</div><div><h4>Intro → buka amplop</h4><p>Klik amplop “KATAKAN” membuka kartu surat (form). Gerak merespons aksi, bukan jalan sendiri.</p></div></div>
+    <div class="trow" data-row="1"><div class="tn">02</div><div><h4>Tulis aspirasi anonim</h4><p>Isi 20–600 karakter, tanpa nama/kelas. Draf tersimpan otomatis di perangkat (localStorage).</p></div></div>
+    <div class="trow" data-row="2"><div class="tn">03</div><div><h4>Kirim ke server</h4><p>POST aspirasi ke <code>/api/aspirasi</code>. Berhasil → terima <code>kode_tiket</code>; gagal → pesan coba lagi.</p></div></div>
+    <div class="trow" data-row="3"><div class="tn">04</div><div><h4>Tercatat &amp; bukti</h4><p>Stempel “TERCATAT”, nomor tiket, simpan kartu (PNG+QR), salin kode, riwayat lokal; draf dibersihkan.</p></div></div>
+    <div class="trow" data-row="4"><div class="tn">05</div><div><h4>Cek status</h4><p>Lacak aspirasi lewat <code>/cek-aspirasi</code> memakai kode tiket/tautan QR.</p></div></div>
+    <div class="trow" data-row="5"><div class="tn">06</div><div><h4>Jalur AKAR (rencana)</h4><p>Jalur bernama (NIS/nama), ruang bicara humas, tiket percakapan. Status: segera hadir; jalur anonim tetap ada.</p></div></div>
+  </section>
+
+  <p class="note"><b>Catatan akurasi:</b> alur di atas menggambarkan yang terekspos di antarmuka Katakan/Tharra (anonim, draf lokal, kirim ke server, kode tiket, cek status, kartu/QR, AKAR sebagai jalur direncanakan). Penanganan internal OSIS di balik server tidak dirinci di UI.</p>
+  <footer>Alur Kerja Tharra · HTML/CSS/JS vanila · animasi + simulasi interaktif · hormat <code>prefers-reduced-motion</code></footer>
 </div>
+
 <script>
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var els = document.querySelectorAll('.reveal');
-  if(reduce || !('IntersectionObserver' in window)){ els.forEach(function(e){e.classList.add('on')}); return; }
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('on'); io.unobserve(en.target); } });
-  }, {threshold: 0.15, rootMargin: '0px 0px -8% 0px'});
-  els.forEach(function(e){ io.observe(e); });
+  var steps = [
+    {
+      title:'1. Buka amplop',
+      meta:'Simulasi · intro',
+      h:'Dari intro ke formulir',
+      body:'<p>Pengguna melihat amplop “KATAKAN”. Saat diklik, tutup terbuka dan kartu surat (formulir) muncul. Gerakan hanya sebagai jawaban aksi (bukan animasi otomatis yang berjalan sendiri).</p>',
+      kv:['<b>Masuk:</b> klik amplop','<b>Keluar:</b> form aspirasi terbuka','<b>Catatan:</b> tanpa scroll mesin'],
+      scene:function(el,done){
+        el.innerHTML='<div class="env-scene"><div class="mini-env" id="menv"><div class="me-back"></div><div class="me-letter">untukmu</div><div class="me-front"></div><div class="me-flap"></div><div class="me-seal"></div></div><div class="cap" id="ecap">Klik amplop…</div></div>';
+        var env=el.querySelector('#menv'), cap=el.querySelector('#ecap');
+        function open(){ env.classList.add('open'); cap.textContent='Amplop terbuka → kartu surat siap'; if(done) setTimeout(done, reduce?50:900); }
+        env.style.cursor='pointer';
+        env.addEventListener('click', open, {once:true});
+        if(!reduce) setTimeout(open, 700); else open();
+      }
+    },
+    {
+      title:'2. Tulis aspirasi (anonim)',
+      meta:'Simulasi · draf lokal',
+      h:'Menulis & draf otomatis',
+      body:'<p>Siswa menulis isi (20–600 karakter). Sepenuhnya anonim. Saat mengetik, draf tersimpan otomatis di perangkat (localStorage) — aman jika halaman ditutup sebelum kirim.</p>',
+      kv:['<b>Identitas:</b> tanpa nama/kelas','<b>Draf:</b> otomatis (perangkat)','<b>Batas:</b> min 20, maks 600'],
+      scene:function(el,done){
+        el.innerHTML='<div class="form-sim"><div class="row"><label>Aspirasimu</label><div class="fake-ta" id="fta"></div></div><div class="draft" id="draf">draf tersimpan otomatis di perangkat ini</div><span class="mini-btn">Kirim Surat</span></div>';
+        var ta=el.querySelector('#fta'), d=el.querySelector('#draf');
+        var text='Lampu di koridor lantai 2 sering mati, jadi gelap saat pulang sore. Tolong diperbaiki ya…';
+        if(reduce){ ta.textContent=text; d.classList.add('show'); if(done) setTimeout(done,60); return; }
+        var i=0; (function tick(){ if(i<=text.length){ ta.innerHTML=text.slice(0,i)+'<span class="cursor"></span>'; i++; setTimeout(tick, 28); } else { ta.textContent=text; d.classList.add('show'); if(done) setTimeout(done, 500);} })();
+      }
+    },
+    {
+      title:'3. Kirim ke server',
+      meta:'Simulasi · jaringan',
+      h:'POST ke API Tharra',
+      body:'<p>Formulir mengirim isi ke <code>/api/aspirasi</code>. Server memproses dan (jika sukses) mengembalikan <code>kode_tiket</code>. Jika gagal terhubung, pengguna diminta mencoba lagi.</p>',
+      kv:['<b>Request:</b> POST /api/aspirasi','<b>Payload:</b> isi aspirasi','<b>Respons:</b> kode_tiket (sukses)'],
+      scene:function(el,done){
+        el.innerHTML='<div class="net-scene"><svg viewBox="0 0 320 220"><defs><linearGradient id="wg" x1="0" x2="1"><stop offset="0" stop-color="#C03B21"/><stop offset="1" stop-color="#2a5f7a"/></linearGradient></defs><rect x="18" y="120" width="70" height="46" rx="8" fill="#fffdf6" stroke="rgba(34,29,21,.25)"/><text x="53" y="148" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#5a4a3a">Klien</text><path d="M 90 143 C 150 143, 170 70, 230 60" stroke="url(#wg)" stroke-width="3" fill="none" stroke-dasharray="6 8" opacity=".5"/><rect id="pkt" x="84" y="136" width="18" height="12" rx="3" fill="#C03B21" opacity="0"/><rect x="220" y="30" width="80" height="60" rx="10" fill="#f4efe3" stroke="rgba(34,29,21,.25)"/><rect x="232" y="44" width="56" height="8" rx="3" fill="#e3dac4"/><rect x="232" y="58" width="56" height="8" rx="3" fill="#e3dac4"/><circle id="led" cx="288" cy="48" r="4" fill="#9aa08a"/><text x="260" y="108" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#5a4a3a">Server Tharra</text><text id="res" x="160" y="190" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#2f6b3f" opacity="0">200 OK · kode_tiket diterbitkan</text></svg></div>';
+        var pkt=el.querySelector('#pkt'), led=el.querySelector('#led'), res=el.querySelector('#res');
+        if(reduce){ pkt.setAttribute('opacity','0'); led.setAttribute('fill','#2f6b3f'); res.setAttribute('opacity','1'); if(done) setTimeout(done,60); return; }
+        pkt.setAttribute('opacity','1');
+        var start=null, dur=1400;
+        function step(ts){ if(!start) start=ts; var p=Math.min(1,(ts-start)/dur); var x=84 + (220-84)*p; var y=136 + (36-136)*p + Math.sin(p*Math.PI)*-30; pkt.setAttribute('x',x); pkt.setAttribute('y',y); if(p<1){ requestAnimationFrame(step); } else { pkt.setAttribute('opacity','0'); led.setAttribute('fill','#2f6b3f'); res.setAttribute('opacity','1'); if(done) setTimeout(done,500);} }
+        requestAnimationFrame(step);
+      }
+    },
+    {
+      title:'4. Tercatat & bukti',
+      meta:'Simulasi · tiket',
+      h:'Kode tiket + kartu bukti',
+      body:'<p>Status “TERCATAT”: muncul nomor tiket. Siswa bisa simpan kartu (PNG, ber-QR ke cek status), salin kode, atau tulis surat lain. Draf dibersihkan, riwayat tercatat lokal.</p><ul><li>Dibaca pengurus OSIS & dirangkum berkala.</li><li>Tiket = kunci lacak.</li></ul>',
+      kv:['<b>Bukti:</b> kode_tiket + stempel','<b>Aksi:</b> simpan kartu / salin / tulis lagi','<b>QR:</b> taut ke /cek-aspirasi'],
+      scene:function(el,done){
+        el.innerHTML='<div class="ticket-scene"><div class="ticket" id="tkt"><div class="stamp">TERCATAT</div><div class="tcode">No. KTN-2481</div><div class="tsub">aspirasi anonim · tercatat di perangkat</div><div class="qr" aria-hidden="true"></div><div class="tsub">QR → cek status</div><div class="actions-row"><span class="chip">simpan kartu</span><span class="chip">salin kode</span><span class="chip">tulis lagi</span></div></div></div>';
+        var t=el.querySelector('#tkt');
+        if(reduce){ t.classList.add('show'); if(done) setTimeout(done,60); return; }
+        setTimeout(function(){ t.classList.add('show'); if(done) setTimeout(done,900); }, 150);
+      }
+    },
+    {
+      title:'5. Cek status',
+      meta:'Simulasi · pelacakan',
+      h:'Lacak dengan kode tiket',
+      body:'<p>Lewat tautan/QR atau halaman <code>/cek-aspirasi</code>, siswa memasukkan kode tiket untuk melihat status aspirasinya — menutup loop kirim → tercatat → dipantau.</p>',
+      kv:['<b>Masuk:</b> kode_tiket / QR','<b>Halaman:</b> /cek-aspirasi','<b>Hasil:</b> status aspirasi'],
+      scene:function(el,done){
+        el.innerHTML='<div class="form-sim"><div class="row"><label>Kode tiket</label><div class="fake-ta" style="min-height:auto;padding:10px;font-family:IBM Plex Mono,monospace">KTN-2481</div></div><div class="mini-btn" style="background:#2f6b3f">Cek status</div><div class="draft show" style="margin-top:12px;color:#2f6b3f">Status: Diterima &amp; tercatat · menunggu pembahasan OSIS</div></div>';
+        if(done) setTimeout(done, reduce?60:700);
+      }
+    },
+    {
+      title:'6. Jalur AKAR (rencana)',
+      meta:'Rencana · segera hadir',
+      h:'Jalur bernama & ruang bicara',
+      body:'<p>Jalur kedua untuk yang ingin dibalas: sertakan identitas (NIS/nama), ruang bicara dengan humas OSIS, nomor tiket percakapan. Saat ini “sedang dibangun”; jalur anonim utama tetap terbuka.</p>',
+      kv:['<b>Identitas:</b> NIS & nama','<b>Interaksi:</b> balasan/diskusi humas','<b>Status:</b> segera hadir'],
+      scene:function(el,done){
+        el.innerHTML='<div class="env-scene" style="height:220px;flex-direction:column;gap:10px"><div style="font:800 2rem Fraunces,serif;color:#221D15">AKAR<span style="color:#C03B21">.</span></div><div style="display:inline-flex;align-items:center;gap:6px;font:500 10px IBM Plex Mono,monospace;letter-spacing:.12em;color:#6b5a2f;border:1px dashed rgba(107,90,47,.4);padding:5px 10px;border-radius:999px;background:#fbf7ea"><span style="width:6px;height:6px;border-radius:50%;background:#C03B21"></span>sedang dibangun</div><div style="font:italic .95rem Spectral,serif;color:rgba(34,29,21,.6);text-align:center;max-width:34ch">Ruang bicara bernama — agar bisa ada jawaban kembali.</div></div>';
+        if(done) setTimeout(done, reduce?60:700);
+      }
+    }
+  ];
+
+  var idx=0, timer=null, playing=false;
+  var scene=document.getElementById('scene'), sceneTitle=document.getElementById('sceneTitle'), sceneMeta=document.getElementById('sceneMeta');
+  var detailTitle=document.getElementById('detailTitle'), detailBody=document.getElementById('detailBody'), detailKv=document.getElementById('detailKv');
+  var statusText=document.getElementById('statusText'), stepCount=document.getElementById('stepCount');
+  var packet=document.getElementById('packet'), ring=document.getElementById('ring'), sled=document.getElementById('sled');
+
+  function setActive(i){
+    idx=i; var s=steps[i];
+    sceneTitle.textContent=s.title; sceneMeta.textContent=s.meta;
+    detailTitle.textContent=s.h; detailBody.innerHTML=s.body;
+    detailKv.innerHTML=s.kv.map(function(x){return '<div>'+x+'</div>';}).join('');
+    statusText.textContent=s.title; stepCount.textContent=(i+1)+'/'+steps.length;
+    document.querySelectorAll('.p-node').forEach(function(n){
+      var si=+n.getAttribute('data-step'); n.classList.remove('active','done');
+      if(si<i) n.classList.add('done'); if(si===i) n.classList.add('active');
+    });
+    document.querySelectorAll('.trow').forEach(function(r){
+      var ri=+r.getAttribute('data-row'); r.classList.remove('active','done');
+      if(ri<i) r.classList.add('done'); if(ri===i) r.classList.add('active');
+    });
+    // tracks
+    ['t2','t3','t4','t5'].forEach(function(id,ti){ var el=document.getElementById(id); if(!el) return; if(i>ti) el.classList.add('flow'); else el.classList.remove('flow'); });
+    // server pulse on step 2
+    if(i===2){ ring.classList.add('run'); sled.setAttribute('fill','#C03B21'); } else { ring.classList.remove('run'); sled.setAttribute('fill', i>2?'#2f6b3f':'#9aa08a'); }
+    // packet move
+    var pos=[[120,105],[280,105],[650,105],[840,105],[840,175],[460,175]];
+    packet.setAttribute('opacity', (i===2?1:0)); packet.setAttribute('transform','translate('+pos[i][0]+','+pos[i][1]+')');
+    s.scene(scene, function(){ if(playing) scheduleNext(); });
+  }
+
+  function scheduleNext(){ clearTimeout(timer); timer=setTimeout(function(){ if(idx < steps.length-1){ setActive(idx+1); } else { playing=false; document.getElementById('playBtn').textContent='▶ Putar lagi'; } }, 2600); }
+  function play(){ clearTimeout(timer); playing=true; document.getElementById('playBtn').textContent='⏸ Memutar…'; if(idx>=steps.length-1) idx=0; setActive(idx); }
+  function reset(){ clearTimeout(timer); playing=false; document.getElementById('playBtn').textContent='▶ Putar animasi alur'; idx=0; setActive(0); }
+
+  document.getElementById('playBtn').addEventListener('click', function(){ if(playing){ playing=false; clearTimeout(timer); this.textContent='▶ Lanjut'; } else play(); });
+  document.getElementById('resetBtn').addEventListener('click', reset);
+  document.querySelectorAll('.p-node').forEach(function(n){ n.addEventListener('click', function(){ playing=false; clearTimeout(timer); document.getElementById('playBtn').textContent='▶ Lanjut'; setActive(+n.getAttribute('data-step')); }); });
+  document.querySelectorAll('.trow').forEach(function(r){ r.style.cursor='pointer'; r.addEventListener('click', function(){ playing=false; clearTimeout(timer); document.getElementById('playBtn').textContent='▶ Lanjut'; setActive(+r.getAttribute('data-row')); }); });
+
+  setActive(0);
 })();
 </script>
 </body>
