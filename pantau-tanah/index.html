@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PANTAU LAHAN — Monitor Kondisi Tanah</title>
+<meta name="description" content="Papan pantau kondisi lahan: kelembapan tanah, pH, suhu, petak, dan irigasi.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --humus:#2b2118; --topsoil:#4a3728; --loam:#6b4c3b; --clay:#8a5a3b; --terracotta:#b56a3c;
+  --ochre:#c9963a; --sand:#e6d7bf; --dust:#f3eadb; --parch:#fbf6ec;
+  --moss:#4f6a3a; --sage:#7a8f5a; --sky:#6e8fa3; --water:#4f7f98;
+  --ink:#2a211a; --ink-soft:#5a4a3c; --muted:#8a7a68; --line:#d7c7ad;
+  --ok:#4f6a3a; --warn:#b07a1a; --dry:#b55a2a;
+  --r:16px; --shadow:0 14px 36px -20px rgba(43,33,24,.45);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:"Work Sans",system-ui,sans-serif; color:var(--ink); background:var(--dust); line-height:1.5; font-size:15px;
+  background-image:
+    radial-gradient(900px 420px at 0% -10%, rgba(181,106,60,.12), transparent 60%),
+    radial-gradient(700px 360px at 100% 0%, rgba(79,106,58,.10), transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+}
+:focus-visible{outline:2px solid var(--terracotta);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1220px;margin:0 auto;padding:20px 20px 36px}
+
+/* top strata bar */
+.strata{height:10px;border-radius:999px;overflow:hidden;display:flex;margin-bottom:18px;box-shadow:inset 0 0 0 1px rgba(43,33,24,.12)}
+.strata span:nth-child(1){flex:3;background:var(--humus)}
+.strata span:nth-child(2){flex:4;background:var(--topsoil)}
+.strata span:nth-child(3){flex:3;background:var(--loam)}
+.strata span:nth-child(4){flex:2;background:var(--clay)}
+.strata span:nth-child(5){flex:2;background:var(--terracotta)}
+
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:14px}
+.mark{width:48px;height:48px;border-radius:14px 14px 14px 4px;background:linear-gradient(160deg,var(--loam),var(--humus));
+  color:var(--sand);display:grid;place-items:center;box-shadow:var(--shadow);border:1px solid rgba(230,215,191,.15)}
+h1{font-family:Fraunces,serif;font-weight:800;font-size:clamp(1.9rem,4vw,2.7rem);line-height:1;margin:0;color:var(--humus);letter-spacing:-.01em}
+.sub{color:var(--ink-soft);font-size:13px;margin-top:3px}
+.hmeta{display:flex;gap:8px;flex-wrap:wrap}
+.pill{font-family:"IBM Plex Mono",monospace;font-size:12px;padding:7px 11px;border-radius:999px;background:var(--parch);
+  border:1px solid var(--line);color:var(--ink-soft);display:inline-flex;align-items:center;gap:7px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--moss);box-shadow:0 0 0 0 rgba(79,106,58,.5);animation:pulse 2.4s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(79,106,58,0)}100%{box-shadow:0 0 0 0 rgba(79,106,58,0)}}
+@media (prefers-reduced-motion:reduce){.dot{animation:none}}
+
+.layout{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+.col{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--parch);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(180deg,var(--ochre),var(--terracotta),var(--loam),var(--topsoil));opacity:.85}
+.card.flat::before{display:none}
+.ch{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px;padding-left:4px}
+.ch h2{font-family:Fraunces,serif;font-size:1.15rem;margin:0;font-weight:700;color:var(--topsoil)}
+.ch .meta{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+
+/* stats */
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{padding:12px 12px 12px 16px;border:1px solid var(--line);border-radius:14px;background:var(--parch);position:relative;overflow:hidden}
+.stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--loam)}
+.stat .l{font-size:12px;color:var(--muted);margin-bottom:4px}
+.stat .v{font-family:Fraunces,serif;font-weight:800;font-size:1.55rem;color:var(--humus);font-variant-numeric:tabular-nums}
+.stat .v span{font-size:.65em;color:var(--muted);font-weight:600;font-family:"Work Sans",sans-serif}
+.stat .s{font-size:12px;color:var(--ink-soft);margin-top:2px}
+.stat.ok::before{background:var(--moss)} .stat.warn::before{background:var(--ochre)} .stat.dry::before{background:var(--terracotta)} .stat.water::before{background:var(--water)}
+
+/* plots */
+.plots{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.plot{border:1px solid var(--line);border-radius:14px;padding:12px;background:linear-gradient(180deg,#fffaf1,#f7efe0)}
+.ptop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+.pname{font-weight:700;color:var(--topsoil)}
+.ptag{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+.badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.b-ok{color:#2f4a22;background:#e3ecd7} .b-warn{color:#6b4a08;background:#f6e7c6} .b-dry{color:#6b2f1e;background:#f3ddd2}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}
+.m{background:var(--sand);border:1px solid var(--line);border-radius:10px;padding:6px;text-align:center}
+.m .ml{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.m .mv{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;color:var(--humus);margin-top:1px}
+.gauge{height:8px;background:#e4d6bc;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.gauge>i{display:block;height:100%;border-radius:999px}
+.g-ok{background:linear-gradient(90deg,var(--sage),var(--moss))}
+.g-warn{background:linear-gradient(90deg,var(--ochre),#c47e1f)}
+.g-dry{background:linear-gradient(90deg,var(--terracotta),var(--dry))}
+.g-water{background:linear-gradient(90deg,#7fb0c2,var(--water))}
+.gfoot{display:flex;justify-content:space-between;margin-top:5px;font-size:11px;font-family:"IBM Plex Mono",monospace;color:var(--muted)}
+
+/* table */
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{padding:9px 6px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-weight:600}
+tr:last-child td{border-bottom:none}
+.mono{font-family:"IBM Plex Mono",monospace;font-size:12px}
+.pill-s{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid var(--line);background:var(--sand)}
+.s-on{color:#1f4b63;background:#dfeaf0;border-color:#bfd3de}
+.s-off{color:var(--muted);background:#efe6d6}
+
+/* soil profile */
+.profile{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.layer{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 12px;color:#f6efe3}
+.layer .ln{font-weight:700;font-size:13px}
+.layer .ld{font-size:11px;opacity:.9}
+.layer .lv{font-family:"IBM Plex Mono",monospace;font-size:12px;text-align:right}
+.l1{background:#7a5a3a} .l2{background:#5a402c} .l3{background:#463222} .l4{background:#332419}
+
+/* rain */
+.rainbars{display:flex;align-items:flex-end;gap:6px;height:120px;padding:8px 4px 0;border-bottom:1px solid var(--line)}
+.rainbars .colb{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.rainbars i{display:block;width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#8fc0d4,var(--water));min-height:2px}
+.rainbars span{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--muted)}
+.note{font-size:12.5px;color:var(--muted);font-style:italic;margin-top:8px}
+
+footer{margin-top:16px;padding-top:10px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+
+@media (max-width:980px){.layout{grid-template-columns:1fr}.strip{grid-template-columns:repeat(2,1fr)}.plots{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.plots{grid-template-columns:1fr}.strip{grid-template-columns:1fr 1fr} th:nth-child(4),td:nth-child(4){display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="strata" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+  <header>
+    <div class="brand">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#e6d7bf" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10z"/><path d="M12 11v4"/><path d="M10 13h4"/></svg>
+      </div>
+      <div>
+        <h1>Pantau Lahan</h1>
+        <div class="sub">Monitor kondisi tanah · Kebun Percobaan Wadas</div>
+      </div>
+    </div>
+    <div class="hmeta">
+      <span class="pill"><span class="dot" aria-hidden="true"></span>Sensor aktif 12/12</span>
+      <span class="pill" id="clock">--:-- WIB</span>
+    </div>
+  </header>
+
+  <section class="strip" aria-label="Ringkasan">
+    <div class="stat ok"><div class="l">Kelembapan rata-rata</div><div class="v">46<span>%</span></div><div class="s">Rentang ideal 40–55%</div></div>
+    <div class="stat warn"><div class="l">pH rata-rata</div><div class="v">6,2</div><div class="s">Sedikit asam (target 6,5)</div></div>
+    <div class="stat water"><div class="l">Curah hujan 7 hari</div><div class="v">38<span> mm</span></div><div class="s">Di bawah rerata musiman</div></div>
+    <div class="stat dry"><div class="l">Petak perlu siram</div><div class="v">2<span> / 6</span></div><div class="s">Petak C & F kering</div></div>
+  </section>
+
+  <div class="layout" style="margin-top:16px">
+    <div class="col">
+      <section class="card" aria-labelledby="h-petak">
+        <div class="ch"><h2 id="h-petak">Kondisi per Petak</h2><span class="meta">sensor kedalaman 20 cm · data contoh</span></div>
+        <div class="plots">
+          <article class="plot">
+            <div class="ptop"><div><div class="pname">Petak A — Padi Gogo</div><div class="ptag">0,8 ha · lempung berpasir</div></div><span class="badge b-ok">Baik</span></div>
+            <div class="metrics"><div class="m"><div class="ml">Lembap</div><div class="mv">51%</div></div><div class="m"><div class="ml">pH</div><div class="mv">6,4</div></div><div class="m"><div class="ml">Suhu</div><div class="mv">27°C</div></div></div>
+            <div class="gauge"><i class="g-ok" style="width:72%"></i></div>
+            <div class="gfoot"><span>Kelembapan tanah</span><span>stabil</span></div>
+          </article>
+          <article class="plot">
+            <div class="ptop"><div><div class="pname">Petak B — Jagung</div><div class="ptag">0,6 ha · lempung</div></div><span class="badge b-ok">Baik</span></div>
+            <div class="metrics"><div class="m"><div class="ml">Lembap</div><div class="mv">47%</div></div><div class="m"><div class="ml">pH</div><div class="mv">6,3</div></div><div class="m"><div class="ml">Suhu</div><div class="mv">28°C</div></div></div>
+            <div class="gauge"><i class="g-ok" style="width:66%"></i></div>
+            <div class="gfoot"><span>Kelembapan tanah</span><span>stabil</span></div>
+          </article>
+          <article class="plot">
+            <div class="ptop"><div><div class="pname">Petak C — Kacang Tanah</div><div class="ptag">0,5 ha · lempung liat</div></div><span class="badge b-dry">Kering</span></div>
+            <div class="metrics"><div class="m"><div class="ml">Lembap</div><div class="mv">28%</div></div><div class="m"><div class="ml">pH</div><div class="mv">5,9</div></div><div class="m"><div class="ml">Suhu</div><div class="mv">31°C</div></div></div>
+            <div class="gauge"><i class="g-dry" style="width:32%"></i></div>
+            <div class="gfoot"><span>Kelembapan tanah</span><span>perlu siram</span></div>
+          </article>
+          <article class="plot">
+            <div class="ptop"><div><div class="pname">Petak D — Singkong</div><div class="ptag">0,7 ha · lempung berpasir</div></div><span class="badge b-warn">Pantau</span></div>
+            <div class="metrics"><div class="m"><div class="ml">Lembap</div><div class="mv">38%</div></div><div class="m"><div class="ml">pH</div><div class="mv">6,1</div></div><div class="m"><div class="ml">Suhu</div><div class="mv">29°C</div></div></div>
+            <div class="gauge"><i class="g-warn" style="width:48%"></i></div>
+            <div class="gfoot"><span>Kelembapan tanah</span><span>menurun</span></div>
+          </article>
+          <article class="plot">
+            <div class="ptop"><div><div class="pname">Petak E — Sayur Daun</div><div class="ptag">0,4 ha · lempung</div></div><span class="badge b-ok">Baik</span></div>
+            <div class="metrics"><div class="m"><div class="ml">Lembap</div><div class="mv">54%</div></div><div class="m"><div class="ml">pH</div><div class="mv">6,5</div></div><div class="m"><div class="ml">Suhu</div><div class="mv">26°C</div></div></div>
+            <div class="gauge"><i class="g-ok" style="width:76%"></i></div>
+            <div class="gfoot"><span>Kelembapan tanah</span><span>optimal</span></div>
+          </article>
+          <article class="plot">
+            <div class="ptop"><div><div class="pname">Petak F — Cabai</div><div class="ptag">0,3 ha · liat berpasir</div></div><span class="badge b-dry">Kering</span></div>
+            <div class="metrics"><div class="m"><div class="ml">Lembap</div><div class="mv">25%</div></div><div class="m"><div class="ml">pH</div><div class="mv">6,0</div></div><div class="m"><div class="ml">Suhu</div><div class="mv">32°C</div></div></div>
+            <div class="gauge"><i class="g-dry" style="width:28%"></i></div>
+            <div class="gfoot"><span>Kelembapan tanah</span><span>irigasi terjadwal</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="h-irig">
+        <div class="ch"><h2 id="h-irig">Jadwal Irigasi</h2><span class="meta">hari ini</span></div>
+        <div style="overflow:auto;padding-left:4px">
+          <table>
+            <thead><tr><th>Waktu</th><th>Petak</th><th>Durasi</th><th>Sumber</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">05:30</td><td>Petak E — Sayur Daun</td><td>25 mnt</td><td>Sumur 1</td><td><span class="pill-s s-off">Selesai</span></td></tr>
+              <tr><td class="mono">06:10</td><td>Petak A — Padi Gogo</td><td>30 mnt</td><td>Sumur 1</td><td><span class="pill-s s-off">Selesai</span></td></tr>
+              <tr><td class="mono">15:00</td><td>Petak C — Kacang Tanah</td><td>40 mnt</td><td>Tandon Utama</td><td><span class="pill-s s-on">Terjadwal</span></td></tr>
+              <tr><td class="mono">16:00</td><td>Petak F — Cabai</td><td>35 mnt</td><td>Tetes</td><td><span class="pill-s s-on">Terjadwal</span></td></tr>
+              <tr><td class="mono">16:45</td><td>Petak D — Singkong</td><td>20 mnt</td><td>Sumur 2</td><td><span class="pill-s s-on">Terjadwal</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="card" aria-labelledby="h-profil">
+        <div class="ch"><h2 id="h-profil">Profil Lapisan Tanah</h2><span class="meta">sampel Petak B</span></div>
+        <div style="padding-left:4px">
+          <div class="profile" role="img" aria-label="Profil lapisan tanah dari permukaan ke bawah">
+            <div class="layer l1"><div><div class="ln">Topsoil (0–20 cm)</div><div class="ld">Humus, gembur, kaya bahan organik</div></div><div class="lv">BO 3,8%</div></div>
+            <div class="layer l2"><div><div class="ln">Subsoil (20–45 cm)</div><div class="ld">Lempung, agregat sedang</div></div><div class="lv">BO 1,9%</div></div>
+            <div class="layer l3"><div><div class="ln">Lapisan liat (45–70 cm)</div><div class="ld">Padat, drainase lambat</div></div><div class="lv">BO 0,7%</div></div>
+            <div class="layer l4"><div><div class="ln">Batuan induk (&gt;70 cm)</div><div class="ld">Pelapukan, kerikil</div></div><div class="lv">—</div></div>
+          </div>
+          <p class="note">BO = bahan organik. Disarankan penambahan kompos pada petak C & F.</p>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="h-hujan">
+        <div class="ch"><h2 id="h-hujan">Curah Hujan 7 Hari</h2><span class="meta">mm</span></div>
+        <div style="padding-left:4px">
+          <div class="rainbars" aria-label="Grafik curah hujan 7 hari">
+            <div class="colb"><i style="height:12%"></i><span>Sn</span></div>
+            <div class="colb"><i style="height:0%"></i><span>Sl</span></div>
+            <div class="colb"><i style="height:38%"></i><span>Rb</span></div>
+            <div class="colb"><i style="height:65%"></i><span>Km</span></div>
+            <div class="colb"><i style="height:22%"></i><span>Jm</span></div>
+            <div class="colb"><i style="height:0%"></i><span>Sb</span></div>
+            <div class="colb"><i style="height:8%"></i><span>Mg</span></div>
+          </div>
+          <p class="note">Total 38 mm (Senin–Minggu). Puncak hujan Kamis 14 mm.</p>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="h-amend">
+        <div class="ch"><h2 id="h-amend">Rekomendasi Pemupukan</h2><span class="meta">berdasar sampel</span></div>
+        <div style="padding-left:4px;display:flex;flex-direction:column;gap:8px;font-size:14px">
+          <div style="display:flex;justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:1px dashed var(--line)"><span><b>Petak C</b> — kapur dolomit + kompos</span><span class="mono" style="color:var(--muted)">pH naik</span></div>
+          <div style="display:flex;justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:1px dashed var(--line)"><span><b>Petak F</b> — mulsa jerami + kompos</span><span class="mono" style="color:var(--muted)">tahan air</span></div>
+          <div style="display:flex;justify-content:space-between;gap:10px"><span><b>Petak D</b> — pupuk kandang matang</span><span class="mono" style="color:var(--muted)">BO +</span></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    <span>Pantau Lahan · Papan monitor kondisi tanah (demo, data ilustrasi)</span>
+    <span>Tema tanah — humus · lempung · liat · terakota</span>
+  </footer>
+</div>
+<script>
+(function(){
+  function pad(n){return n<10?'0'+n:n}
+  function tick(){var d=new Date();var el=document.getElementById('clock');if(el)el.textContent=pad(d.getHours())+':'+pad(d.getMinutes())+' WIB';}
+  tick();
+  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){setInterval(tick,30000);}
+})();
+</script>
+</body>
+</html>
