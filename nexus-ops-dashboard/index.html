@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexus Ops — Operations Dashboard</title>
+<meta name="description" content="Dashboard operasional real-time untuk memantau metrik, layanan, dan aktivitas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#1E293B;--primary-2:#334155;--accent:#22C55E;--accent-dim:rgba(34,197,94,.18);
+  --bg:#0B1220;--bg-2:#0F172A;--fg:#F8FAFC;--muted:#94A3B8;--muted-2:#64748B;
+  --card:rgba(30,41,59,.55);--card-solid:#162033;--border:rgba(148,163,184,.16);
+  --border-strong:rgba(148,163,184,.28);--warn:#F59E0B;--danger:#EF4444;--info:#38BDF8;
+  --glass:blur(14px) saturate(120%);--radius:14px;--radius-sm:10px;
+  --shadow:0 18px 50px -20px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.03) inset;
+  --ring:0 0 0 3px rgba(34,197,94,.35);
+  --font:"Fira Sans",system-ui,-apple-system,sans-serif;--mono:"Fira Code",ui-monospace,monospace;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:var(--font);color:var(--fg);background:var(--bg);
+  background-image:
+    radial-gradient(1200px 600px at 10% -10%, rgba(56,189,248,.12), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(34,197,94,.10), transparent 55%),
+    radial-gradient(700px 400px at 50% 120%, rgba(99,102,241,.10), transparent 60%),
+    linear-gradient(180deg,#0B1220 0%,#0F172A 100%);
+  line-height:1.45; -webkit-font-smoothing:antialiased;}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+:focus-visible{outline:none;box-shadow:var(--ring);border-radius:8px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+/* sidebar */
+.sidebar{position:sticky;top:0;height:100vh;padding:22px 16px;border-right:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(15,23,42,.75),rgba(15,23,42,.35));backdrop-filter:var(--glass);
+  display:flex;flex-direction:column;gap:18px}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 8px;font-weight:700;letter-spacing:.2px}
+.brand-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:linear-gradient(135deg,rgba(34,197,94,.25),rgba(56,189,248,.18));border:1px solid var(--border-strong)}
+.brand small{display:block;color:var(--muted);font-weight:500;font-size:11px;letter-spacing:.4px;text-transform:uppercase}
+nav{display:flex;flex-direction:column;gap:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--muted);
+  border:1px solid transparent;cursor:pointer;transition:background .18s ease,color .18s ease,border-color .18s ease}
+.nav-item:hover{color:var(--fg);background:rgba(148,163,184,.08);border-color:var(--border)}
+.nav-item[aria-current="page"]{color:var(--fg);background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.25)}
+.nav-item svg{width:18px;height:18px;flex:0 0 18px}
+.side-foot{margin-top:auto;padding:12px;border:1px solid var(--border);border-radius:12px;background:rgba(15,23,42,.35)}
+.side-foot .label{font-size:12px;color:var(--muted);margin-bottom:6px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:#86EFAC;
+  background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);padding:4px 8px;border-radius:999px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(34,197,94,.15)}
+
+/* main */
+.main{padding:22px 22px 28px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.title h1{font-size:22px;margin:0 0 2px;font-weight:650;letter-spacing:.2px}
+.title p{margin:0;color:var(--muted);font-size:13px}
+.top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border);border-radius:10px;
+  background:rgba(15,23,42,.45);min-width:220px}
+.search svg{width:16px;height:16px;color:var(--muted)}
+.search input{background:transparent;border:none;outline:none;color:var(--fg);width:100%;font-size:13px}
+.search input::placeholder{color:var(--muted-2)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);
+  background:rgba(30,41,59,.35);color:var(--fg);cursor:pointer;transition:transform .12s ease,background .18s ease,border-color .18s ease}
+.btn:hover{background:rgba(51,65,85,.45);border-color:var(--border-strong)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.35);color:#D1FAE5}
+.btn svg{width:16px;height:16px}
+.menu-btn{display:none}
+
+/* grids */
+.grid-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.grid-mid{display:grid;grid-template-columns:1.6fr 1fr;gap:14px}
+.grid-low{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px}
+.card{background:var(--card);backdrop-filter:var(--glass);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:16px;min-width:0}
+.card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.card-h h2,.card-h h3{margin:0;font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.2px;text-transform:uppercase}
+.card-h .meta{font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+.kpi .value{font-size:28px;font-weight:700;letter-spacing:-.3px;margin:2px 0 4px;font-variant-numeric:tabular-nums}
+.kpi .sub{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.delta{font-family:var(--mono);font-weight:600;padding:2px 6px;border-radius:6px}
+.delta.up{color:#86EFAC;background:rgba(34,197,94,.14)}
+.delta.down{color:#FCA5A5;background:rgba(239,68,68,.14)}
+.spark{margin-top:10px;height:36px}
+.spark svg{width:100%;height:100%;display:block}
+
+/* chart */
+.chart-wrap{height:220px;position:relative}
+.chart-wrap svg{width:100%;height:100%;display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;color:var(--muted);font-size:12px}
+.leg{display:inline-flex;align-items:center;gap:6px}
+.sw{width:10px;height:10px;border-radius:3px}
+
+/* services */
+.svc-list{display:flex;flex-direction:column;gap:10px}
+.svc{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;padding:10px;border:1px solid var(--border);
+  border-radius:12px;background:rgba(15,23,42,.25)}
+.svc .name{font-weight:600;font-size:14px}
+.svc .desc{font-size:12px;color:var(--muted)}
+.badge{font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+.ok{color:#86EFAC;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.25)}
+.warn{color:#FCD34D;background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.25)}
+.down{color:#FCA5A5;background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.25)}
+.bar{grid-column:1/-1;height:6px;border-radius:999px;background:rgba(148,163,184,.12);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),#38BDF8)}
+
+/* table/feed */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+td{color:#E2E8F0}
+tr:last-child td{border-bottom:none}
+.mono{font-family:var(--mono);font-size:12px}
+.feed{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.feed li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:10px 4px;border-bottom:1px solid var(--border)}
+.feed li:last-child{border-bottom:none}
+.ic{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:rgba(148,163,184,.1);border:1px solid var(--border)}
+.ic svg{width:14px;height:14px}
+.feed .t{font-size:13px;color:#E2E8F0}
+.feed .s{font-size:12px;color:var(--muted)}
+.feed time{font-family:var(--mono);font-size:11px;color:var(--muted-2);white-space:nowrap}
+
+/* responsive */
+@media (max-width:1100px){.grid-kpi{grid-template-columns:repeat(2,1fr)}.grid-mid{grid-template-columns:1fr}.grid-low{grid-template-columns:1fr 1fr}}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:fixed;inset:0 auto 0 0;width:260px;transform:translateX(-102%);transition:transform .22s ease;z-index:30}
+  .sidebar.open{transform:none}
+  .menu-btn{display:inline-flex}
+  .scrim{position:fixed;inset:0;background:rgba(2,6,23,.55);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:20}
+  .scrim.show{opacity:1;pointer-events:auto}
+  .grid-low{grid-template-columns:1fr}
+}
+@media (max-width:520px){.grid-kpi{grid-template-columns:1fr}.search{min-width:0;width:100%}.top-actions{width:100%}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}}
+</style>
+</head>
+<body>
+<a class="sr-only" href="#content">Lewati ke konten</a>
+<div class="app">
+  <aside class="sidebar" id="sidebar" aria-label="Navigasi utama">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#86EFAC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/></svg>
+      </div>
+      <div>Nexus Ops<small>Control Plane</small></div>
+    </div>
+    <nav>
+      <a class="nav-item" href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Overview</a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>Metrik</a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h8M6 12h.01M10 12h8M6 16h.01M10 16h5"/></svg>Layanan</a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Insiden</a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1 1 0 0 0 .2 1.1l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a2 2 0 1 1-4 0v-.1a1 1 0 0 0-.7-.9 1 1 0 0 0-1.1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4a2 2 0 1 1 0-4h.1a1 1 0 0 0 .9-.7 1 1 0 0 0-.2-1.1l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1 1 0 0 0 1.1.2h.1a1 1 0 0 0 .6-.9V4a2 2 0 1 1 4 0v.1a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1 1 0 0 0-.2 1.1v.1a1 1 0 0 0 .9.6H20a2 2 0 1 1 0 4h-.1a1 1 0 0 0-.9.6z"/></svg>Pengaturan</a>
+    </nav>
+    <div class="side-foot">
+      <div class="label">Status sistem</div>
+      <div class="pill"><span class="dot" aria-hidden="true"></span>Semua normal</div>
+      <div class="label" style="margin-top:8px">Pembaruan: <span class="mono" id="sideTime">--:--:--</span></div>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim" aria-hidden="true"></div>
+
+  <main class="main" id="content">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="btn menu-btn" id="menuBtn" aria-label="Buka menu" aria-expanded="false" aria-controls="sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div class="title">
+          <h1>Overview Operasional</h1>
+          <p>Ringkasan metrik & kesehatan layanan · <span class="mono" id="stamp">--</span></p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <label class="search"><span class="sr-only">Cari</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input type="search" placeholder="Cari metrik, layanan…" autocomplete="off">
+        </label>
+        <button class="btn" type="button" id="refreshBtn" aria-label="Segarkan data">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg> Segarkan
+        </button>
+        <button class="btn primary" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Laporan
+        </button>
+      </div>
+    </header>
+
+    <section class="grid-kpi" aria-label="Metrik utama">
+      <article class="card kpi">
+        <div class="card-h"><h2>Permintaan / mnt</h2><span class="meta">API</span></div>
+        <div class="value" id="kpiReq">—</div>
+        <div class="sub"><span class="delta up" id="kpiReqD">+0%</span> vs 1 jam lalu</div>
+        <div class="spark"><svg viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline id="sp1" fill="none" stroke="#22C55E" stroke-width="2" points=""/></svg></div>
+      </article>
+      <article class="card kpi">
+        <div class="card-h"><h2>Latensi p95</h2><span class="meta">ms</span></div>
+        <div class="value" id="kpiLat">—</div>
+        <div class="sub"><span class="delta up" id="kpiLatD">-0%</span> lebih cepat</div>
+        <div class="spark"><svg viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline id="sp2" fill="none" stroke="#38BDF8" stroke-width="2" points=""/></svg></div>
+      </article>
+      <article class="card kpi">
+        <div class="card-h"><h2>Error rate</h2><span class="meta">5m</span></div>
+        <div class="value" id="kpiErr">—</div>
+        <div class="sub"><span class="delta up" id="kpiErrD">stabil</span> ambang 1%</div>
+        <div class="spark"><svg viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline id="sp3" fill="none" stroke="#F59E0B" stroke-width="2" points=""/></svg></div>
+      </article>
+      <article class="card kpi">
+        <div class="card-h"><h2>Sesi aktif</h2><span class="meta">live</span></div>
+        <div class="value" id="kpiSes">—</div>
+        <div class="sub"><span class="delta up" id="kpiSesD">+0%</span> hari ini</div>
+        <div class="spark"><svg viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline id="sp4" fill="none" stroke="#A78BFA" stroke-width="2" points=""/></svg></div>
+      </article>
+    </section>
+
+    <section class="grid-mid" aria-label="Grafik dan layanan">
+      <article class="card">
+        <div class="card-h"><h3>Throughput & Error (24 jam)</h3><span class="meta" id="chartMeta">simulasi</span></div>
+        <div class="chart-wrap">
+          <svg id="mainChart" viewBox="0 0 600 220" preserveAspectRatio="none" role="img" aria-label="Grafik throughput dan error 24 jam">
+            <defs>
+              <linearGradient id="gReq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22C55E" stop-opacity=".35"/><stop offset="100%" stop-color="#22C55E" stop-opacity="0"/></linearGradient>
+              <linearGradient id="gErr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#F59E0B" stop-opacity=".30"/><stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/></linearGradient>
+            </defs>
+            <g id="grid"></g>
+            <path id="areaReq" fill="url(#gReq)" d=""></path>
+            <path id="lineReq" fill="none" stroke="#22C55E" stroke-width="2.2" d=""></path>
+            <path id="areaErr" fill="url(#gErr)" d=""></path>
+            <path id="lineErr" fill="none" stroke="#F59E0B" stroke-width="2" d=""></path>
+          </svg>
+        </div>
+        <div class="legend"><span class="leg"><span class="sw" style="background:#22C55E"></span>Throughput (req/mnt)</span><span class="leg"><span class="sw" style="background:#F59E0B"></span>Error (×10)</span></div>
+      </article>
+
+      <article class="card">
+        <div class="card-h"><h3>Kesehatan Layanan</h3><span class="meta">6 layanan</span></div>
+        <div class="svc-list" id="svcList">
+          <div class="svc"><div><div class="name">API Gateway</div><div class="desc">edge · us-1</div></div><span class="badge ok">Operasional</span><div class="bar"><i style="width:96%"></i></div></div>
+          <div class="svc"><div><div class="name">Auth Service</div><div class="desc">login & sesi</div></div><span class="badge ok">Operasional</span><div class="bar"><i style="width:99%"></i></div></div>
+          <div class="svc"><div><div class="name">Database</div><div class="desc">primary · replica</div></div><span class="badge ok">Operasional</span><div class="bar"><i style="width:94%"></i></div></div>
+          <div class="svc"><div><div class="name">Worker Queue</div><div class="desc">jobs async</div></div><span class="badge warn">Degradasi</span><div class="bar"><i style="width:78%;background:linear-gradient(90deg,#F59E0B,#FBBF24)"></i></div></div>
+          <div class="svc"><div><div class="name">Storage</div><div class="desc">objek & aset</div></div><span class="badge ok">Operasional</span><div class="bar"><i style="width:97%"></i></div></div>
+          <div class="svc"><div><div class="name">Notifier</div><div class="desc">email & push</div></div><span class="badge ok">Operasional</span><div class="bar"><i style="width:92%"></i></div></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="grid-low" aria-label="Tabel dan aktivitas">
+      <article class="card" style="grid-column:span 2">
+        <div class="card-h"><h3>Deploy & Rilis Terbaru</h3><span class="meta">hari ini</span></div>
+        <div style="overflow:auto">
+        <table>
+          <thead><tr><th>Waktu</th><th>Layanan</th><th>Versi</th><th>Status</th><th>Durasi</th></tr></thead>
+          <tbody id="deployBody">
+            <tr><td class="mono">08:14</td><td>API Gateway</td><td class="mono">v2.18.4</td><td><span class="badge ok">Sukses</span></td><td class="mono">42s</td></tr>
+            <tr><td class="mono">07:52</td><td>Auth Service</td><td class="mono">v1.9.0</td><td><span class="badge ok">Sukses</span></td><td class="mono">38s</td></tr>
+            <tr><td class="mono">07:10</td><td>Worker Queue</td><td class="mono">v3.2.1</td><td><span class="badge warn">Canary</span></td><td class="mono">—</td></tr>
+            <tr><td class="mono">06:40</td><td>Notifier</td><td class="mono">v1.4.7</td><td><span class="badge ok">Sukses</span></td><td class="mono">31s</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-h"><h3>Aktivitas</h3><span class="meta">feed</span></div>
+        <ul class="feed" id="feed">
+          <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#86EFAC" stroke-width="1.8"><path d="M20 6L9 17l-5-5"/></svg></span><div><div class="t">Deploy API Gateway sukses</div><div class="s">v2.18.4 ke produksi</div></div><time>08:14</time></li>
+          <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#FCD34D" stroke-width="1.8"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 4.3L2 19h20L13.7 4.3a2 2 0 0 0-3.4 0z"/></svg></span><div><div class="t">Antrian worker naik</div><div class="s">backlog 1.2k job (canary)</div></div><time>07:18</time></li>
+          <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="1.8"><path d="M3 12h18"/><path d="M12 3v18"/></svg></span><div><div class="t">Skala otomatis +2 pod</div><div class="s">beban puncak pagi</div></div><time>06:55</time></li>
+          <li><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg></span><div><div class="t">Login admin: ops@team</div><div class="s">dari sesi tepercaya</div></div><time>06:20</time></li>
+        </ul>
+      </article>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (s)=>document.querySelector(s);
+  const fmt = (n)=>n.toLocaleString('id-ID');
+  function nowStr(){ const d=new Date(); return d.toLocaleString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+  function stamp(){ const d=new Date(); return d.toLocaleDateString('id-ID',{weekday:'short',day:'2-digit',month:'short'})+' · '+nowStr(); }
+  function tickClock(){ $('#stamp').textContent = stamp(); $('#sideTime').textContent = nowStr(); }
+
+  // mock series
+  const N=24;
+  const req = Array.from({length:N},(_,i)=> 820 + Math.sin(i/3)*140 + (i>14&&i<20?180:0) + (Math.random()*60-30));
+  const err = Array.from({length:N},(_,i)=> 2 + Math.max(0, Math.sin(i/2.2))*3 + (i===17?5:0) + Math.random()*1.2);
+
+  function spark(id, arr, invert){
+    const w=120,h=36,p=2; const min=Math.min(...arr), max=Math.max(...arr), span=max-min||1;
+    const pts = arr.map((v,i)=>{ const x=p + (i/(arr.length-1))*(w-2*p); const y = invert ? (p + (v-min)/span*(h-2*p)) : (h-p - (v-min)/span*(h-2*p)); return x.toFixed(1)+','+y.toFixed(1); }).join(' ');
+    document.getElementById(id).setAttribute('points', pts);
+  }
+  function pathLine(arr,w,h,pad,maxV){
+    const max = maxV || Math.max(...arr)*1.15 || 1;
+    return arr.map((v,i)=>{ const x=pad + (i/(arr.length-1))*(w-2*pad); const y=h-pad - (v/max)*(h-2*pad); return (i?'L':'M')+x.toFixed(1)+','+y.toFixed(1); }).join(' ');
+  }
+  function areaPath(arr,w,h,pad,maxV){
+    const d = pathLine(arr,w,h,pad,maxV);
+    const x0=pad, x1=pad + (w-2*pad);
+    return d + ` L${x1},${h-pad} L${x0},${h-pad} Z`;
+  }
+  function drawChart(){
+    const w=600,h=220,pad=28;
+    const grid = $('#grid'); grid.innerHTML='';
+    for(let i=0;i<=4;i++){
+      const y = pad + i*(h-2*pad)/4;
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',pad); line.setAttribute('x2',w-pad); line.setAttribute('y1',y); line.setAttribute('y2',y);
+      line.setAttribute('stroke','rgba(148,163,184,.12)'); line.setAttribute('stroke-width','1');
+      grid.appendChild(line);
+      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',6); t.setAttribute('y',y+4); t.setAttribute('fill','#64748B'); t.setAttribute('font-size','10'); t.setAttribute('font-family','Fira Code, monospace');
+      const val = Math.round((1-i/4)*1200); t.textContent = val; grid.appendChild(t);
+    }
+    const maxReq = 1300;
+    $('#areaReq').setAttribute('d', areaPath(req,w,h,pad,maxReq));
+    $('#lineReq').setAttribute('d', pathLine(req,w,h,pad,maxReq));
+    const errScaled = err.map(v=>v*40);
+    $('#areaErr').setAttribute('d', areaPath(errScaled,w,h,pad,maxReq));
+    $('#lineErr').setAttribute('d', pathLine(errScaled,w,h,pad,maxReq));
+  }
+
+  function renderKpis(){
+    const r = req[req.length-1]; const l = 118 + (Math.sin(Date.now()/7000)*12); const e = err[err.length-1]/10; const s = 1284 + Math.round(Math.sin(Date.now()/9000)*40);
+    $('#kpiReq').textContent = fmt(Math.round(r));
+    $('#kpiLat').textContent = Math.round(l) + ' ms';
+    $('#kpiErr').textContent = e.toFixed(2) + '%';
+    $('#kpiSes').textContent = fmt(Math.max(900, Math.round(s)));
+    $('#kpiReqD').textContent = '+4.2%';
+    $('#kpiLatD').textContent = '-6.1%';
+    $('#kpiErrD').textContent = e < 1 ? 'stabil' : 'naik';
+    $('#kpiSesD').textContent = '+2.8%';
+  }
+
+  spark('sp1', req.slice(-12));
+  spark('sp2', req.slice(-12).map((v,i)=>160 - v/10 + i), false);
+  spark('sp3', err.slice(-12), true);
+  spark('sp4', req.slice(-12).map(v=>v*0.9));
+  drawChart(); renderKpis(); tickClock();
+
+  if(!reduce){
+    setInterval(()=>{ // gentle live drift
+      req.push(Math.max(600, req[req.length-1] + (Math.random()*80-40))); req.shift();
+      err.push(Math.max(0.5, err[err.length-1] + (Math.random()*1.2-0.6))); err.shift();
+      drawChart(); spark('sp1', req.slice(-12)); spark('sp3', err.slice(-12), true); renderKpis(); tickClock();
+    }, 5000);
+  } else {
+    setInterval(tickClock, 1000);
+  }
+
+  // mobile nav
+  const sb=$('#sidebar'), scrim=$('#scrim'), btn=$('#menuBtn');
+  function setNav(open){ sb.classList.toggle('open',open); scrim.classList.toggle('show',open); btn.setAttribute('aria-expanded', open?'true':'false'); }
+  btn.addEventListener('click',()=>setNav(!sb.classList.contains('open')));
+  scrim.addEventListener('click',()=>setNav(false));
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') setNav(false); });
+  $('#refreshBtn').addEventListener('click',()=>{ drawChart(); renderKpis(); tickClock(); $('#refreshBtn').blur(); });
+})();
+</script>
+</body>
+</html>
