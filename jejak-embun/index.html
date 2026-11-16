@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jejak Embun — Cerita Lembap Pagi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--soil:#3d2d22;--earth:#5c4332;--clay:#7a5a3f;--sand:#dcc8ab;--parch:#f6f0e6;--moss:#566b3d;--dew:#7fb6a8;--warn:#b57a2a;--ink:#2b231c;--muted:#6e5e50;--line:#d3c4ae}
+*,*::before,*::after{box-sizing:border-box}html,body{margin:0}
+body{font-family:"Work Sans",sans-serif;background:var(--parch);color:var(--ink);line-height:1.55;font-size:16px;overflow-x:hidden}
+:focus-visible{outline:2px solid var(--moss);outline-offset:3px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+.progress{position:fixed;top:0;left:0;right:0;height:3px;background:rgba(61,45,34,.08);z-index:50}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--moss),var(--dew));transform-origin:left}
+.hero{min-height:100svh;display:grid;place-items:center;padding:70px 0 40px;background:radial-gradient(700px 380px at 70% 10%,rgba(127,182,168,.2),transparent 60%),radial-gradient(600px 320px at 10% 90%,rgba(86,107,61,.12),transparent 55%)}
+h1{font-family:Fraunces,serif;font-size:clamp(2.4rem,6vw,4.6rem);line-height:.95;margin:0 0 12px;color:var(--soil)}h1 em{font-style:normal;color:var(--moss)}
+.lead{color:var(--muted);max-width:44ch}
+.grid{display:grid;grid-template-columns:1fr 1.1fr;gap:40px;align-items:start;padding:20px 0 60px}
+.stage{position:sticky;top:20px}
+.card{background:#fffdf9;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 18px 40px -28px rgba(61,45,34,.5)}
+.dew-box{height:240px;border-radius:14px;background:linear-gradient(180deg,#cfe6e0,#e9efe4);position:relative;overflow:hidden;border:1px solid var(--line)}
+.drop{position:absolute;width:14px;height:18px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:rgba(255,255,255,.8);border:1px solid rgba(127,182,168,.6);left:var(--x);top:var(--y);transform:scale(var(--s,1));animation:float 4s ease-in-out infinite;animation-delay:var(--d,0s)}
+.drop::after{content:"";position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;left:3px;top:4px;opacity:.8}
+@keyframes float{0%,100%{transform:translateY(0) scale(var(--s,1))}50%{transform:translateY(-6px) scale(var(--s,1))}}
+.meter{margin-top:14px}
+.meter .t{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted)}
+.bar{height:10px;background:#eadfcb;border-radius:999px;overflow:hidden;margin-top:6px;border:1px solid var(--line)}
+.bar i{display:block;height:100%;width:var(--w,60%);background:linear-gradient(90deg,var(--clay),var(--moss));border-radius:999px;transition:width .8s ease}
+.steps{padding:6vh 0 10vh}
+.step{min-height:70vh;display:flex;flex-direction:column;justify-content:center;opacity:.3;transform:translateY(12px);transition:opacity .5s,transform .5s;padding:20px 0;border-bottom:1px solid var(--line)}
+.step.on{opacity:1;transform:none}
+.step .k{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--moss);text-transform:uppercase}
+.step h2{font-family:Fraunces,serif;font-size:clamp(1.6rem,3vw,2.2rem);margin:6px 0 8px;color:var(--earth)}
+.step p{color:var(--muted);max-width:36ch}
+footer{padding:24px 20px 40px;text-align:center;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:11px;border-top:1px solid var(--line)}
+@media (prefers-reduced-motion:reduce){.drop,.step{animation:none;opacity:1;transform:none}.bar i{transition:none}}
+@media (max-width:900px){.grid{grid-template-columns:1fr}.stage{position:relative;top:auto}.step{min-height:auto;opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="progress"><i id="prog"></i></div>
+<header class="hero"><div class="wrap"><p class="k" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--moss)">CERITA PAGI · LAHAN BASAH</p><h1>Jejak <em>Embun</em><br>di Ujung Petak</h1><p class="lead">Dari tetes pertama di daun sampai tanah hangat siang—ikuti jejak kelembapan lewat satu pagi di kebun.</p></div></header>
+<main class="wrap grid">
+  <div class="stage"><div class="card"><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:8px">PETAK A · VISUAL KONDENSASI</div>
+    <div class="dew-box" id="dew">
+      <span class="drop" style="--x:18%;--y:28%;--s:.9;--d:0s"></span><span class="drop" style="--x:42%;--y:18%;--s:1.1;--d:.4s"></span><span class="drop" style="--x:68%;--y:34%;--s:.8;--d:.8s"></span><span class="drop" style="--x:28%;--y:62%;--s:1.2;--d:1s"></span><span class="drop" style="--x:56%;--y:58%;--s:.7;--d:1.4s"></span><span class="drop" style="--x:78%;--y:66%;--s:1;--d:.6s"></span>
+    </div>
+    <div class="meter"><div class="t"><span>Indeks embun (relatif)</span><span id="dewv">88</span></div><div class="bar"><i id="dewb" style="--w:88%"></i></div></div>
+    <div class="meter"><div class="t"><span>Kelembapan tanah</span><span id="soilv">62%</span></div><div class="bar"><i id="soilb" style="--w:62%;background:linear-gradient(90deg,var(--sand),var(--moss))"></i></div></div>
+    <p style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin:12px 0 0" id="phase">Fase: Subuh (05:00)</p>
+  </div></div>
+  <div class="steps">
+    <article class="step on" data-dew="88" data-soil="62" data-phase="Fase: Subuh (05:00)"><div class="k">Bab 1 · 05:00</div><h2>Embun turun di sela daun</h2><p>Suhu turun semalaman, uap menempel jadi butiran kecil. Tanah masih hangap lembap dari hujan kemarin.</p></article>
+    <article class="step" data-dew="72" data-soil="66" data-phase="Fase: Pagi (07:30)"><div class="k">Bab 2 · 07:30</div><h2>Matahari mulai menarik uap</h2><p>Embun menguap, akar menyerap air tanah. Petani mulai memeriksa daun dan permukaan petak.</p></article>
+    <article class="step" data-dew="28" data-soil="54" data-phase="Fase: Siang (11:00)"><div class="k">Bab 3 · 11:00</div><h2>Hari mengeringkan permukaan</h2><p>Butiran hilang, tanah di permukaan mengering lebih cepat. Ini momen penting untuk keputusan irigasi.</p></article>
+    <article class="step" data-dew="18" data-soil="49" data-phase="Fase: Menjelang siang (12:30)"><div class="k">Bab 4 · 12:30</div><h2>Jejak tetap di bawah</h2><p>Di kedalaman 10–20 cm, kelembapan masih ada—jadi pijakan untuk jadwal siram sore.</p></article>
+  </div>
+</main>
+<footer>Jejak Embun · scrollytelling tema tanah (demo)</footer>
+<script>
+(function(){
+  var r=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var steps=[].slice.call(document.querySelectorAll('.step'));
+  var dewb=document.getElementById('dewb'),dewv=document.getElementById('dewv'),soilb=document.getElementById('soilb'),soilv=document.getElementById('soilv'),phase=document.getElementById('phase'),prog=document.getElementById('prog');
+  function apply(s){if(!s)return;var d=s.dataset.dew||0,so=s.dataset.soil||0;dewb.style.setProperty('--w',d+'%');dewv.textContent=d;soilb.style.setProperty('--w',so+'%');soilv.textContent=so+'%';phase.textContent=s.dataset.phase||'';}
+  if(!r&&'IntersectionObserver'in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){steps.forEach(function(x){x.classList.remove('on')});e.target.classList.add('on');apply(e.target);}})},{rootMargin:'-45% 0px -45% 0px'});steps.forEach(function(s){io.observe(s)});} else {steps.forEach(function(s){s.classList.add('on')});}
+  apply(steps[0]);
+  window.addEventListener('scroll',function(){var h=document.documentElement;var sc=h.scrollTop/(h.scrollHeight-h.clientHeight||1);if(prog)prog.style.width=(sc*100)+'%';},{passive:true});
+})();
+</script>
+</body>
+</html>
