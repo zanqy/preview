@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visibilitas surat — versi ringkas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2ECDE;--paper-2:#EDE4CF;--lembar:#FBF7EC;--ink:#221D15;
+  --ink-60:rgba(34,29,21,.6);--ink-40:rgba(34,29,21,.4);--red:#C03B21;
+  --line:rgba(34,29,21,.16);--ui-line:rgba(34,29,21,.22);
+  --fd:'Fraunces',serif;--fs:'Spectral',serif;--fm:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{background:var(--paper);overflow-x:clip}
+body{background:var(--paper);color:var(--ink);font-family:var(--fs);
+  background-image:radial-gradient(rgba(34,29,21,.045) 1px,transparent 1px);background-size:6px 6px;
+  padding:clamp(20px,4vw,48px) 16px 70px}
+:focus-visible{outline:2px dashed var(--red);outline-offset:4px}
+.wrap{max-width:1180px;margin:0 auto}
+header.top{border-bottom:2px solid var(--ink);padding-bottom:16px;display:flex;
+  justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap}
+.brand{font:600 10px var(--fm);letter-spacing:.3em;text-transform:uppercase}
+.brand em{font-style:normal;color:var(--red)}
+.meta{font:400 9.5px var(--fm);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-60)}
+h1{font-family:var(--fd);font-weight:800;font-size:clamp(29px,4.6vw,46px);line-height:1.03;
+  letter-spacing:-.035em;margin-top:24px;max-width:24ch}
+h1 em{font-style:italic;color:var(--red)}
+.lede{margin-top:13px;font:italic 400 clamp(.94rem,1.6vw,1.06rem)/1.6 var(--fs);color:var(--ink-60);max-width:66ch}
+.lede b{color:var(--ink);font-weight:500}
+
+.rail{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px;align-items:start}
+@media(max-width:980px){.rail{grid-template-columns:1fr;max-width:600px;margin-inline:auto}}
+.opt{position:relative;border:1px solid var(--ui-line);border-radius:12px;background:rgba(251,247,236,.55);
+  padding:16px;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .2s,background .2s}
+.opt:hover{transform:translateY(-3px);box-shadow:0 18px 34px -28px rgba(34,29,21,.75)}
+.opt[aria-pressed="true"]{border-color:var(--red);background:var(--lembar);
+  box-shadow:0 0 0 1px var(--red),0 22px 44px -30px rgba(34,29,21,.8)}
+.opt-tag{position:absolute;top:-1px;right:16px;background:var(--red);color:var(--paper);
+  font:500 8.5px var(--fm);letter-spacing:.18em;text-transform:uppercase;padding:5px 9px;border-radius:0 0 5px 5px;
+  opacity:0;transition:opacity .2s}
+.opt[aria-pressed="true"] .opt-tag{opacity:1}
+.rec{position:absolute;top:-1px;left:16px;background:var(--ink);color:var(--paper);
+  font:500 8.5px var(--fm);letter-spacing:.18em;text-transform:uppercase;padding:5px 9px;border-radius:0 0 5px 5px}
+.opt-id{font:500 10px var(--fm);letter-spacing:.22em;color:var(--red)}
+.opt h2{font-family:var(--fd);font-weight:800;font-size:1.45rem;letter-spacing:-.02em;margin-top:6px;line-height:1.1}
+.opt .trade{margin-top:7px;font:italic 400 .85rem/1.5 var(--fs);color:var(--ink-60);min-height:38px}
+.cost{display:inline-block;margin-top:8px;font:500 8.5px var(--fm);letter-spacing:.14em;text-transform:uppercase;
+  border:1px solid var(--ui-line);border-radius:3px;padding:4px 7px;color:var(--ink-60)}
+.cost b{color:var(--red);font-weight:500}
+
+.sheet{position:relative;margin-top:14px;background:var(--lembar);border:1px solid rgba(34,29,21,.3);
+  border-radius:10px;padding:15px 14px 13px;box-shadow:0 16px 34px -26px rgba(24,20,16,.6)}
+.sheet::before{content:"";position:absolute;inset:5px;border:1px dashed rgba(34,29,21,.18);border-radius:7px;pointer-events:none}
+.k{font:500 8px var(--fm);letter-spacing:.28em;text-transform:uppercase;color:var(--red)}
+.sheet h3{font:600 1.05rem/1.15 var(--fd);letter-spacing:-.01em;margin-top:5px}
+.sheet h3 em{font-style:italic;color:var(--red)}
+.sub{font:italic 400 .74rem/1.45 var(--fs);color:var(--ink-60);margin-top:6px}
+.lab{display:block;font:500 8px var(--fm);letter-spacing:.24em;text-transform:uppercase;color:var(--ink-60);margin:11px 0 4px}
+.ta{min-height:56px;border:1px solid var(--line);border-radius:6px;
+  background-image:repeating-linear-gradient(180deg,transparent 0 22px,var(--line) 22px 23px);
+  background-position:0 5px;font:italic 400 .76rem/22px var(--fs);color:var(--ink-40);padding:4px 9px}
+.send{margin-top:10px;background:var(--ink);color:var(--paper);border-radius:6px;padding:9px;
+  text-align:center;font:600 .8rem var(--fd);display:flex;justify-content:center;gap:8px;align-items:center}
+.send svg{width:13px;height:13px}
+.note{margin-top:7px;text-align:center;font:400 8px var(--fm);letter-spacing:.08em;line-height:1.5;color:var(--ink-40)}
+
+/* opsi 1 — satu baris pengganti catatan */
+.oneline{display:flex;align-items:center;justify-content:center;gap:7px;min-height:22px;margin-top:7px;
+  font:400 9px var(--fm);letter-spacing:.06em;color:var(--ink-60)}
+.box{width:11px;height:11px;flex:none;border:1px solid var(--ink-40);border-radius:2px;position:relative}
+.oneline.on .box{border-color:var(--red);background:rgba(192,59,33,.08)}
+.oneline.on .box::after{content:"";position:absolute;left:3px;top:0px;width:3px;height:7px;
+  border:solid var(--red);border-width:0 1.5px 1.5px 0;transform:rotate(38deg)}
+
+/* opsi 2 — layar sukses */
+.success{margin-top:12px;border:1px dashed var(--ui-line);border-radius:7px;padding:11px;text-align:center}
+.seal{display:inline-block;border:2px solid var(--red);color:var(--red);border-radius:5px;
+  font:700 .72rem var(--fd);letter-spacing:.14em;padding:5px 10px;transform:rotate(-6deg)}
+.success p{font:italic 400 .75rem/1.5 var(--fs);color:var(--ink-60);margin-top:8px}
+.after{margin-top:8px;font:400 8.5px var(--fm);letter-spacing:.04em;color:var(--ink-60)}
+.tiny{background:transparent;border:0;border-bottom:1px solid var(--ui-line);color:var(--ink);
+  font:500 8.5px var(--fm);letter-spacing:.08em;padding:2px 1px;cursor:default}
+.tiny.hot{color:var(--red);border-color:var(--red)}
+
+/* opsi 3 — beranda tanpa feed aspirasi */
+.home{margin-top:12px;border:1px solid var(--ui-line);border-radius:7px;padding:10px;background:rgba(237,228,207,.5)}
+.home .hh{font:500 8px var(--fm);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-60);
+  border-bottom:1px solid var(--ink);padding-bottom:6px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:9px}
+.stat{border-right:1px solid var(--line);padding-right:5px}
+.stat:last-child{border:0}
+.stat b{display:block;font:700 1rem var(--fd)}
+.stat span{display:block;font:400 7px var(--fm);letter-spacing:.06em;color:var(--ink-40);margin-top:2px}
+.home .mading{margin-top:9px;font:italic 400 .74rem/1.45 var(--fs);color:var(--ink-60);
+  border-left:2px solid var(--red);padding-left:8px}
+
+.verdict{margin-top:26px;border:2px solid var(--ink);border-radius:10px;background:var(--lembar);
+  padding:18px 20px;display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.vk{font:600 10px var(--fm);letter-spacing:.22em;text-transform:uppercase;color:var(--red);
+  border:1px solid var(--red);border-radius:4px;padding:6px 9px;flex:none}
+.verdict h3{font:700 1.25rem var(--fd);letter-spacing:-.01em}
+.verdict p{font:400 .9rem/1.6 var(--fs);color:var(--ink-60);margin-top:5px;max-width:74ch}
+.verdict p b{color:var(--ink);font-weight:500}
+footer{margin-top:30px;border-top:1px solid var(--line);padding-top:12px;
+  font:400 9px var(--fm);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-60);
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Tharra <em>·</em> Katakan</div>
+    <div class="meta">Versi ringkas · klik kartu untuk memilih</div>
+  </header>
+
+  <h1>Tiga cara <em>tanpa bikin form berat.</em></h1>
+  <p class="lede">Opsi A/B/C sebelumnya cuma beda default — kontrolnya tetap dua kotak besar dan itu yang mengganggu. Di sini kontrolnya <b>disusutkan, dipindah, atau dihapus</b>. Perhatikan tinggi kartu form di ketiga kolom: hampir sama.</p>
+
+  <div class="rail" role="group" aria-label="Tiga alternatif ringkas">
+
+    <!-- 1 -->
+    <section class="opt" role="button" tabindex="0" aria-pressed="true" data-key="1">
+      <span class="opt-tag">Dipilih</span>
+      <div class="opt-id">IDE 1</div>
+      <h2>Satu baris saja</h2>
+      <p class="trade">Menggantikan baris catatan yang sudah ada. Tidak ada kotak, tidak ada panel — cuma satu centang kecil.</p>
+      <span class="cost">Tambah tinggi form: <b>0 baris</b></span>
+
+      <div class="sheet">
+        <p class="k">Surat untuk Sekolah</p>
+        <h3>Tulis yang selama ini <em>kau simpan.</em></h3>
+        <p class="sub">Sepenuhnya anonim — dibaca pengurus OSIS.</p>
+        <span class="lab">Aspirasimu</span>
+        <div class="ta">Tulis apa pun — ruang kelas, kegiatan, kantin…</div>
+        <div class="send">Kirim Surat <svg viewBox="0 0 24 24" fill="none"><path d="M3 12h17M14 6l7 6-7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="oneline"><span class="box"></span><span>Tampilkan di beranda (anonim)</span></div>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="opt" role="button" tabindex="0" aria-pressed="false" data-key="2">
+      <span class="opt-tag">Dipilih</span>
+      <div class="opt-id">IDE 2</div>
+      <h2>Ditanya setelah kirim</h2>
+      <p class="trade">Form tetap persis seperti sekarang. Pilihannya muncul di kartu "TERCATAT", saat siswa sudah lega selesai menulis.</p>
+      <span class="cost">Tambah tinggi form: <b>0</b> · sukses: <b>+1 baris</b></span>
+
+      <div class="sheet">
+        <p class="k">Surat untuk Sekolah</p>
+        <h3>Tulis yang selama ini <em>kau simpan.</em></h3>
+        <p class="sub">Sepenuhnya anonim — dibaca pengurus OSIS.</p>
+        <span class="lab">Aspirasimu</span>
+        <div class="ta">Tulis apa pun — ruang kelas, kegiatan, kantin…</div>
+        <div class="send">Kirim Surat <svg viewBox="0 0 24 24" fill="none"><path d="M3 12h17M14 6l7 6-7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="note">Sepenuhnya anonim — tanpa nama, tanpa kelas.</div>
+      </div>
+      <div class="success">
+        <span class="seal">TERCATAT</span>
+        <p>Suratmu sudah kami terima.</p>
+        <div class="after">Mau dibaca banyak orang? <button class="tiny hot">Tampilkan</button> · <button class="tiny">Cukup untuk OSIS</button></div>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="opt" role="button" tabindex="0" aria-pressed="false" data-key="3">
+      <span class="rec">Rekomendasi</span><span class="opt-tag">Dipilih</span>
+      <div class="opt-id">IDE 3</div>
+      <h2>Tanpa kontrol sama sekali</h2>
+      <p class="trade">Katakan tetap privat. Yang tampil di beranda cukup angka dan tempelan mading dari Aksara — yang sudah ada sistem tinjauannya.</p>
+      <span class="cost">UI baru: <b>tidak ada</b></span>
+
+      <div class="sheet">
+        <p class="k">Surat untuk Sekolah</p>
+        <h3>Tulis yang selama ini <em>kau simpan.</em></h3>
+        <p class="sub">Sepenuhnya anonim — dibaca pengurus OSIS.</p>
+        <span class="lab">Aspirasimu</span>
+        <div class="ta">Tulis apa pun — ruang kelas, kegiatan, kantin…</div>
+        <div class="send">Kirim Surat <svg viewBox="0 0 24 24" fill="none"><path d="M3 12h17M14 6l7 6-7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="note">Sepenuhnya anonim — tanpa nama, tanpa kelas.</div>
+      </div>
+      <div class="home">
+        <div class="hh">Beranda · yang dilihat umum</div>
+        <div class="stats">
+          <div class="stat"><b>248</b><span>aspirasi</span></div>
+          <div class="stat"><b>31</b><span>diteruskan</span></div>
+          <div class="stat"><b>12</b><span>tempelan mading</span></div>
+        </div>
+        <div class="mading">“Sapu dulu sebelum menulis… Kirim siapa yang layak membaca.” — dari mading umum.</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="verdict" aria-live="polite">
+    <div class="vk" id="vk">IDE 1</div>
+    <div>
+      <h3 id="vh"></h3>
+      <p id="vp"></p>
+    </div>
+  </div>
+
+  <footer>
+    <span>Tharra · Katakan · alternatif ringkas</span>
+    <span>versi besar masih di /preview/katakan-visibilitas/</span>
+  </footer>
+</div>
+
+<script>
+const data={
+  1:{h:"Satu baris — paling murah",p:"Menggantikan <b>card-note</b> yang sudah ada, jadi tinggi kartu tidak berubah. Centang pakai checkbox asli dengan label, bisa dipakai keyboard dan punya fokus terlihat. Trade-off: pilihannya tetap harus disadari sebelum menekan kirim, dan teks lama “Sepenuhnya anonim” perlu diubah jadi “anonim tapi bisa tampil di beranda”."},
+  2:{h:"Ditanya setelah kirim — form utuh",p:"Tidak ada satu pun elemen baru di form, jadi kesan “satu tarikan napas” tetap terjaga. Siswa memutuskan setelah suratnya selesai, ketika tekanan menulis sudah hilang. Trade-off: Butuh penyimpanan pilihan lewat kode tiket, dan ada langkah ekstra setelah sukses — gampang terlewat kalau tidak diberi penjelasan."},
+  3:{h:"Tanpa kontrol — rekomendasi aku",p:"Katakan dipertegas sebagai ruang privat: surat dibaca OSIS, bukan konten beranda. Yang tampil di depan cukup <b>angka agregat</b> dan <b>tempelan mading Aksara</b> — dan mading sudah punya halaman moderasi, jadi tidak perlu membangun rem baru. Trade-off: beranda kehilangan kutipan aspirasi langsung; kalau kamu memang ingin ada suara siswa di depan, pilih Ide 1."}
+};
+const cards=[...document.querySelectorAll('.opt')];
+function pick(k){
+  cards.forEach(c=>c.setAttribute('aria-pressed',String(c.dataset.key===k)));
+  document.getElementById('vk').textContent='IDE '+k;
+  document.getElementById('vh').textContent=data[k].h;
+  document.getElementById('vp').innerHTML=data[k].p;
+}
+cards.forEach(c=>{
+  c.addEventListener('click',()=>pick(c.dataset.key));
+  c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(c.dataset.key);}});
+});
+pick('1');
+</script>
+</body>
+</html>
