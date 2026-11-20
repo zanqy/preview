@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Satu baris — Katakan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F2ECDE;--lembar:#FBF7EC;--ink:#221D15;--ink-60:rgba(34,29,21,.6);
+--ink-40:rgba(34,29,21,.4);--red:#C03B21;--line:rgba(34,29,21,.16);--ui-line:rgba(34,29,21,.22);
+--fd:'Fraunces',serif;--fs:'Spectral',serif;--fm:'IBM Plex Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html{background:var(--paper);overflow-x:clip}
+body{background:var(--paper);color:var(--ink);font-family:var(--fs);
+ background-image:radial-gradient(rgba(34,29,21,.045) 1px,transparent 1px);background-size:6px 6px;
+ padding:clamp(20px,4vw,48px) 16px 60px}
+:focus-visible{outline:2px dashed var(--red);outline-offset:4px}
+.wrap{max-width:720px;margin:0 auto}
+header.top{border-bottom:2px solid var(--ink);padding-bottom:14px;display:flex;
+ justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap}
+.brand{font:600 10px var(--fm);letter-spacing:.3em;text-transform:uppercase}
+.brand em{font-style:normal;color:var(--red)}
+.meta{font:400 9.5px var(--fm);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-60)}
+h1{font-family:var(--fd);font-weight:800;font-size:clamp(29px,5vw,44px);line-height:1.03;
+ letter-spacing:-.035em;margin-top:22px;max-width:22ch}
+h1 em{font-style:italic;color:var(--red)}
+.lede{margin-top:12px;font:italic 400 clamp(.94rem,1.6vw,1.05rem)/1.6 var(--fs);color:var(--ink-60);max-width:60ch}
+.lede b{color:var(--ink);font-weight:500}
+.stage{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px;align-items:start}
+@media(max-width:760px){.stage{grid-template-columns:1fr;max-width:520px;margin-inline:auto}}
+.col-h{font:500 9px var(--fm);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-60);
+ border-bottom:1px solid var(--ink);padding-bottom:7px;margin-bottom:11px;display:flex;justify-content:space-between}
+.col-h b{color:var(--red);font-weight:500}
+.sheet{position:relative;background:var(--lembar);border:1px solid rgba(34,29,21,.3);border-radius:12px;
+ padding:18px 16px 15px;box-shadow:0 24px 56px -30px rgba(24,20,16,.55)}
+.sheet::before{content:"";position:absolute;inset:6px;border:1px dashed rgba(34,29,21,.18);border-radius:8px;pointer-events:none}
+.k{font:500 8.5px var(--fm);letter-spacing:.28em;text-transform:uppercase;color:var(--red)}
+.sheet h2{font:600 1.2rem/1.14 var(--fd);letter-spacing:-.01em;margin-top:6px}
+.sheet h2 em{font-style:italic;color:var(--red)}
+.sub{font:italic 400 .78rem/1.5 var(--fs);color:var(--ink-60);margin-top:7px}
+.lab{display:block;font:500 8px var(--fm);letter-spacing:.24em;text-transform:uppercase;color:var(--ink-60);margin:13px 0 5px}
+.ta{min-height:74px;border:1px solid var(--line);border-radius:6px;
+ background-image:repeating-linear-gradient(180deg,transparent 0 24px,var(--line) 24px 25px);
+ background-position:0 5px;font:italic 400 .78rem/24px var(--fs);color:var(--ink-40);padding:4px 9px}
+.send{margin-top:12px;background:var(--ink);color:var(--paper);border-radius:6px;padding:10px;
+ text-align:center;font:600 .84rem var(--fd);display:flex;justify-content:center;gap:8px;align-items:center}
+.send svg{width:13px;height:13px}
+.note{margin-top:7px;text-align:center;font:400 8px var(--fm);letter-spacing:.08em;color:var(--ink-40)}
+
+/* A — satu baris */
+.oneline{display:flex;align-items:center;gap:7px;min-height:26px;margin-top:8px;
+ font:400 9px var(--fm);letter-spacing:.04em;color:var(--ink-60)}
+.oneline input{width:12px;height:12px;accent-color:var(--red);flex:none;cursor:pointer}
+.oneline label{cursor:pointer}
+
+/* B — dua label kecil */
+.vis-label{display:block;font:500 8px var(--fm);letter-spacing:.24em;text-transform:uppercase;
+ color:var(--ink-60);margin:11px 0 5px}
+.picks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pick{display:flex;align-items:flex-start;gap:6px;min-height:42px;border:1px solid var(--ui-line);
+ border-radius:6px;padding:7px;cursor:pointer}
+.pick:has(input:checked){border-color:var(--red);background:rgba(192,59,33,.06)}
+.pick input{width:10px;height:10px;accent-color:var(--red);flex:none;margin-top:2px}
+.pick b{display:block;font:600 .7rem/1.2 var(--fd)}
+.pick small{display:block;margin-top:2px;font:400 .62rem/1.25 var(--fs);color:var(--ink-60)}
+
+/* C — sesudah kirim */
+.success{margin-top:12px;border:1px dashed var(--ui-line);border-radius:8px;padding:13px;text-align:center}
+.seal{display:inline-block;border:2px solid var(--red);color:var(--red);border-radius:5px;
+ font:700 .72rem var(--fd);letter-spacing:.14em;padding:5px 10px;transform:rotate(-6deg)}
+.success p{font:italic 400 .77rem/1.5 var(--fs);color:var(--ink-60);margin-top:8px}
+.after{margin-top:8px;font:400 8.5px var(--fm);color:var(--ink-60)}
+.tiny{background:transparent;border:0;border-bottom:1px solid var(--ui-line);color:var(--ink);
+ font:500 8.5px var(--fm);padding:2px 1px;cursor:pointer}
+.tiny.hot{color:var(--red);border-color:var(--red)}
+
+.notes{margin-top:22px;border-left:2px solid var(--red);padding:2px 0 2px 14px}
+.notes p{font:400 .88rem/1.65 var(--fs);color:var(--ink-60)}
+.notes p b{color:var(--ink);font-weight:500}
+.cost{display:inline-block;margin-top:10px;font:500 8.5px var(--fm);letter-spacing:.12em;
+ text-transform:uppercase;border:1px solid var(--ui-line);border-radius:3px;padding:4px 7px;color:var(--ink-60)}
+.cost b{color:var(--red);font-weight:500}
+.compare{margin-top:24px;border-top:1px solid var(--line);padding-top:12px;
+ font:400 9px var(--fm);letter-spacing:.1em;color:var(--ink-60);display:flex;gap:16px;flex-wrap:wrap}
+.compare a{color:var(--red);text-decoration:none;border-bottom:1px solid var(--red);padding-bottom:2px}
+footer{margin-top:22px;font:400 9px var(--fm);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-60)}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <header class="top">
+  <div class="brand">Tharra <em>·</em> Katakan</div>
+  <div class="meta">OPSI A · preview mandiri</div>
+ </header>
+
+ <h1>Pilihannya <em>cuma satu baris.</em></h1>
+ <p class="lede">Menggantikan baris catatan yang sudah ada, jadi form tidak bertambah tinggi. Siswa tetap bisa memilih <b>tampil atau tidak</b> — tinggal centang.</p>
+
+ <div class="stage">
+  <div>
+   <div class="col-h"><span>Form Katakan</span><b>+0</b></div>
+   <div class="sheet">
+    <p class="k">Surat untuk Sekolah</p>
+    <h2>Tulis yang selama ini <em>kau simpan.</em></h2>
+    <p class="sub">Dibaca langsung pengurus OSIS. Sepenuhnya anonim.</p>
+    <span class="lab">Aspirasimu</span>
+    <div class="ta">Tulis apa pun — ruang kelas, kegiatan, kantin…</div>
+    <div class="oneline"><input type="checkbox" id="tampil"><label for="tampil">Tampilkan di beranda (anonim)</label></div>
+    <div class="send">Kirim Surat <svg viewBox="0 0 24 24" fill="none"><path d="M3 12h17M14 6l7 6-7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    
+   </div>
+  </div>
+  <div>
+   <div class="col-h"><span>Hasilnya</span><b>beranda</b></div>
+   <div class="sheet"><p class="k">Beranda · aspirasi terbaru</p>
+       <p class="sub" style="margin-top:10px">Belum ada yang centang. Surat tetap masuk ke OSIS.</p>
+       <div class="oneline"><input type="checkbox" checked id="demo1" disabled><label for="demo1">Kalau dicentang → kutipan anonim muncul di sini</label></div></div>
+   <div class="notes"><p>Paling murah dan paling jujur: satu keputusan kecil, langsung terlihat, tidak ada panel baru. <b>anonim ≠ privat</b> tetap perlu ditegaskan di teks. Trade-off: pilihannya harus disadari sebelum menekan kirim.</p>
+    <span class="cost">Dampak tinggi form: <b>0 baris</b></span>
+   </div>
+  </div>
+ </div>
+
+ <div class="compare">
+  <span>Bandingkan:</span>
+  <a href="../katakan-pilih-baris/">A · satu baris</a>
+  <a href="../katakan-pilih-tab/">B · dua label kecil</a>
+  <a href="../katakan-pilih-sukses/">C · setelah kirim</a>
+ </div>
+ <footer>Tharra · Katakan · OPSI A</footer>
+</div>
+</body>
+</html>
