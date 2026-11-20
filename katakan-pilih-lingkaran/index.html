@@ -380,6 +380,15 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 .mark-ring .star{position:absolute;top:-14px;right:-12px;width:19px;height:19px;color:var(--red);
  opacity:0;transform:rotate(-18deg) scale(.5);transition:opacity .3s .12s,transform .3s .12s}
 .mark-ring input:checked ~ .star{opacity:1;transform:rotate(-18deg) scale(1)}
+
+.mark-ring .ps{position:absolute;top:12px;right:-32px;font:italic 600 .66rem var(--fd);color:var(--red);
+ opacity:0;transform:rotate(-6deg);transition:opacity .3s .18s}
+.mark-ring input:checked ~ .ps{opacity:1}
+.mark-ring .swoosh{position:absolute;left:-8px;bottom:-6px;width:58px;height:12px;color:var(--red);
+ opacity:0;transition:opacity .3s}
+.mark-ring input:checked ~ .swoosh{opacity:.75}
+.mark-ring .blot{position:absolute;left:8px;top:-9px;width:5px;height:5px;border-radius:50%;
+ background:rgba(34,29,21,.35);box-shadow:6px -2px 0 -1px rgba(34,29,21,.2)}
 </style>
 </head>
 <body>
@@ -439,7 +448,9 @@ footer a:hover{color:var(--red);border-color:var(--red)}
       
       <div class="mark-ring"><label>
         <input type="checkbox">
-        <span class="ring"></span><span class="txt">boleh dibaca orang lain?</span><svg class="star" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14.6 9.1 L22 9.6 L16.3 14.2 L18.2 21.5 L12 17.3 L5.8 21.5 L7.7 14.2 L2 9.6 L9.4 9.1 Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span class="ring"></span><span class="blot"></span><span class="txt">boleh dibaca orang lain?</span><span class="ps">oke!</span>
+        <svg class="swoosh" viewBox="0 0 58 12" fill="none"><path d="M2 8C16 2 38 2 56 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg class="star" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14.6 9.1 L22 9.6 L16.3 14.2 L18.2 21.5 L12 17.3 L5.8 21.5 L7.7 14.2 L2 9.6 L9.4 9.1 Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
       </label></div>
       <button type="submit" class="send" id="sendBtn"><span>Kirim Surat</span>
         <svg viewBox="0 0 24 24" fill="none"><path d="M3 12h17M14 6l7 6-7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>

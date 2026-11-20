@@ -381,6 +381,13 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 .md-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);
  margin-right:6px;vertical-align:middle;opacity:0;transform:scale(.3);transition:opacity .2s,transform .2s}
 .md-side.on .md-dot{opacity:1;transform:scale(1)}
+
+.scribble-top{display:flex;align-items:center;gap:8px;margin-top:9px;transform:rotate(-1deg)}
+.scribble-top .sw{height:1px;flex:1;background:repeating-linear-gradient(90deg,rgba(34,29,21,.28) 0 6px,transparent 6px 10px)}
+.scribble-top .sw2{width:9px;height:9px;border:1.5px solid var(--red);border-radius:50%;transform:rotate(-12deg);opacity:.75}
+.margin-after{margin-top:5px;margin-bottom:2px;display:flex;justify-content:flex-end;align-items:center;gap:9px}
+.margin-after .ink{width:7px;height:7px;border-radius:50%;background:rgba(34,29,21,.45);box-shadow:5px 2px 0 -2px rgba(34,29,21,.25)}
+.margin-after svg{width:34px;height:19px;color:var(--red);opacity:.8}
 </style>
 </head>
 <body>
@@ -441,6 +448,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
       <div class="margin-duo">
         <button type="button" class="md-side on"><span class="md-dot"></span><span class="md-note">khusus OSIS</span><span class="md-cross"></span></button>
         <button type="button" class="md-side"><span class="md-dot"></span><span class="md-note">biar dibaca semua</span><span class="md-cross"></span></button>
+      </div>
+      
+      <div class="scribble-top"><span class="sw"></span><span class="sw2"></span></div>
+      <div class="margin-after"><span class="ink"></span>
+        <svg viewBox="0 0 34 19" fill="none"><path d="M2 13C11 4 22 3 32 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M27 4 L32 8 L27 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <button type="submit" class="send" id="sendBtn"><span>Kirim Surat</span>
         <svg viewBox="0 0 24 24" fill="none"><path d="M3 12h17M14 6l7 6-7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
