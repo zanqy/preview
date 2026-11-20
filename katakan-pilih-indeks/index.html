@@ -375,10 +375,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
  color:var(--ink-40);transition:color .2s}
 .indeks-row .no{font-weight:500}
 .indeks-row .lead{flex:1;border-bottom:1px dotted rgba(34,29,21,.28);transform:translateY(-2px)}
-.indeks-row .cek{font-size:8px}
+.indeks-row .cek{width:7px;height:7px;border-radius:50%;border:1px solid currentColor;
+ flex:none;align-self:center}
 .indeks-row.on{color:var(--ink)}
 .indeks-row.on .no{color:var(--red)}
-.indeks-row.on .cek{color:var(--red)}
+.indeks-row.on .cek{background:var(--red);border-color:var(--red)}
 </style>
 </head>
 <body>
@@ -437,8 +438,8 @@ footer a:hover{color:var(--red);border-color:var(--red)}
       </div>
       
       <div class="indeks"><span class="indeks-h">SURAT INI UNTUK</span>
-        <button type="button" class="indeks-row on" data-k="privat"><span class="no">01</span><span class="lbl">Khusus OSIS</span><span class="lead"></span><span class="cek">●</span></button>
-        <button type="button" class="indeks-row" data-k="umum"><span class="no">02</span><span class="lbl">Tampil di beranda</span><span class="lead"></span><span class="cek">○</span></button>
+        <button type="button" class="indeks-row on" data-k="privat"><span class="no">01</span><span class="lbl">Khusus OSIS</span><span class="lead"></span><span class="cek"></span></button>
+        <button type="button" class="indeks-row" data-k="umum"><span class="no">02</span><span class="lbl">Tampil di beranda</span><span class="lead"></span><span class="cek"></span></button>
       </div>
       <button type="submit" class="send" id="sendBtn"><span>Kirim Surat</span>
         <svg viewBox="0 0 24 24" fill="none"><path d="M3 12h17M14 6l7 6-7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
