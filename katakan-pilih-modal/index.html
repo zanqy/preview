@@ -405,6 +405,13 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 <body>
 
 <div class="tudung" id="tudung"></div>
+<div class="kartu amp" id="kartu" aria-hidden="true">
+        <p class="kk">SEBELUM DIKIRIM</p>
+        <h3>Surat ini untuk siapa?</h3>
+        <button type="button" class="pil on" data-k="privat"><svg class="amp-ikon" viewBox="0 0 42 28" fill="none"><rect x="1.5" y="4.5" width="39" height="21" rx="2" stroke="currentColor"/><path d="M2 6 L21 20 L40 6" stroke="currentColor"/></svg><span class="oteks"><b>Khusus OSIS</b><small>Hanya pengurus yang membaca</small></span></button>
+        <button type="button" class="pil" data-k="umum"><svg class="amp-ikon" viewBox="0 0 42 28" fill="none"><rect x="1.5" y="4.5" width="39" height="21" rx="2" stroke="currentColor"/><path d="M2 6 L21 20 L40 6" stroke="currentColor"/></svg><span class="oteks"><b>Tampil di beranda</b><small>Anonim, dibaca siapa saja</small></span></button>
+        <button type="button" class="kirim" id="kirimAkhir">Kirim sekarang <span>→</span></button>
+      </div>
 <div class="grain" aria-hidden="true"></div>
 
 <!-- ============ INTRO: AMPLOP TERTUTUP ============ -->
@@ -460,13 +467,6 @@ footer a:hover{color:var(--red);border-color:var(--red)}
       <button type="button" class="send" id="sendBtn"><span>Kirim Surat</span>
         <svg viewBox="0 0 24 24" fill="none"><path d="M3 12h17M14 6l7 6-7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="kartu amp" id="kartu" aria-hidden="true">
-        <p class="kk">SEBELUM DIKIRIM</p>
-        <h3>Surat ini untuk siapa?</h3>
-        <button type="button" class="pil on" data-k="privat"><svg class="amp-ikon" viewBox="0 0 42 28" fill="none"><rect x="1.5" y="4.5" width="39" height="21" rx="2" stroke="currentColor"/><path d="M2 6 L21 20 L40 6" stroke="currentColor"/></svg><span class="oteks"><b>Khusus OSIS</b><small>Hanya pengurus yang membaca</small></span></button>
-        <button type="button" class="pil" data-k="umum"><svg class="amp-ikon" viewBox="0 0 42 28" fill="none"><rect x="1.5" y="4.5" width="39" height="21" rx="2" stroke="currentColor"/><path d="M2 6 L21 20 L40 6" stroke="currentColor"/></svg><span class="oteks"><b>Tampil di beranda</b><small>Anonim, dibaca siapa saja</small></span></button>
-        <button type="button" class="kirim" id="kirimAkhir">Kirim sekarang <span>→</span></button>
-      </div>
       <div class="draft-row">
         <span class="draft-hint">draf tersimpan otomatis di perangkat ini</span>
         <span class="draft-flash" id="draftFlash" aria-hidden="true">tersimpan</span>
