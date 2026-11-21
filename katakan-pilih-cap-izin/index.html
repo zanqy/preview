@@ -401,12 +401,13 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 .tudung.muncul{opacity:1;visibility:visible;transition:opacity .3s ease}
 
 .pil{border-color:rgba(34,29,21,.18)!important;background:transparent!important;box-shadow:none!important;transform:none!important}
-.pil:not(.on){opacity:.5}
-.seg{width:52px;height:52px;flex:none;color:var(--red);opacity:0;transform:scale(2.2) rotate(-20deg);
- transform-origin:center;transition:transform .38s cubic-bezier(.2,1.5,.3,1),opacity .22s;
+.pil:not(.on){opacity:.78}
+.seg{width:52px;height:52px;flex:none;color:var(--red);opacity:0;visibility:hidden;
+ transform:scale(1.5) rotate(-16deg);transform-origin:center;
+ transition:transform .38s cubic-bezier(.2,1.4,.3,1),opacity .22s,visibility 0s .38s;
  filter:drop-shadow(0 3px 4px rgba(34,29,21,.28))}
 .pil[data-k=privat] .seg{color:#332C22}
-.pil.on .seg{opacity:1;transform:scale(1) rotate(-8deg)}
+.pil.on .seg{opacity:1;visibility:visible;transform:scale(1) rotate(-8deg);transition:transform .38s cubic-bezier(.2,1.4,.3,1),opacity .22s,visibility 0s}
 .pil.on{opacity:1}
 </style>
 </head>
