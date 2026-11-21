@@ -370,16 +370,22 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 
 .segaris{margin-top:15px;display:flex;align-items:center;gap:0}
 .g1-end{border:0;background:transparent;cursor:pointer;padding:10px 2px;flex:none;
- font:500 8px var(--fm);letter-spacing:.14em;color:rgba(34,29,21,.62);transition:color .2s;
+ font:600 9px var(--fm);letter-spacing:.14em;color:rgba(34,29,21,.78);transition:color .2s;
  min-height:44px}
 .g1-end.on{color:var(--ink)}
 .g1-end.kiri.on{color:var(--red)}
-.g1-track{position:relative;flex:1;height:2px;margin:0 10px;background:rgba(34,29,21,.16)}
+.g1-track{position:relative;flex:1;height:3px;margin:0 12px;background:rgba(34,29,21,.22);
+ border-radius:2px}
+.g1-knot{position:absolute;top:-3px;left:calc(100% - 9px);width:9px;height:9px;border-radius:50%;
+ background:var(--red);box-shadow:0 0 0 3px rgba(192,59,33,.16);
+ transition:left .55s cubic-bezier(.3,.9,.3,1)}
+.segaris.kiri .g1-knot{left:0}
 .g1-fill{position:absolute;inset:0;background:var(--red);transform-origin:right center;
  transform:scaleX(0);transition:transform .55s cubic-bezier(.3,.9,.3,1)}
 .g1-track::after{content:"";position:absolute;left:-4px;top:-2.5px;width:7px;height:7px;border-radius:50%;
  border:1px solid rgba(34,29,21,.4);background:var(--lembar)}
 .segaris.kiri .g1-fill{transform:scaleX(1)}
+.g1-fill{height:100%}
 .g1-end.on .g1-arrow{display:inline-block;width:8px;height:10px;vertical-align:-1px}
 .g1-arrow{display:none;color:var(--red);margin-right:4px}
 </style>
@@ -441,7 +447,7 @@ footer a:hover{color:var(--red);border-color:var(--red)}
       
       <div class="segaris" id="segaris">
         <button type="button" class="g1-end kiri" data-k="umum"><svg class="g1-arrow" viewBox="0 0 8 10" fill="none"><path d="M7 1 L2 5 L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>BOLEH DILIHAT</button>
-        <span class="g1-track"><span class="g1-fill"></span></span>
+        <span class="g1-track"><span class="g1-fill"></span><span class="g1-knot"></span></span>
         <button type="button" class="g1-end kanan on" data-k="privat">TIDAK BOLEH DILIHAT</button>
       </div>
       <button type="submit" class="send" id="sendBtn"><span>Kirim Surat</span>
