@@ -399,6 +399,16 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 .s-meta{font:500 7px var(--fm);letter-spacing:.2em;color:var(--ink-40)}
 .surat.ke-kiri{border-color:var(--red)}
 .surat.ke-kanan{border-color:var(--ink)}
+
+.konfirmasi{margin-top:10px;border-top:1px solid var(--line);padding-top:9px;display:none}
+.konfirmasi.muncul{display:block}
+.konfirmasi p{text-align:center;font:italic 400 .8rem/1.4 var(--fs);color:var(--ink-60)}
+.konfirmasi b{color:var(--red);font-weight:600}
+.kf-row{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;margin-top:8px}
+.kf-row button{border:1px solid var(--ui-line);border-radius:6px;background:transparent;padding:9px 6px;
+ font:600 .72rem var(--fd);cursor:pointer}
+.kf-row #ubahBtn{color:var(--ink-60)}
+.kf-row #kirimAkhir{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 </style>
 </head>
 <body>
@@ -466,6 +476,13 @@ footer a:hover{color:var(--red);border-color:var(--red)}
           <div class="surat" id="surat">
             <span class="s-main">"Tulis yang selama ini kau simpan…"</span>
             <span class="s-bar"></span><span class="s-meta">SURAT · ANONIM</span>
+          </div>
+        </div>
+        <div class="konfirmasi" id="konfirmasi">
+          <p>Surat akan <b id="keputusan">khusus OSIS</b></p>
+          <div class="kf-row">
+            <button type="button" id="ubahBtn">Ubah</button>
+            <button type="button" id="kirimAkhir">Kirim sekarang</button>
           </div>
         </div>
       </div>
@@ -941,17 +958,27 @@ sr.addEventListener('pointermove',function(e){
 });
 function selesai(){
   if(!dragging)return;dragging=false;sr.style.transition='transform .3s cubic-bezier(.2,.9,.3,1)';
-  if(dx<-58){sr.classList.add('ke-kiri');commit();}
-  else if(dx>58){sr.classList.add('ke-kanan');commit();}
+  if(dx<-58){sr.classList.add('ke-kiri');siap('umum');}
+  else if(dx>58){sr.classList.add('ke-kanan');siap('osis');}
   else sr.style.transform='translate(-50%,-50%)';
 }
 sr.addEventListener('pointerup',selesai);
 sr.addEventListener('pointercancel',selesai);
-function commit(){
+var konf=document.getElementById('konfirmasi'),kep=document.getElementById('keputusan');
+function siap(k){
+  kep.textContent = k==='umum' ? 'tampil di beranda' : 'khusus OSIS';
+  konf.classList.add('muncul');
+}
+document.getElementById('ubahBtn').addEventListener('click',function(){
+  sr.classList.remove('ke-kiri','ke-kanan');
+  sr.style.transform='translate(-50%,-50%)';
+  dx=0;konf.classList.remove('muncul');
+});
+document.getElementById('kirimAkhir').addEventListener('click',function(){
   krt.setAttribute('aria-hidden','true');
   document.getElementById('letterForm').classList.add('sent');
   document.getElementById('cardSuccess').classList.add('show');
   document.getElementById('cardEl').classList.add('selesai');
-}
+});
 </script></body>
 </html>
