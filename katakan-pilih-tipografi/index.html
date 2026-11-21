@@ -375,6 +375,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 .tp:hover{color:var(--ink)}
 .tp.on{color:var(--ink);border-bottom-color:var(--ink)}
 .pem{font:400 .78rem/1 var(--fs);color:rgba(34,29,21,.28)}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

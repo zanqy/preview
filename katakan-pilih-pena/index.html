@@ -379,6 +379,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
  clip-path:polygon(0 50%,100% 0,100% 100%);transition:left .6s cubic-bezier(.3,.9,.3,1)}
 .pena.kiri .pn-fill{transform:scaleX(1)}
 .pena.kiri .pn-tip{left:-6px}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

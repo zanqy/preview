@@ -379,6 +379,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 .ld-fill{flex:1;align-self:center;transform:translateY(-2px);
  border-bottom:1px dotted rgba(34,29,21,.3);transition:border-bottom-color .25s,border-bottom-width .25s}
 .ld-row.on .ld-fill{border-bottom:2px solid var(--red)}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

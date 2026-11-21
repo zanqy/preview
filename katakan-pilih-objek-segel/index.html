@@ -388,6 +388,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
  transform:rotate(-8deg) scale(.9);opacity:.38;transition:opacity .3s,transform .3s}
 .seg::after{content:"";position:absolute;inset:5px;border:1px dashed rgba(251,247,236,.85);border-radius:50%}
 .pil.on .seg{opacity:1;transform:rotate(-8deg) scale(1.05)}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

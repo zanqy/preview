@@ -377,6 +377,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 .pita[data-k="umum"] svg{color:var(--red)}
 .pita.on{opacity:1;transform:translateY(-5px)}
 .pita-lbl{display:block;margin-top:5px;font:400 .6rem/1.25 var(--fs);color:var(--ink-60);max-width:96px}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

@@ -389,6 +389,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 .mark-ring input:checked ~ .swoosh{opacity:.75}
 .mark-ring .blot{position:absolute;left:8px;top:-9px;width:5px;height:5px;border-radius:50%;
  background:rgba(34,29,21,.35);box-shadow:6px -2px 0 -1px rgba(34,29,21,.2)}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

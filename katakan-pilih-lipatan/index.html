@@ -382,6 +382,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 .flap.buka .flap-depan{transform:rotateX(-155deg);box-shadow:0 -4px 10px -6px rgba(34,29,21,.6)}
 .flap::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;
  background:repeating-linear-gradient(90deg,rgba(34,29,21,.35) 0 4px,transparent 4px 8px)}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

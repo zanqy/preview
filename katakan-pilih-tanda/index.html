@@ -382,6 +382,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 .tk-fill{position:absolute;inset:0;background:var(--red);transform-origin:right center;
  transform:scaleX(0);transition:transform .55s cubic-bezier(.3,.9,.3,1)}
 .ticks.kiri .tk-fill{transform:scaleX(1)}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

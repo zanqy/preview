@@ -376,6 +376,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 .gs-bar{position:absolute;left:0;right:50%;bottom:-1px;height:2px;background:var(--red);
  transition:left .32s cubic-bezier(.3,.9,.3,1),right .32s cubic-bezier(.3,.9,.3,1)}
 .gs.right .gs-bar{left:50%;right:0}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

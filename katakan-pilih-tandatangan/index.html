@@ -380,6 +380,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 .ttd{position:absolute;right:2px;bottom:-2px;width:86px;height:27px;color:var(--red);pointer-events:none}
 .ttd path{stroke-dasharray:210;stroke-dashoffset:210;transition:stroke-dashoffset .65s cubic-bezier(.3,.8,.3,1)}
 .izin-label input:checked ~ .ttd path{stroke-dashoffset:0}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

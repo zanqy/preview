@@ -377,6 +377,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
  font:600 8.5px var(--fm);letter-spacing:.12em;color:var(--ink-60);transition:transform .4s cubic-bezier(.3,.9,.3,1),opacity .3s,border-color .2s}
 .half.on{color:var(--red);border-color:var(--red)}
 .half.lepas{transform:rotate(9deg) translate(8px,-16px);opacity:0;pointer-events:none}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

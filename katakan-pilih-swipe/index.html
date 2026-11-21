@@ -413,6 +413,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 /* preview tetap menampilkan form walaupun JavaScript tidak tersedia */
 .intro{display:none!important}
 #isi{opacity:1!important;visibility:visible!important}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

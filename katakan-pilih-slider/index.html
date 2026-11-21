@@ -389,6 +389,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 #slRange::-moz-range-thumb{width:24px;height:24px;border-radius:50%;
  background:var(--lembar);border:2px solid var(--red);box-shadow:0 3px 9px -3px rgba(34,29,21,.55)}
 .sl-hint{margin-top:2px;text-align:center;font:500 8px var(--fm);letter-spacing:.16em;color:var(--red)}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

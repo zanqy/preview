@@ -387,6 +387,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 .kartu.muncul{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
 .tudung{position:fixed;inset:0;background:rgba(34,29,21,.42);opacity:0;visibility:hidden;z-index:59;transition:opacity .3s}
 .tudung.muncul{opacity:1;visibility:visible}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>

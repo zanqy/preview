@@ -383,6 +383,11 @@ footer a:hover{color:var(--red);border-color:var(--red)}
  filter:blur(.35px);transition:color .4s,filter .4s,text-decoration-color .4s;
  text-decoration:underline;text-decoration-color:transparent;text-underline-offset:5px}
 .tinta.permanen ~ .catatan{color:var(--ink);filter:none;text-decoration-color:var(--red)}
+
+@media(hover:none){
+  .send:hover,.send:hover:not(:disabled),.send-public:hover,.kirim:hover,
+  .kf-row button:hover,.pil:hover,.tp:hover{transform:none;box-shadow:none}
+}
 </style>
 </head>
 <body>
