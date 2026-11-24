@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="./assets/index-CEbzlove.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-DwLYCmkF.css">
+  <script type="module" crossorigin src="./assets/index-Bi99BZ42.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-B7SZJjzm.css">
 </head>
 <body>
 <header class="topbar">
@@ -23,8 +23,10 @@
     <h2>Papan Lagu</h2>
     <p>1–8 PILIH · ↑↓ VOLUME · X STOP · M MUTE · 0 DETIK = LANGSUNG</p>
     <button class="add" id="addBtn">+ PILIH FILE</button>
+    <button class="add" id="folderBtn">+ FOLDER</button>
   </div>
   <input type="file" id="fileInput" accept="audio/*" multiple hidden>
+  <input type="file" id="folderInput" webkitdirectory directory multiple hidden>
   <div class="empty" id="empty"><span>Belum ada lagu.</span><button id="emptyAdd">PILIH FILE AUDIO</button><small>MP3 · M4A · OGG · FLAC · WAV</small></div>
   <div class="grid" id="grid"></div>
 </main>
