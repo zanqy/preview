@@ -55,15 +55,28 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .clock{font:500 12px 'IBM Plex Mono',monospace;color:var(--muted);letter-spacing:.1em}
 
 /* ── main ── */
-main{flex:1; padding:24px 30px 138px}
-.sec-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+main{flex:1; padding:22px 30px 138px}
+.sec-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:12px;flex-wrap:wrap}
 .sec-head h2{font:600 13px 'IBM Plex Mono',monospace;letter-spacing:.22em;text-transform:uppercase;color:var(--ink)}
 .sec-head p{font:400 11px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--muted)}
+.settings{
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:10px 14px;margin-bottom:16px;
+}
+.set{display:flex;align-items:center;gap:8px}
+.slabel{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.14em;color:var(--muted)}
+.set input{
+  width:56px;background:#0E110E;border:1px solid var(--line);border-radius:6px;
+  color:var(--ink);font:600 13px 'IBM Plex Mono',monospace;text-align:center;padding:6px 4px;
+}
+.sunit{font:500 9px 'IBM Plex Mono',monospace;color:var(--muted)}
+.shint{margin-left:auto;font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--muted)}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 
 .card{
   position:relative; background:var(--surface); border:1px solid var(--line); border-radius:14px;
-  padding:14px 15px 13px; min-height:250px; display:flex; flex-direction:column;
+  padding:14px 15px 13px; min-height:246px; display:flex; flex-direction:column;
   transition:border-color .18s ease, background .18s ease, transform .18s ease, box-shadow .18s ease;
 }
 .card:hover{border-color:#556150; background:var(--surface-2); transform:translateY(-2px)}
@@ -119,7 +132,7 @@ kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-
 .stop:hover{color:var(--danger);border-color:var(--danger)}
 .stop svg{width:13px;height:13px;fill:currentColor}
 .level{position:absolute;left:0;right:0;bottom:0;height:3px;background:#242B24;border-radius:0 0 13px 13px;overflow:hidden}
-.level span{display:block;height:100%;width:0;background:var(--coral);transition:width .08s linear}
+.level span{display:block;height:100%;width:0;background:var(--coral);transition:width .06s linear}
 .card.silent .level span{background:var(--amber)}
 
 /* ── transport ── */
@@ -134,7 +147,7 @@ kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-
 .now .nm{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .now .ar{font:400 10px 'IBM Plex Mono',monospace;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .meter{height:5px;background:#242B24;border-radius:3px;margin-top:10px;overflow:hidden}
-.meter span{display:block;height:100%;width:0;background:var(--coral);transition:width .08s linear}
+.meter span{display:block;height:100%;width:0;background:var(--coral);transition:width .06s linear}
 .ctl{display:flex;align-items:center;gap:10px}
 .tbtn{
   display:flex;align-items:center;gap:9px;padding:14px 17px;border-radius:10px;
@@ -187,6 +200,19 @@ kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-
     <h2>Papan Lagu</h2>
     <p>1–8 PILIH &nbsp;·&nbsp; ↑↓ VOLUME KARTU &nbsp;·&nbsp; X STOP &nbsp;·&nbsp; M MUTE</p>
   </div>
+  <div class="settings">
+    <div class="set">
+      <span class="slabel">HENTIKAN · FADE KELUAR</span>
+      <input id="fadeOut" type="number" min="0" max="30" step="0.5" value="3" aria-label="Durasi fade saat stop dalam detik">
+      <span class="sunit">detik</span>
+    </div>
+    <div class="set">
+      <span class="slabel">MULAI · FADE MASUK</span>
+      <input id="fadeIn" type="number" min="0" max="30" step="0.5" value="0" aria-label="Durasi fade saat mulai dalam detik">
+      <span class="sunit">detik</span>
+    </div>
+    <span class="shint">0 = LANGSUNG &nbsp;·&nbsp; STOP DITEKAN LAGI = HENTI SEKETIKA</span>
+  </div>
   <div class="grid" id="grid"></div>
 </main>
 
@@ -206,7 +232,7 @@ kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-
       <svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5ZM16 9l5 6M16 15l5-6"/></svg>
       VOL + <kbd>↑</kbd>
     </button>
-    <button class="tbtn stop" id="btnStop" aria-label="Stop">
+    <button class="tbtn stop" id="btnStop" aria-label="Stop dengan fade keluar">
       <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>
       STOP <kbd>X</kbd>
     </button>
@@ -229,7 +255,8 @@ const tracks=[
   {t:'Cadangan', a:'instrumental · cadangan', src:'DOWNLOAD', dur:'2:15', vol:60, seed:51},
 ];
 const grid=document.getElementById('grid');
-let active=-1, muted=false;
+const fadeOutInput=document.getElementById('fadeOut'), fadeInInput=document.getElementById('fadeIn');
+let active=-1, level=0, muted=false, raf=null, fadingOut=false;
 
 function bars(seed){
   let s=seed,out='';
@@ -270,41 +297,64 @@ function paintVol(card,i){
 document.querySelectorAll('.card').forEach((c,i)=>paintVol(c,i));
 grid.addEventListener('input',e=>{
   if(e.target.type!=='range')return;
-  const card=e.target.closest('.card');
-  paintVol(card,+card.dataset.i);
+  const card=e.target.closest('.card'), i=+card.dataset.i;
+  paintVol(card,i);
+  if(active===i){cancelRaf();fadingOut=false;level=tracks[i].vol;setState()}
 });
 
 function setState(){
-  let lvl=0;
   document.querySelectorAll('.card').forEach((c,i)=>{
-    const on=i===active, tr=tracks[i];
-    c.classList.toggle('onair',on && tr.vol>0);
-    c.classList.toggle('silent',on && tr.vol===0);
+    const on=i===active;
+    c.classList.toggle('onair',on && level>0);
+    c.classList.toggle('silent',on && level<=0);
     c.querySelector('.lab').textContent= on ? 'SEDANG DIPUTAR' : 'PUTAR';
-    c.querySelector('.card-state').textContent= on ? (tr.vol===0?'VOLUME 0%':'ON AIR') : 'SIAP';
-    c.querySelector('.level span').style.width=(on?tr.vol:0)+'%';
-    if(on)lvl=tr.vol;
+    c.querySelector('.card-state').textContent= on ? (fadingOut?'FADING OUT':level<=0?'VOLUME 0%':'ON AIR') : 'SIAP';
+    c.querySelector('.level span').style.width=(on?level:0)+'%';
   });
   const tr=active>=0?tracks[active]:null;
   nowTitle.textContent=tr?tr.t:'— belum ada lagu —';
-  nowArtist.textContent=tr?(tr.vol===0?'volume kartu 0%':'volume kartu '+tr.vol+'%'):'pilih kartu untuk memulai';
-  meterFill.style.width=(muted?0:lvl)+'%';
-  pct.textContent=Math.round(muted?0:lvl)+'%';
-  statusEl.className='status'+(muted?' muted':!tr?'':tr.vol===0?' spot':' live');
-  statusText.textContent=muted?'MUTE SEMUA':!tr?'SIAP':tr.vol===0?'SUNYI · VOLUME 0%':'ON AIR · '+tr.src;
+  nowArtist.textContent=tr?(fadingOut?'fade keluar · '+Math.round(level)+'%':'volume kartu '+tr.vol+'%'):'pilih kartu untuk memulai';
+  meterFill.style.width=(muted?0:level)+'%';
+  pct.textContent=Math.round(muted?0:level)+'%';
+  statusEl.className='status'+(muted?' muted':!tr?'':fadingOut||level<=0?' spot':' live');
+  statusText.textContent=muted?'MUTE SEMUA':!tr?'SIAP':fadingOut?'FADING OUT · '+Math.round(level)+'%':level<=0?'SUNYI · VOLUME 0%':'ON AIR · '+tr.src;
   muteBtn.classList.toggle('on',muted);
   muteBtn.setAttribute('aria-pressed',String(muted));
 }
-function play(i){active=i;setState()}
-function stop(){active=-1;setState()}
+function cancelRaf(){if(raf)cancelAnimationFrame(raf);raf=null}
+function ramp(to,secs,done){
+  const from=level, t0=performance.now(), dur=Math.max(16,secs*1000);
+  (function step(now){
+    const p=Math.min(1,(now-t0)/dur);
+    level=from+(to-from)*p;
+    setState();
+    if(p<1)raf=requestAnimationFrame(step);
+    else{raf=null;if(done)done()}
+  })(t0);
+}
+function secs(input){const v=parseFloat(input.value);return Number.isFinite(v)&&v>0?Math.min(v,30):0}
+function play(i){
+  cancelRaf();fadingOut=false;active=i;
+  const fin=secs(fadeInInput);
+  if(fin>0){level=0;setState();ramp(tracks[i].vol,fin)}
+  else{level=tracks[i].vol;setState()}
+}
+function stop(){
+  if(active<0)return;
+  if(fadingOut){cancelRaf();fadingOut=false;active=-1;level=0;setState();return}
+  const fout=secs(fadeOutInput);
+  if(fout>0){fadingOut=true;ramp(0,fout,()=>{fadingOut=false;active=-1;level=0;setState()})}
+  else{active=-1;level=0;setState()}
+}
 function mute(){muted=!muted;setState()}
 function stepVolume(d){
   if(active<0)return;
   const input=document.querySelectorAll('.card')[active].querySelector('input');
   input.value=Math.max(0,Math.min(100,+input.value+d));
-  paintVol(input.closest('.card'),active);
+  const card=input.closest('.card'), i=active;
+  paintVol(card,i);
+  cancelRaf();fadingOut=false;level=tracks[i].vol;setState();
 }
-
 grid.addEventListener('click',e=>{
   const p=e.target.closest('[data-play]'); if(p){play(+p.dataset.play);return}
   const s=e.target.closest('[data-stop]'); if(s && +s.dataset.stop===active)stop();
@@ -314,7 +364,7 @@ document.getElementById('btnVolUp').onclick=()=>stepVolume(5);
 document.getElementById('btnStop').onclick=stop;
 muteBtn.onclick=mute;
 document.addEventListener('keydown',e=>{
-  if(e.target.tagName==='SELECT'||e.target.type==='range')return;
+  if(e.target.tagName==='SELECT'||e.target.type==='range'||e.target.type==='number')return;
   if(/^[1-8]$/.test(e.key)){play(+e.key-1);e.preventDefault()}
   else if(e.key==='ArrowDown'){stepVolume(-5);e.preventDefault()}
   else if(e.key==='ArrowUp'){stepVolume(5);e.preventDefault()}
