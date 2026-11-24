@@ -20,8 +20,9 @@ body{
   font-family:'DM Sans',system-ui,sans-serif;
   display:flex; flex-direction:column; min-height:100vh; overflow-x:hidden;
 }
-button{font:inherit; color:inherit; cursor:pointer; border:0; background:none}
-button:focus-visible,select:focus-visible{outline:2px solid var(--amber); outline-offset:3px}
+button,input{font:inherit; color:inherit}
+button{cursor:pointer; border:0; background:none}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--amber); outline-offset:3px}
 .mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
 
 /* ── topbar ── */
@@ -40,8 +41,8 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--amber); outlin
 .status .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px rgba(124,224,180,.55);flex:none}
 .status.live{color:var(--coral);border-color:rgba(255,118,84,.45)}
 .status.live .dot{background:var(--coral);box-shadow:0 0 12px rgba(255,118,84,.7)}
-.status.spot{color:var(--amber);border-color:rgba(243,196,92,.45)}
-.status.spot .dot{background:var(--amber);box-shadow:0 0 12px rgba(243,196,92,.6)}
+.status.spot,.status.low{color:var(--amber);border-color:rgba(243,196,92,.45)}
+.status.spot .dot,.status.low .dot{background:var(--amber);box-shadow:0 0 12px rgba(243,196,92,.6)}
 .status.muted{color:var(--danger);border-color:rgba(255,95,86,.45)}
 .status.muted .dot{background:var(--danger);box-shadow:0 0 12px rgba(255,95,86,.6)}
 .top-spacer{flex:1}
@@ -55,46 +56,73 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--amber); outlin
 .clock{font:500 12px 'IBM Plex Mono',monospace;color:var(--muted);letter-spacing:.1em}
 
 /* ── main ── */
-main{flex:1; padding:26px 30px 132px}
-.sec-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+main{flex:1; padding:24px 30px 138px}
+.sec-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap}
 .sec-head h2{font:600 13px 'IBM Plex Mono',monospace;letter-spacing:.22em;text-transform:uppercase;color:var(--ink)}
 .sec-head p{font:400 11px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--muted)}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 
 .card{
   position:relative; background:var(--surface); border:1px solid var(--line); border-radius:14px;
-  padding:16px 16px 14px; min-height:214px; display:flex; flex-direction:column;
+  padding:14px 15px 13px; min-height:258px; display:flex; flex-direction:column;
   transition:border-color .18s ease, background .18s ease, transform .18s ease, box-shadow .18s ease;
 }
 .card:hover{border-color:#556150; background:var(--surface-2); transform:translateY(-2px)}
 .card.onair{border-color:var(--coral); background:#211914; box-shadow:0 0 0 1px rgba(255,118,84,.25),0 12px 34px rgba(255,118,84,.09)}
 .card.faded{border-color:var(--amber)}
-.card-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.card-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .num{font:600 11px 'IBM Plex Mono',monospace;color:var(--ink);letter-spacing:.08em}
 .card.faded .num,.card.onair .num{color:var(--coral)}
 .badge{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:3px 7px}
-.badge.down{color:var(--amber);border-color:rgba(243,196,92,.4)}
-.card.faded .badge:not(.down),.card.onair .badge:not(.down){color:var(--coral);border-color:rgba(255,118,84,.4)}
+.card.faded .badge,.card.onair .badge{color:var(--coral);border-color:rgba(255,118,84,.4)}
 .dur{margin-left:auto;font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)}
-.title{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600;line-height:1.15;letter-spacing:-.02em;margin-bottom:5px}
+.title{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;line-height:1.15;letter-spacing:-.02em;margin-bottom:4px}
 .artist{font:400 11px 'IBM Plex Mono',monospace;color:var(--muted);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wave{height:30px;margin:15px 0 12px;display:flex;align-items:center;gap:2px;opacity:.55}
+.wave{height:22px;margin:11px 0 8px;display:flex;align-items:center;gap:2px;opacity:.55}
 .wave i{display:block;width:3px;min-width:2px;flex:1;background:var(--muted);border-radius:2px;opacity:.5}
 .card.onair .wave i{background:var(--coral);opacity:.85}
 .card.faded .wave i{background:var(--amber);opacity:.7}
-.card-foot{margin-top:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ── volume window ── */
+.volhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.volhead span{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:var(--muted)}
+.volhead b{font:600 10px 'IBM Plex Mono',monospace;color:var(--ink)}
+.vrange{position:relative;height:26px;margin-bottom:4px}
+.vrail{position:absolute;left:0;right:0;top:11px;height:5px;border-radius:3px;background:#2A332A}
+.vfill{position:absolute;top:11px;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--amber),var(--mint))}
+.vrange input[type=range]{
+  position:absolute;left:0;top:0;width:100%;height:26px;margin:0;background:none;
+  -webkit-appearance:none;appearance:none;pointer-events:none;
+}
+.vrange input[type=range]::-webkit-slider-runnable-track{height:26px;background:transparent}
+.vrange input[type=range]::-moz-range-track{height:26px;background:transparent}
+.vrange input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;pointer-events:auto;
+  width:13px;height:19px;margin-top:3px;border-radius:4px;background:var(--ink);
+  border:2px solid var(--bg);box-shadow:0 0 0 1px var(--line);cursor:ew-resize;
+}
+.vrange input[type=range]::-moz-range-thumb{
+  pointer-events:auto;width:11px;height:17px;border-radius:4px;background:var(--ink);
+  border:2px solid var(--bg);box-shadow:0 0 0 1px var(--line);cursor:ew-resize;
+}
+.card.onair .vrange input[type=range]::-webkit-slider-thumb{background:var(--coral)}
+.card.onair .vrange input[type=range]::-moz-range-thumb{background:var(--coral)}
+.vlabels{display:flex;justify-content:space-between;font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:var(--muted)}
+.vlabels b{color:var(--ink);font-weight:600}
+
+.card-foot{margin-top:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:8px}
 .fade-meta{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--muted);white-space:nowrap}
 .fade-meta b{color:var(--ink);font-weight:600}
 .play{
   margin-left:auto; display:flex; align-items:center; gap:8px;
-  background:var(--ink); color:var(--bg); border-radius:8px; padding:10px 13px;
+  background:var(--ink); color:var(--bg); border-radius:8px; padding:9px 12px;
   font:700 11px 'IBM Plex Mono',monospace; letter-spacing:.08em; transition:background .15s ease,transform .15s ease;
 }
 .play:hover{background:var(--mint);transform:translateY(-1px)}
 .card.onair .play,.card.faded .play{background:var(--coral);color:#160C08}
 .card.onair .play:hover,.card.faded .play:hover{background:#FF8E72}
 kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-radius:3px;padding:1px 4px;opacity:.65}
-.stop{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;color:var(--muted);flex:none}
+.stop{width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;color:var(--muted);flex:none}
 .stop:hover{color:var(--danger);border-color:var(--danger)}
 .stop svg{width:13px;height:13px;fill:currentColor}
 .level{position:absolute;left:0;right:0;bottom:0;height:3px;background:#242B24;border-radius:0 0 13px 13px;overflow:hidden}
@@ -178,13 +206,13 @@ kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-
     <div class="meter"><span id="meterFill"></span></div>
   </div>
   <div class="ctl">
-    <button class="tbtn fade-out" id="btnDown" aria-label="Fade turun">
+    <button class="tbtn fade-out" id="btnDown" aria-label="Fade turun ke volume bawah kartu">
       <svg viewBox="0 0 24 24"><path d="M12 4v13M6 12l6 6 6-6M4 21h16"/></svg>
-      FADE TURUN <kbd>SPACE</kbd>
+      TURUN <kbd>SPACE</kbd>
     </button>
-    <button class="tbtn fade-in" id="btnUp" aria-label="Fade naik">
+    <button class="tbtn fade-in" id="btnUp" aria-label="Fade naik ke volume atas kartu">
       <svg viewBox="0 0 24 24"><path d="M12 20V7M6 13l6-6 6 6M4 4h16"/></svg>
-      FADE NAIK <kbd>ENTER</kbd>
+      NAIK <kbd>ENTER</kbd>
     </button>
     <button class="tbtn stop" id="btnStop" aria-label="Stop">
       <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>
@@ -199,14 +227,14 @@ kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-
 
 <script>
 const tracks=[
-  {t:'Sambutan Pembuka', a:'intro · warm keys', src:'MUSIC', dur:'2:48', down:3, up:5, seed:1},
-  {t:'Walk In — MC', a:'intro · woodwind', src:'MUSIC', dur:'1:32', down:2, up:4, seed:7},
-  {t:'Sambutan — Kepala Sekolah', a:'pengiring · strings', src:'MUSIC', dur:'3:10', down:4, up:6, seed:13},
-  {t:'Sambutan — Tamu Undangan', a:'pengiring · gitar', src:'MUSIC', dur:'2:24', down:3, up:5, seed:21},
-  {t:'Pengumuman', a:'ringan · perkusi', src:'DOWNLOAD', dur:'1:45', down:2, up:3, seed:29},
-  {t:'Antar Kembali', a:'outro · akustik', src:'MUSIC', dur:'2:02', down:3, up:5, seed:37},
-  {t:'Lagu Penutup', a:'orkestra · penutup', src:'MUSIC', dur:'3:36', down:5, up:6, seed:43},
-  {t:'Cadangan', a:'instrumental · cadangan', src:'DOWNLOAD', dur:'2:15', down:3, up:4, seed:51},
+  {t:'Sambutan Pembuka', a:'intro · warm keys', src:'MUSIC', dur:'2:48', down:3, up:5, lo:0,  hi:80, seed:1},
+  {t:'Walk In — MC', a:'intro · woodwind', src:'MUSIC', dur:'1:32', down:2, up:4, lo:0,  hi:72, seed:7},
+  {t:'Sambutan — Kepala Sekolah', a:'pengiring · strings', src:'MUSIC', dur:'3:10', down:4, up:6, lo:0,  hi:88, seed:13},
+  {t:'Sambutan — Tamu Undangan', a:'pengiring · gitar', src:'MUSIC', dur:'2:24', down:3, up:5, lo:0,  hi:70, seed:21},
+  {t:'Pengumuman', a:'ringan · perkusi', src:'DOWNLOAD', dur:'1:45', down:2, up:3, lo:12, hi:65, seed:29},
+  {t:'Antar Kembali', a:'outro · akustik', src:'MUSIC', dur:'2:02', down:3, up:5, lo:0,  hi:78, seed:37},
+  {t:'Lagu Penutup', a:'orkestra · penutup', src:'MUSIC', dur:'3:36', down:5, up:6, lo:15, hi:90, seed:43},
+  {t:'Cadangan', a:'instrumental · cadangan', src:'DOWNLOAD', dur:'2:15', down:3, up:4, lo:0,  hi:60, seed:51},
 ];
 const grid=document.getElementById('grid');
 let active=-1, level=0, muted=false, raf=null;
@@ -224,6 +252,13 @@ tracks.forEach((tr,i)=>{
       <span class="badge">${tr.src}</span><span class="dur">${tr.dur}</span></div>
     <div class="title">${tr.t}</div><div class="artist">${tr.a}</div>
     <div class="wave" aria-hidden="true">${bars(tr.seed)}</div>
+    <div class="volhead"><span>VOLUME KARTU</span><b>${tr.lo}% → ${tr.hi}%</b></div>
+    <div class="vrange">
+      <div class="vrail"><div class="vfill"></div></div>
+      <input type="range" class="lo" min="0" max="100" value="${tr.lo}" step="1" aria-label="Volume bawah ${tr.t}">
+      <input type="range" class="hi" min="0" max="100" value="${tr.hi}" step="1" aria-label="Volume atas ${tr.t}">
+    </div>
+    <div class="vlabels"><span>BAWAH <b class="loVal">${tr.lo}%</b></span><span>ATAS <b class="hiVal">${tr.hi}%</b></span></div>
     <div class="card-foot">
       <span class="fade-meta">TURUN <b>${tr.down}s</b> · NAIK <b>${tr.up}s</b></span>
       <button class="play" data-play="${i}" aria-label="Putar ${tr.t}"><span class="lab">PUTAR</span><kbd>${i+1}</kbd></button>
@@ -233,6 +268,29 @@ tracks.forEach((tr,i)=>{
   grid.appendChild(el);
 });
 
+function paintRange(card){
+  const lo=+card.querySelector('.lo').value, hi=+card.querySelector('.hi').value;
+  const fill=card.querySelector('.vfill');
+  fill.style.left=lo+'%'; fill.style.width=(hi-lo)+'%';
+  card.querySelector('.loVal').textContent=lo+'%';
+  card.querySelector('.hiVal').textContent=hi+'%';
+  card.querySelector('.volhead b').textContent=lo+'% → '+hi+'%';
+  return {lo,hi};
+}
+document.querySelectorAll('.card').forEach(paintRange);
+grid.addEventListener('input',e=>{
+  if(!e.target.matches('.lo,.hi'))return;
+  const card=e.target.closest('.card'), lo=card.querySelector('.lo'), hi=card.querySelector('.hi');
+  if(e.target===lo && +lo.value>+hi.value-2)lo.value=Math.max(0,+hi.value-2);
+  if(e.target===hi && +hi.value<+lo.value+2)hi.value=Math.min(100,+lo.value+2);
+  tracks[+card.dataset.i].lo=+lo.value; tracks[+card.dataset.i].hi=+hi.value;
+  paintRange(card);
+  if(active===+card.dataset.i){
+    const tr=tracks[active];
+    ramp(level>tr.lo+1?tr.hi:tr.lo,.4);
+  }
+});
+
 const statusEl=document.getElementById('status'), statusText=document.getElementById('statusText');
 const nowTitle=document.getElementById('nowTitle'), nowArtist=document.getElementById('nowArtist');
 const meterFill=document.getElementById('meterFill'), pct=document.getElementById('pct');
@@ -240,20 +298,21 @@ const muteBtn=document.getElementById('btnMute');
 
 function setState(){
   document.querySelectorAll('.card').forEach((c,i)=>{
-    const on=i===active;
-    c.classList.toggle('onair',on && level>0.01);
-    c.classList.toggle('faded',on && level<=0.01);
-    const lab=c.querySelector('.lab');
-    lab.textContent= on ? (level>0.01?'FADE TURUN':'FADE NAIK') : 'PUTAR';
-    c.querySelector('.level span').style.width=(on?level*100:0)+'%';
+    const on=i===active, tr=tracks[i];
+    const atLow=Math.abs(level-tr.lo)<1;
+    c.classList.toggle('onair',on && !atLow && level>1);
+    c.classList.toggle('faded',on && atLow);
+    c.querySelector('.lab').textContent= on ? (atLow?'NAIK LAGI':'TURUN') : 'PUTAR';
+    c.querySelector('.level span').style.width=(on?level:0)+'%';
   });
   const tr=active>=0?tracks[active]:null;
+  const atLow=tr && Math.abs(level-tr.lo)<1;
   nowTitle.textContent=tr?tr.t:'— belum ada lagu —';
-  nowArtist.textContent=tr?(level>0.01?'sedang diputar':'sunyi · efek spot'):'pilih kartu untuk memulai';
-  meterFill.style.width=(muted?0:level*100)+'%';
-  pct.textContent=Math.round(muted?0:level*100)+'%';
-  statusEl.className='status'+(muted?' muted':active<0?'':level>0.01?' live':' spot');
-  statusText.textContent=muted?'MUTE SEMUA':active<0?'SIAP':level>0.01?'ON AIR · '+tr.src:'SUNYI · EFEK SPOT';
+  nowArtist.textContent=tr?(atLow?(tr.lo===0?'sunyi · efek spot':'volume rendah · '+tr.lo+'%'):'sedang diputar · batas '+tr.hi+'%'):'pilih kartu untuk memulai';
+  meterFill.style.width=(muted?0:level)+'%';
+  pct.textContent=Math.round(muted?0:level)+'%';
+  statusEl.className='status'+(muted?' muted':!tr?'':atLow?(tr.lo===0?' spot':' low'):' live');
+  statusText.textContent=muted?'MUTE SEMUA':!tr?'SIAP':atLow?(tr.lo===0?'SUNYI · EFEK SPOT':'VOLUME RENDAH'):'ON AIR · '+tr.src;
   muteBtn.classList.toggle('on',muted);
   muteBtn.setAttribute('aria-pressed',String(muted));
 }
@@ -269,27 +328,27 @@ function ramp(to,secs){
   })(t0);
 }
 function play(i){
-  if(active>=0 && active!==i) level=0;
-  active=i;
-  nowTitle.textContent=tracks[i].t;
-  ramp(1,tracks[i].up);
+  if(active>=0 && active!==i)level=0;
+  active=i; ramp(tracks[i].hi,tracks[i].up);
 }
 function stop(){if(raf)cancelAnimationFrame(raf);active=-1;level=0;setState()}
 function mute(){muted=!muted;setState()}
+function down(){if(active>=0)ramp(tracks[active].lo,tracks[active].down)}
+function up(){if(active<0)play(0);else ramp(tracks[active].hi,tracks[active].up)}
 
 grid.addEventListener('click',e=>{
   const p=e.target.closest('[data-play]'); if(p){play(+p.dataset.play);return}
   const s=e.target.closest('[data-stop]'); if(s && +s.dataset.stop===active)stop();
 });
-document.getElementById('btnDown').onclick=()=>ramp(0,active>=0?tracks[active].down:3);
-document.getElementById('btnUp').onclick=()=>{if(active<0)play(0);else ramp(1,tracks[active].up)};
+document.getElementById('btnDown').onclick=down;
+document.getElementById('btnUp').onclick=up;
 document.getElementById('btnStop').onclick=stop;
 muteBtn.onclick=mute;
 document.addEventListener('keydown',e=>{
-  if(e.target.tagName==='SELECT')return;
+  if(e.target.tagName==='SELECT'||e.target.type==='range')return;
   if(/^[1-8]$/.test(e.key)){play(+e.key-1);e.preventDefault()}
-  else if(e.code==='Space'){ramp(0,active>=0?tracks[active].down:3);e.preventDefault()}
-  else if(e.key==='Enter'){if(active<0)play(0);else ramp(1,tracks[active].up);e.preventDefault()}
+  else if(e.code==='Space'){down();e.preventDefault()}
+  else if(e.key==='Enter'){up();e.preventDefault()}
   else if(e.key.toLowerCase()==='x')stop();
   else if(e.key.toLowerCase()==='m')mute();
 });
