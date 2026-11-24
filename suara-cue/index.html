@@ -56,27 +56,14 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
 /* ── main ── */
 main{flex:1; padding:22px 30px 138px}
-.sec-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+.sec-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap}
 .sec-head h2{font:600 13px 'IBM Plex Mono',monospace;letter-spacing:.22em;text-transform:uppercase;color:var(--ink)}
 .sec-head p{font:400 11px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--muted)}
-.settings{
-  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
-  background:var(--surface);border:1px solid var(--line);border-radius:12px;
-  padding:10px 14px;margin-bottom:16px;
-}
-.set{display:flex;align-items:center;gap:8px}
-.slabel{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.14em;color:var(--muted)}
-.set input{
-  width:56px;background:#0E110E;border:1px solid var(--line);border-radius:6px;
-  color:var(--ink);font:600 13px 'IBM Plex Mono',monospace;text-align:center;padding:6px 4px;
-}
-.sunit{font:500 9px 'IBM Plex Mono',monospace;color:var(--muted)}
-.shint{margin-left:auto;font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--muted)}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 
 .card{
   position:relative; background:var(--surface); border:1px solid var(--line); border-radius:14px;
-  padding:14px 15px 13px; min-height:246px; display:flex; flex-direction:column;
+  padding:14px 15px 13px; min-height:274px; display:flex; flex-direction:column;
   transition:border-color .18s ease, background .18s ease, transform .18s ease, box-shadow .18s ease;
 }
 .card:hover{border-color:#556150; background:var(--surface-2); transform:translateY(-2px)}
@@ -90,12 +77,12 @@ main{flex:1; padding:22px 30px 138px}
 .dur{margin-left:auto;font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)}
 .title{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;line-height:1.15;letter-spacing:-.02em;margin-bottom:4px}
 .artist{font:400 11px 'IBM Plex Mono',monospace;color:var(--muted);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wave{height:22px;margin:11px 0 8px;display:flex;align-items:center;gap:2px;opacity:.55}
+.wave{height:20px;margin:10px 0 8px;display:flex;align-items:center;gap:2px;opacity:.55}
 .wave i{display:block;width:3px;min-width:2px;flex:1;background:var(--muted);border-radius:2px;opacity:.5}
 .card.onair .wave i{background:var(--coral);opacity:.85}
 .card.silent .wave i{background:var(--amber);opacity:.7}
 
-/* ── volume: satu slider, menyimpan di kartu ── */
+/* ── volume: slider kartu ikut bergerak saat fade ── */
 .volhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
 .volhead span{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:var(--muted)}
 .volhead b{font:600 11px 'IBM Plex Mono',monospace;color:var(--ink)}
@@ -114,9 +101,15 @@ main{flex:1; padding:22px 30px 138px}
 }
 .card.onair .vrange input[type=range]::-webkit-slider-thumb{background:var(--coral)}
 .card.onair .vrange input[type=range]::-moz-range-thumb{background:var(--coral)}
+.fade-set{display:flex;gap:14px;margin:6px 0 0}
+.fade-set label{display:flex;align-items:center;gap:5px;font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:var(--muted)}
+.fade-set input{
+  width:40px;background:#0E110E;border:1px solid var(--line);border-radius:5px;
+  color:var(--ink);font:600 10px 'IBM Plex Mono',monospace;text-align:center;padding:4px 2px;
+}
 
 .card-foot{margin-top:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:9px}
-.card-state{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:var(--muted)}
+.card-state{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--muted)}
 .card.onair .card-state{color:var(--coral)}
 .card.silent .card-state{color:var(--amber)}
 .play{
@@ -198,20 +191,7 @@ kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-
 <main>
   <div class="sec-head">
     <h2>Papan Lagu</h2>
-    <p>1–8 PILIH &nbsp;·&nbsp; ↑↓ VOLUME KARTU &nbsp;·&nbsp; X STOP &nbsp;·&nbsp; M MUTE</p>
-  </div>
-  <div class="settings">
-    <div class="set">
-      <span class="slabel">HENTIKAN · FADE KELUAR</span>
-      <input id="fadeOut" type="number" min="0" max="30" step="0.5" value="3" aria-label="Durasi fade saat stop dalam detik">
-      <span class="sunit">detik</span>
-    </div>
-    <div class="set">
-      <span class="slabel">MULAI · FADE MASUK</span>
-      <input id="fadeIn" type="number" min="0" max="30" step="0.5" value="0" aria-label="Durasi fade saat mulai dalam detik">
-      <span class="sunit">detik</span>
-    </div>
-    <span class="shint">0 = LANGSUNG &nbsp;·&nbsp; STOP DITEKAN LAGI = HENTI SEKETIKA</span>
+    <p>1–8 PILIH &nbsp;·&nbsp; ↑↓ VOLUME &nbsp;·&nbsp; X STOP &nbsp;·&nbsp; M MUTE &nbsp;·&nbsp; 0 DETIK = LANGSUNG</p>
   </div>
   <div class="grid" id="grid"></div>
 </main>
@@ -232,7 +212,7 @@ kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-
       <svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5ZM16 9l5 6M16 15l5-6"/></svg>
       VOL + <kbd>↑</kbd>
     </button>
-    <button class="tbtn stop" id="btnStop" aria-label="Stop dengan fade keluar">
+    <button class="tbtn stop" id="btnStop" aria-label="Stop dengan hitung mundur kartu">
       <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>
       STOP <kbd>X</kbd>
     </button>
@@ -245,18 +225,17 @@ kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-
 
 <script>
 const tracks=[
-  {t:'Sambutan Pembuka', a:'intro · warm keys', src:'MUSIC', dur:'2:48', vol:80, seed:1},
-  {t:'Walk In — MC', a:'intro · woodwind', src:'MUSIC', dur:'1:32', vol:72, seed:7},
-  {t:'Sambutan — Kepala Sekolah', a:'pengiring · strings', src:'MUSIC', dur:'3:10', vol:88, seed:13},
-  {t:'Sambutan — Tamu Undangan', a:'pengiring · gitar', src:'MUSIC', dur:'2:24', vol:70, seed:21},
-  {t:'Pengumuman', a:'ringan · perkusi', src:'DOWNLOAD', dur:'1:45', vol:65, seed:29},
-  {t:'Antar Kembali', a:'outro · akustik', src:'MUSIC', dur:'2:02', vol:78, seed:37},
-  {t:'Lagu Penutup', a:'orkestra · penutup', src:'MUSIC', dur:'3:36', vol:90, seed:43},
-  {t:'Cadangan', a:'instrumental · cadangan', src:'DOWNLOAD', dur:'2:15', vol:60, seed:51},
+  {t:'Sambutan Pembuka', a:'intro · warm keys', src:'MUSIC', dur:'2:48', vol:80, fout:3, fin:0, seed:1},
+  {t:'Walk In — MC', a:'intro · woodwind', src:'MUSIC', dur:'1:32', vol:72, fout:3, fin:0, seed:7},
+  {t:'Sambutan — Kepala Sekolah', a:'pengiring · strings', src:'MUSIC', dur:'3:10', vol:88, fout:4, fin:2, seed:13},
+  {t:'Sambutan — Tamu Undangan', a:'pengiring · gitar', src:'MUSIC', dur:'2:24', vol:70, fout:3, fin:0, seed:21},
+  {t:'Pengumuman', a:'ringan · perkusi', src:'DOWNLOAD', dur:'1:45', vol:65, fout:2, fin:1, seed:29},
+  {t:'Antar Kembali', a:'outro · akustik', src:'MUSIC', dur:'2:02', vol:78, fout:3, fin:0, seed:37},
+  {t:'Lagu Penutup', a:'orkestra · penutup', src:'MUSIC', dur:'3:36', vol:90, fout:5, fin:3, seed:43},
+  {t:'Cadangan', a:'instrumental · cadangan', src:'DOWNLOAD', dur:'2:15', vol:60, fout:3, fin:0, seed:51},
 ];
 const grid=document.getElementById('grid');
-const fadeOutInput=document.getElementById('fadeOut'), fadeInInput=document.getElementById('fadeIn');
-let active=-1, level=0, muted=false, raf=null, fadingOut=false;
+let active=-1, level=0, muted=false, raf=null, fadingOut=false, fadingIn=false, fadeLeft=0;
 
 function bars(seed){
   let s=seed,out='';
@@ -273,6 +252,10 @@ tracks.forEach((tr,i)=>{
     <div class="wave" aria-hidden="true">${bars(tr.seed)}</div>
     <div class="volhead"><span>VOLUME KARTU</span><b class="volNum">${tr.vol}%</b></div>
     <div class="vrange"><input type="range" min="0" max="100" step="1" value="${tr.vol}" aria-label="Volume ${tr.t}"></div>
+    <div class="fade-set">
+      <label>KELUAR <input class="fout" type="number" min="0" max="30" step="0.5" value="${tr.fout}" aria-label="Detik fade keluar ${tr.t}">s</label>
+      <label>MASUK <input class="fin" type="number" min="0" max="30" step="0.5" value="${tr.fin}" aria-label="Detik fade masuk ${tr.t}">s</label>
+    </div>
     <div class="card-foot">
       <span class="card-state">SIAP</span>
       <button class="play" data-play="${i}" aria-label="Putar ${tr.t}"><span class="lab">PUTAR</span><kbd>${i+1}</kbd></button>
@@ -286,38 +269,55 @@ const statusEl=document.getElementById('status'), statusText=document.getElement
 const nowTitle=document.getElementById('nowTitle'), nowArtist=document.getElementById('nowArtist');
 const meterFill=document.getElementById('meterFill'), pct=document.getElementById('pct');
 const muteBtn=document.getElementById('btnMute');
+const cards=[...document.querySelectorAll('.card')];
 
-function paintVol(card,i){
-  const v=+card.querySelector('input').value;
-  card.querySelector('input').style.setProperty('--track',`linear-gradient(90deg,#FF7654 ${v}%,#2A332A ${v}%)`);
-  card.querySelector('.volNum').textContent=v+'%';
-  tracks[i].vol=v;
-  setState();
+function setSlider(card,v){
+  const inp=card.querySelector('.vrange input');
+  inp.value=v;
+  inp.style.setProperty('--track',`linear-gradient(90deg,#FF7654 ${v}%,#2A332A ${v}%)`);
+  card.querySelector('.volNum').textContent=Math.round(v)+'%';
 }
-document.querySelectorAll('.card').forEach((c,i)=>paintVol(c,i));
+function restoreSlider(card,i){setSlider(card,tracks[i].vol)}
+cards.forEach((c,i)=>setSlider(c,tracks[i].vol));
+
+function numSec(v){const n=parseFloat(v);return Number.isFinite(n)&&n>0?Math.min(n,30):0}
 grid.addEventListener('input',e=>{
-  if(e.target.type!=='range')return;
-  const card=e.target.closest('.card'), i=+card.dataset.i;
-  paintVol(card,i);
-  if(active===i){cancelRaf();fadingOut=false;level=tracks[i].vol;setState()}
+  const t=e.target, card=t.closest('.card'); if(!card)return;
+  const i=+card.dataset.i;
+  if(t.type==='range'){
+    tracks[i].vol=+t.value;
+    setSlider(card,+t.value);
+    if(active===i){cancelRaf();fadingOut=false;fadingIn=false;fadeLeft=0;level=tracks[i].vol}
+    setState();
+  } else if(t.classList.contains('fout')) tracks[i].fout=numSec(t.value);
+  else if(t.classList.contains('fin')) tracks[i].fin=numSec(t.value);
 });
 
 function setState(){
-  document.querySelectorAll('.card').forEach((c,i)=>{
+  cards.forEach((c,i)=>{
     const on=i===active;
     c.classList.toggle('onair',on && level>0);
     c.classList.toggle('silent',on && level<=0);
     c.querySelector('.lab').textContent= on ? 'SEDANG DIPUTAR' : 'PUTAR';
-    c.querySelector('.card-state').textContent= on ? (fadingOut?'FADING OUT':level<=0?'VOLUME 0%':'ON AIR') : 'SIAP';
+    c.querySelector('.card-state').textContent= on
+      ? (fadingOut?'HITUNG MUNDUR '+fadeLeft.toFixed(1)+'s'
+        : fadingIn?'FADE MASUK '+fadeLeft.toFixed(1)+'s'
+        : level<=0?'VOLUME 0%':'ON AIR')
+      : 'SIAP';
     c.querySelector('.level span').style.width=(on?level:0)+'%';
   });
   const tr=active>=0?tracks[active]:null;
   nowTitle.textContent=tr?tr.t:'— belum ada lagu —';
-  nowArtist.textContent=tr?(fadingOut?'fade keluar · '+Math.round(level)+'%':'volume kartu '+tr.vol+'%'):'pilih kartu untuk memulai';
+  nowArtist.textContent=tr?(fadingOut?'hitung mundur '+fadeLeft.toFixed(1)+'s · '+Math.round(level)+'%'
+    : fadingIn?'naik ke '+tr.vol+'% · '+Math.round(level)+'%'
+    : 'volume kartu '+tr.vol+'%'):'pilih kartu untuk memulai';
   meterFill.style.width=(muted?0:level)+'%';
   pct.textContent=Math.round(muted?0:level)+'%';
-  statusEl.className='status'+(muted?' muted':!tr?'':fadingOut||level<=0?' spot':' live');
-  statusText.textContent=muted?'MUTE SEMUA':!tr?'SIAP':fadingOut?'FADING OUT · '+Math.round(level)+'%':level<=0?'SUNYI · VOLUME 0%':'ON AIR · '+tr.src;
+  statusEl.className='status'+(muted?' muted':!tr?'':fadingOut||fadingIn||level<=0?' spot':' live');
+  statusText.textContent=muted?'MUTE SEMUA':!tr?'SIAP'
+    :fadingOut?'HITUNG MUNDUR '+fadeLeft.toFixed(1)+'s'
+    :fadingIn?'FADE MASUK '+fadeLeft.toFixed(1)+'s'
+    :level<=0?'SUNYI · VOLUME 0%':'ON AIR · '+tr.src;
   muteBtn.classList.toggle('on',muted);
   muteBtn.setAttribute('aria-pressed',String(muted));
 }
@@ -327,33 +327,43 @@ function ramp(to,secs,done){
   (function step(now){
     const p=Math.min(1,(now-t0)/dur);
     level=from+(to-from)*p;
+    fadeLeft=Math.max(0,(1-p)*secs);
+    if(active>=0)setSlider(cards[active],level);
     setState();
     if(p<1)raf=requestAnimationFrame(step);
-    else{raf=null;if(done)done()}
+    else{raf=null;fadeLeft=0;if(done)done()}
   })(t0);
 }
-function secs(input){const v=parseFloat(input.value);return Number.isFinite(v)&&v>0?Math.min(v,30):0}
 function play(i){
-  cancelRaf();fadingOut=false;active=i;
-  const fin=secs(fadeInInput);
-  if(fin>0){level=0;setState();ramp(tracks[i].vol,fin)}
-  else{level=tracks[i].vol;setState()}
+  cancelRaf();fadingOut=false;fadingIn=false;active=i;
+  const fin=numSec(tracks[i].fin);
+  if(fin>0){
+    level=0;setSlider(cards[i],0);fadingIn=true;setState();
+    ramp(tracks[i].vol,fin,()=>{fadingIn=false;setState()});
+  } else {
+    level=tracks[i].vol;setSlider(cards[i],tracks[i].vol);setState();
+  }
 }
 function stop(){
   if(active<0)return;
-  if(fadingOut){cancelRaf();fadingOut=false;active=-1;level=0;setState();return}
-  const fout=secs(fadeOutInput);
-  if(fout>0){fadingOut=true;ramp(0,fout,()=>{fadingOut=false;active=-1;level=0;setState()})}
-  else{active=-1;level=0;setState()}
+  const i=active;
+  if(fadingOut||fadingIn){
+    cancelRaf();fadingOut=false;fadingIn=false;fadeLeft=0;
+    restoreSlider(cards[i],i);active=-1;level=0;setState();return;
+  }
+  const fout=numSec(tracks[i].fout);
+  if(fout>0){
+    fadingOut=true;
+    ramp(0,fout,()=>{fadingOut=false;restoreSlider(cards[i],i);active=-1;level=0;setState()});
+  } else {restoreSlider(cards[i],i);active=-1;level=0;setState()}
 }
 function mute(){muted=!muted;setState()}
 function stepVolume(d){
   if(active<0)return;
-  const input=document.querySelectorAll('.card')[active].querySelector('input');
-  input.value=Math.max(0,Math.min(100,+input.value+d));
-  const card=input.closest('.card'), i=active;
-  paintVol(card,i);
-  cancelRaf();fadingOut=false;level=tracks[i].vol;setState();
+  const card=cards[active], inp=card.querySelector('.vrange input');
+  inp.value=Math.max(0,Math.min(100,+inp.value+d));
+  tracks[active].vol=+inp.value;setSlider(card,+inp.value);
+  cancelRaf();fadingOut=false;fadingIn=false;fadeLeft=0;level=tracks[active].vol;setState();
 }
 grid.addEventListener('click',e=>{
   const p=e.target.closest('[data-play]'); if(p){play(+p.dataset.play);return}
