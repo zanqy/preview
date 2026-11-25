@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suara — Cue Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0D0B;--surface:#171B17;--surface-2:#1D221D;--ink:#F3F0E7;--muted:#B7BFB4;--line:#333B33;--coral:#FF7654;--amber:#F3C45C;--mint:#7CE0B4;--danger:#FF5F56}
+*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;display:flex;flex-direction:column;min-height:100vh;overflow-x:hidden}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.topbar{display:flex;align-items:center;gap:24px;padding:16px 30px 14px;border-bottom:1px solid var(--line);background:#0E110E;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:14px}.brand h1{font-family:'Fraunces',Georgia,serif;font-size:29px;font-weight:600;letter-spacing:-.04em;line-height:1}
+.brand .tag{font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.24em;color:var(--muted)}
+.status{display:flex;align-items:center;gap:9px;padding:8px 14px;border:1px solid var(--line);border-radius:999px;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:var(--muted);background:var(--surface);min-width:180px}
+.status .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px rgba(124,224,180,.55);flex:none}
+.status.live{color:var(--coral);border-color:rgba(255,118,84,.45)}.status.live .dot{background:var(--coral);box-shadow:0 0 12px rgba(255,118,84,.7)}
+.status.spot{color:var(--amber);border-color:rgba(243,196,92,.45)}.status.spot .dot{background:var(--amber);box-shadow:0 0 12px rgba(243,196,92,.6)}
+.status.muted{color:var(--danger);border-color:rgba(255,95,86,.45)}.status.muted .dot{background:var(--danger)}
+.top-spacer{flex:1}.output{display:flex;align-items:center;gap:10px;font:500 11px 'IBM Plex Mono',monospace;color:var(--muted);letter-spacing:.1em}
+.output select{appearance:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 14px;font:500 11px 'IBM Plex Mono',monospace}
+.clock{font:500 12px 'IBM Plex Mono',monospace;color:var(--muted);letter-spacing:.1em}
+main{flex:1;padding:18px 30px 138px}
+.palets{display:flex;align-items:center;gap:8px;overflow-x:auto;padding:4px 0 14px;margin-bottom:14px;border-bottom:1px solid var(--line);scrollbar-width:thin}
+.palet{display:flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--muted);font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;white-space:nowrap;flex:none;transition:all .16s}
+.palet:hover{border-color:#556150;color:var(--ink)}.palet.on{border-color:var(--coral);color:var(--ink);background:#211914}
+.palet .live-dot{width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 9px rgba(255,118,84,.8);flex:none}
+.palet.new{border-style:dashed;color:var(--mint);border-color:rgba(124,224,180,.45)}
+.sec-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.sec-head h2{font:600 13px 'IBM Plex Mono',monospace;letter-spacing:.22em;text-transform:uppercase}
+.sec-head p{font:400 10px 'IBM Plex Mono',monospace;color:var(--muted);letter-spacing:.06em}
+.sec-actions{display:flex;gap:8px}.add{padding:10px 14px;border:1px solid var(--mint);border-radius:8px;color:var(--mint);font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.08em}
+.add.alt{border-color:var(--line);color:var(--muted)}.add:hover{background:rgba(124,224,180,.12)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 15px 13px;min-height:342px;display:flex;flex-direction:column;transition:border-color .18s,background .18s,transform .18s}
+.card:hover{border-color:#556150;background:var(--surface-2);transform:translateY(-2px)}
+.card.onair{border-color:var(--coral);background:#211914;box-shadow:0 0 0 1px rgba(255,118,84,.25),0 12px 34px rgba(255,118,84,.09)}
+.card.silent{border-color:var(--amber)}
+.card-top{display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.num{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.08em}.card.onair .num,.card.silent .num{color:var(--coral)}
+.badge{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.14em;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:3px 6px}
+.card.onair .badge,.card.silent .badge{color:var(--coral);border-color:rgba(255,118,84,.4)}
+.dur{margin-left:auto;font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)}
+.mv,.x{width:20px;height:20px;display:grid;place-items:center;color:var(--muted);font:600 13px 'IBM Plex Mono',monospace;line-height:1;border:1px solid var(--line);border-radius:4px}
+.mv:hover{color:var(--mint);border-color:var(--mint)}.x:hover{color:var(--danger);border-color:var(--danger)}
+.title{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;line-height:1.15;letter-spacing:-.02em;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.artist{font:400 11px 'IBM Plex Mono',monospace;color:var(--muted);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wave{height:20px;margin:10px 0 8px;display:flex;align-items:center;gap:2px;opacity:.55}
+.wave i{display:block;width:3px;min-width:2px;flex:1;background:var(--muted);border-radius:2px;opacity:.5}
+.card.onair .wave i{background:var(--coral);opacity:.85}.card.silent .wave i{background:var(--amber);opacity:.7}
+.time-row{display:flex;justify-content:space-between;font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--muted)}
+.time-row b{color:var(--ink);font-weight:600}
+.seek{height:6px;margin-top:6px;border-radius:3px;background:#2A332A;cursor:pointer;overflow:hidden}
+.seek-fill{height:100%;width:0;background:var(--mint);border-radius:3px}.card.onair .seek-fill{background:var(--coral)}
+.volhead{display:flex;justify-content:space-between;align-items:center;margin-top:18px;margin-bottom:12px}
+.volhead span{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:var(--muted)}.volhead b{font:600 11px 'IBM Plex Mono',monospace}
+.vrange input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:30px;margin:0;background:transparent;cursor:ew-resize;display:block}
+.vrange input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--track,#2A332A)}
+.vrange input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--track,#2A332A)}
+.vrange input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:26px;margin-top:-9px;border-radius:5px;background:var(--ink);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--line)}
+.vrange input[type=range]::-moz-range-thumb{width:16px;height:24px;border-radius:5px;background:var(--ink);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--line)}
+.card.onair .vrange input[type=range]::-webkit-slider-thumb{background:var(--coral)}.card.onair .vrange input[type=range]::-moz-range-thumb{background:var(--coral)}
+.durbox{margin-top:18px;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:#121612}
+.durbox .cap{font:500 8px 'IBM Plex Mono',monospace;letter-spacing:.18em;color:var(--muted);margin-bottom:8px}
+.durrow{display:flex;gap:16px;align-items:center}
+.durrow label{display:flex;align-items:center;gap:6px;font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:var(--muted)}
+.durrow input{width:44px;background:#0E110E;border:1px solid var(--line);border-radius:5px;font:600 11px 'IBM Plex Mono',monospace;text-align:center;padding:6px 2px;color:var(--ink)}
+.card-foot{margin-top:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:14px}
+.card-state{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--muted)}
+.card.onair .card-state{color:var(--coral)}.card.silent .card-state{color:var(--amber)}
+.play{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);border-radius:8px;padding:9px 12px;font:700 11px 'IBM Plex Mono',monospace;letter-spacing:.08em}
+.play:hover{background:var(--mint)}.card.onair .play,.card.silent .play{background:var(--coral);color:#160C08}
+kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-radius:3px;padding:1px 4px;opacity:.65}
+.stop{width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;color:var(--muted);flex:none}.stop:hover{color:var(--danger);border-color:var(--danger)}
+.stop svg{width:13px;height:13px;fill:currentColor}
+.level{position:absolute;left:0;right:0;bottom:0;height:3px;background:#242B24;border-radius:0 0 13px 13px;overflow:hidden}
+.level span{display:block;height:100%;width:0;background:var(--coral);transition:width .08s linear}.card.silent .level span{background:var(--amber)}
+.transport{position:fixed;left:0;right:0;bottom:0;z-index:5;background:#101410;border-top:1px solid var(--line);padding:14px 30px 18px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;box-shadow:0 -18px 40px rgba(0,0,0,.45)}
+.now{min-width:250px;max-width:320px;flex:1}.now .lbl{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.2em;color:var(--muted);margin-bottom:6px}
+.now .nm{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.now .ar{font:400 10px 'IBM Plex Mono',monospace;color:var(--muted);margin-top:3px}
+.meter{height:5px;background:#242B24;border-radius:3px;margin-top:10px;overflow:hidden}.meter span{display:block;height:100%;width:0;background:var(--coral)}
+.ctl{display:flex;align-items:center;gap:10px}.tbtn{display:flex;align-items:center;gap:9px;padding:14px 17px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.1em}
+.tbtn:hover{background:var(--surface-2);border-color:#556150}.tbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tbtn.vol{color:var(--mint);border-color:rgba(124,224,180,.35)}.tbtn.stop{color:var(--coral);border-color:rgba(255,118,84,.35)}.tbtn kbd{opacity:.55}
+.master{display:flex;align-items:center;gap:12px;margin-left:auto}.mute{padding:14px 16px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:var(--muted)}
+.mute.on{background:var(--danger);border-color:var(--danger);color:#1A0706}.pct{font:600 22px 'IBM Plex Mono',monospace;min-width:64px;text-align:right}
+@media(max-width:1100px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:780px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:16px 16px 170px}.topbar,.transport{padding-left:16px;padding-right:16px}.master{margin-left:0}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><h1>Suara.</h1><span class="tag">CUE DESK</span></div>
+  <div class="status" id="status"><span class="dot"></span><span id="statusText">SIAP</span></div>
+  <div class="top-spacer"></div>
+  <div class="output"><span>OUTPUT</span><select aria-label="Output audio"><option>Speaker Laptop</option><option>USB Audio Device</option></select></div>
+  <div class="clock" id="clock">00:00:00</div>
+</header>
+<main>
+  <div class="palets" id="palets"></div>
+  <div class="sec-head">
+    <h2 id="paletTitle">Papan Lagu — UTAMA</h2>
+    <p>1–8 PILIH · ↑↓ VOLUME · X STOP · M MUTE</p>
+    <div class="sec-actions"><button class="add alt">+ PILIH FILE</button><button class="add">+ FOLDER</button></div>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+<footer class="transport">
+  <div class="now"><div class="lbl">ON AIR</div><div class="nm" id="nowTitle">— belum ada lagu —</div><div class="ar" id="nowArtist">pilih kartu untuk memulai</div><div class="meter"><span id="meterFill"></span></div></div>
+  <div class="ctl">
+    <button class="tbtn vol"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5ZM16 9l5 6M21 9l-5 6"/></svg>VOL − <kbd>↓</kbd></button>
+    <button class="tbtn vol"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5ZM16 9l5 6M16 15l5-6"/></svg>VOL + <kbd>↑</kbd></button>
+    <button class="tbtn stop" id="btnStop"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>STOP <kbd>X</kbd></button>
+  </div>
+  <div class="master"><button class="mute" id="btnMute">MUTE SEMUA <kbd>M</kbd></button><div class="pct" id="pct">0%</div></div>
+</footer>
+<script>
+const palettes=[
+ {name:'UTAMA',cards:[
+  {t:'Sambutan Pembuka',a:'intro · warm keys',src:'MUSIC',dur:'2:48',vol:80,fout:3,fin:0,seed:1},
+  {t:'Walk In — MC',a:'intro · woodwind',src:'MUSIC',dur:'1:32',vol:72,fout:2,fin:0,seed:7},
+  {t:'Sambutan — Kepala Sekolah',a:'pengiring · strings',src:'MUSIC',dur:'3:10',vol:88,fout:4,fin:2,seed:13},
+  {t:'Sambutan — Tamu Undangan',a:'pengiring · gitar',src:'MUSIC',dur:'2:24',vol:70,fout:3,fin:0,seed:21},
+  {t:'Pengumuman',a:'ringan · perkusi',src:'DOWNLOAD',dur:'1:45',vol:65,fout:2,fin:1,seed:29},
+  {t:'Antar Kembali',a:'outro · akustik',src:'MUSIC',dur:'2:02',vol:78,fout:3,fin:0,seed:37}]},
+ {name:'SAMBUTAN',cards:[
+  {t:'Intro Panggung',a:'orchestral · masuk',src:'MUSIC',dur:'2:10',vol:82,fout:3,fin:2,seed:41},
+  {t:'Tamu Kehormatan',a:'warm piano',src:'MUSIC',dur:'3:02',vol:76,fout:4,fin:3,seed:47},
+  {t:'Standing Ovation',a:'applause bed',src:'DOWNLOAD',dur:'0:48',vol:60,fout:2,fin:0,seed:53}]},
+ {name:'MC',cards:[
+  {t:'MC Walk In',a:'bright intro',src:'MUSIC',dur:'1:18',vol:74,fout:2,fin:1,seed:59},
+  {t:'Transisi MC',a:'light sting',src:'DOWNLOAD',dur:'0:22',vol:68,fout:1,fin:0,seed:61}]},
+ {name:'PENUTUP',cards:[
+  {t:'Closing Theme',a:'orchestral · penutup',src:'MUSIC',dur:'3:36',vol:90,fout:5,fin:3,seed:67},
+  {t:'Outro Credits',a:'soft strings',src:'MUSIC',dur:'2:15',vol:70,fout:4,fin:2,seed:71}]}
+];
+let cur=0, playing=null, level=0, pos=0, paused=false, muted=false, raf=0;
+const grid=document.getElementById('grid'), palets=document.getElementById('palets');
+function bars(seed){let s=seed,o='';for(let i=0;i<44;i++){s=(s*1103515245+12345)&0x7fffffff;o+=`<i style="height:${12+((s>>7)%68)}%"></i>`}return o}
+function fmt(ms){const s=Math.floor(Math.max(0,ms)/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function renderPalets(){
+  palets.innerHTML='';
+  palettes.forEach((p,i)=>{
+    const b=document.createElement('button');
+    b.className='palet'+(i===cur?' on':'');
+    const live=playing&&playing.p===i;
+    b.innerHTML=(live?'<span class="live-dot"></span>':'')+p.name;
+    b.onclick=()=>{cur=i;render()};
+    palets.appendChild(b);
+  });
+  const add=document.createElement('button');add.className='palet new';add.textContent='+ PALET';
+  add.onclick=()=>{palettes.push({name:'PALET '+(palettes.length+1),cards:[]});cur=palettes.length-1;render()};
+  palets.appendChild(add);
+}
+function render(){
+  renderPalets();
+  document.getElementById('paletTitle').textContent='Papan Lagu — '+palettes[cur].name;
+  grid.innerHTML='';
+  palettes[cur].cards.forEach((c,i)=>{
+    const on=playing&&playing.p===cur&&playing.i===i;
+    const art=document.createElement('article');
+    art.className='card'+(on?(paused?' silent':' onair'):'');
+    art.dataset.i=i;
+    art.innerHTML=`
+      <div class="card-top"><span class="num">${String(i+1).padStart(2,'0')}</span><span class="badge">${c.src}</span><span class="dur">${c.dur}</span>
+        <button class="mv" title="Geser kiri">‹</button><button class="mv" title="Geser kanan">›</button><button class="x" title="Hapus">×</button></div>
+      <div class="title">${c.t}</div><div class="artist">${c.a}</div>
+      <div class="wave" aria-hidden="true">${bars(c.seed)}</div>
+      <div class="time-row"><span>POS <b class="pos">${on?fmt(pos):'00:00'}</b> / ${c.dur}</span><span>TOTAL <b class="played">00:00</b></span></div>
+      <div class="seek"><div class="seek-fill" style="width:${on?(pos/1000/180*100):0}%"></div></div>
+      <div class="volhead"><span>VOLUME KARTU</span><b class="volNum">${c.vol}%</b></div>
+      <div class="vrange"><input type="range" min="0" max="100" value="${c.vol}" aria-label="Volume ${c.t}"></div>
+      <div class="durbox"><div class="cap">FADE — TERPISAH DARI VOLUME</div><div class="durrow">
+        <label>KELUAR <input type="number" min="0" max="30" value="${c.fout}">s</label>
+        <label>MASUK <input type="number" min="0" max="30" value="${c.fin}">s</label></div></div>
+      <div class="card-foot"><span class="card-state">${on?(paused?'JEDA · '+fmt(pos):'ON AIR'):'SIAP'}</span>
+        <button class="play">${on&&paused?'LANJUT':'PUTAR'} <kbd>${i+1}</kbd></button>
+        <button class="stop" title="Stop"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg></button></div>
+      <div class="level"><span style="width:${on?level:0}%"></span></div>`;
+    const inp=art.querySelector('input[type=range]');
+    inp.style.setProperty('--track',`linear-gradient(90deg,#FF7654 ${c.vol}%,#2A332A ${c.vol}%)`);
+    inp.oninput=()=>{c.vol=+inp.value;art.querySelector('.volNum').textContent=c.vol+'%';inp.style.setProperty('--track',`linear-gradient(90deg,#FF7654 ${c.vol}%,#2A332A ${c.vol}%)`);if(on)level=c.vol;paint(on)};
+    art.querySelector('.play').onclick=()=>play(i);
+    art.querySelector('.stop').onclick=()=>{if(on)stop()};
+    art.querySelector('.seek').onclick=e=>{if(!on)return;const r=e.currentTarget.getBoundingClientRect();pos=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*180000;art.querySelector('.pos').textContent=fmt(pos);art.querySelector('.seek-fill').style.width=(pos/1000/180*100)+'%'};
+    grid.appendChild(art);
+  });
+  paint(!!playing);
+}
+function paint(on){
+  const c=on?palettes[playing.p].cards[playing.i]:null;
+  document.getElementById('nowTitle').textContent=c?c.t:'— belum ada lagu —';
+  document.getElementById('nowArtist').textContent=c?(paused?'jeda · '+fmt(pos):palettes[playing.p].name+' · volume '+c.vol+'%'):'pilih kartu untuk memulai';
+  document.getElementById('meterFill').style.width=(muted?0:level)+'%';
+  document.getElementById('pct').textContent=Math.round(muted?0:level)+'%';
+  const st=document.getElementById('status'),txt=document.getElementById('statusText');
+  txt.textContent=muted?'MUTE SEMUA':!c?'SIAP':paused?'JEDA · '+fmt(pos):'ON AIR · '+c.src;
+  st.className='status'+(muted?' muted':!c?'':paused?' spot':' live');
+}
+function ramp(to,secs,done){cancelAnimationFrame(raf);const from=level,t0=performance.now(),d=Math.max(16,secs*1000);(function step(n){const p=Math.min(1,(n-t0)/d);level=from+(to-from)*p;const c=palettes[playing.p].cards[playing.i];const card=grid.children[playing.i];if(card){card.querySelector('.level span').style.width=level+'%';const inp=card.querySelector('input[type=range]');inp.value=Math.round(level);inp.style.setProperty('--track',`linear-gradient(90deg,#FF7654 ${level}%,#2A332A ${level}%)`);card.querySelector('.volNum').textContent=Math.round(level)+'%'}paint(true);if(p<1)raf=requestAnimationFrame(step);else{raf=0;done&&done()}})(t0)}
+const timer=setInterval(()=>{if(playing&&!paused){pos+=250;const card=grid.children[playing.i];if(card&&palettes[cur]===palettes[playing.p]){card.querySelector('.pos').textContent=fmt(pos);card.querySelector('.seek-fill').style.width=(pos/1000/180*100)+'%'}}document.getElementById('clock').textContent=new Date().toLocaleTimeString('id-ID',{hour12:false})},250);
+function play(i){cancelAnimationFrame(raf);if(playing&&!(playing.p===cur&&playing.i===i)){level=0}
+  const same=playing&&playing.p===cur&&playing.i===i;
+  playing={p:cur,i};level=0;paused=false;
+  const c=palettes[cur].cards[i],fin=+c.fin||0;
+  render();
+  if(fin>0)ramp(c.vol,fin);else{level=c.vol;paint(true)}
+}
+function stop(){if(!playing)return;if(paused){cancelAnimationFrame(raf);playing=null;level=0;pos=0;paused=false;render();return}
+  const c=palettes[playing.p].cards[playing.i],fout=+c.fout||0;
+  if(fout>0)ramp(0,fout,()=>{paused=true;render()});else{paused=true;render()}
+}
+document.getElementById('btnStop').onclick=stop;
+document.getElementById('btnMute').onclick=e=>{muted=!muted;e.currentTarget.classList.toggle('on',muted);paint(!!playing)};
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;if(/^[1-8]$/.test(e.key))play(+e.key-1);else if(e.key.toLowerCase()==='x')stop();else if(e.key.toLowerCase()==='m')document.getElementById('btnMute').click()});
+render();
+</script>
+</body>
+</html>
