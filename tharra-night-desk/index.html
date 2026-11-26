@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Night Desk — konsol operasi OSIS dengan data contoh." />
+  <title>Night Desk — Tharra Ops Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b0e0c;
+      --surface: #111613;
+      --surface-2: #161d18;
+      --surface-3: #1d261f;
+      --line: #303b33;
+      --line-strong: #4d5d50;
+      --text: #edf3ec;
+      --muted: #a4b1a6;
+      --faint: #748276;
+      --accent: #c8f04b;
+      --accent-ink: #10150f;
+      --warn: #f2b544;
+      --crit: #ff7562;
+      --ok: #7bd49c;
+      --info: #83c9e8;
+      --grid-line: rgba(200, 240, 75, 0.035);
+      --radius: 2px;
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+    html { overflow-x: hidden; scroll-behavior: smooth; scroll-padding-top: 76px; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+        var(--bg);
+      background-size: 32px 32px;
+      color: var(--text);
+      font-family: "Fira Sans", system-ui, sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    button:not(:disabled) { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: 0.45; }
+    a { color: inherit; }
+    svg { display: block; }
+    .icon { width: 18px; height: 18px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .mono { font-family: "Fira Code", monospace; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: fixed; top: 10px; left: 10px; z-index: 200; padding: 9px 13px; transform: translateY(-160%); background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+    .skip-link:focus { transform: translateY(0); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    ::selection { background: var(--accent); color: var(--accent-ink); }
+
+    .app { display: grid; grid-template-columns: 66px minmax(0, 1fr); min-height: 100vh; }
+    .rail {
+      position: sticky; top: 0; z-index: 30; display: flex; flex-direction: column; align-items: center; gap: 8px;
+      height: 100vh; padding: 14px 0; border-right: 1px solid var(--line); background: var(--bg);
+    }
+    .rail-mark {
+      display: grid; place-items: center; width: 40px; height: 40px; margin-bottom: 14px;
+      border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink);
+      font: 700 17px/1 "Fira Code", monospace;
+    }
+    .rail-button {
+      position: relative; display: grid; place-items: center; width: 44px; height: 44px;
+      border: 1px solid transparent; background: transparent; color: var(--faint);
+      transition: color 140ms ease, background 140ms ease, border-color 140ms ease;
+    }
+    .rail-button:hover { color: var(--text); background: var(--surface-2); }
+    .rail-button.active { color: var(--accent); border-color: var(--accent); background: rgba(200,240,75,0.07); }
+    .rail-button .icon { width: 19px; height: 19px; }
+    .rail-spacer { flex: 1; }
+    .rail-status { width: 9px; height: 9px; margin-bottom: 4px; background: var(--ok); box-shadow: 0 0 0 4px rgba(123,212,156,0.1); }
+    .rail-user {
+      display: grid; place-items: center; width: 38px; height: 38px;
+      border: 1px solid var(--line-strong); color: var(--muted); font: 600 10px/1 "Fira Code", monospace;
+    }
+
+    .main { min-width: 0; padding: 0 26px 30px; }
+    .topbar {
+      position: sticky; top: 0; z-index: 25; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      min-height: 56px; padding: 0 2px; border-bottom: 1px solid var(--line); background: var(--bg);
+    }
+    .topline { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .console-name { font: 700 12px/1.2 "Fira Code", monospace; letter-spacing: 1.2px; }
+    .console-name span { color: var(--faint); }
+    .demo-tag { padding: 3px 7px; border: 1px solid var(--warn); color: var(--warn); font: 700 9px/1.4 "Fira Code", monospace; letter-spacing: 0.8px; }
+    .topright { display: flex; align-items: center; gap: 8px; }
+    .clock { color: var(--muted); font: 11px/1 "Fira Code", monospace; white-space: nowrap; }
+    .ghost-button, .primary-button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 36px; padding: 7px 11px; border: 1px solid var(--line-strong); background: transparent; color: var(--text);
+      font: 600 11px/1.2 "Fira Code", monospace; letter-spacing: 0.2px;
+      transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+    }
+    .ghost-button:hover { background: var(--surface-2); border-color: var(--muted); }
+    .primary-button { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+    .primary-button:hover { transform: translateY(-1px); background: #d8ff68; }
+    .ghost-button .icon, .primary-button .icon { width: 15px; height: 15px; }
+
+    .hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 24px 0 16px; }
+    .hero h1 { margin: 0; font: 700 clamp(25px, 3vw, 34px)/1.1 "Fira Sans", sans-serif; letter-spacing: -0.8px; }
+    .hero p { max-width: 620px; margin: 7px 0 0; color: var(--muted); font-size: 12px; }
+    .hero p strong { color: var(--text); }
+    .hero-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .pipeline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); background: var(--surface); }
+    .stage {
+      position: relative; display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 10px;
+      min-height: 76px; padding: 12px 14px; border: 0; border-right: 1px solid var(--line);
+      background: transparent; color: var(--muted); text-align: left;
+      transition: background 140ms ease, color 140ms ease;
+    }
+    .stage:last-child { border-right: 0; }
+    .stage:hover { background: var(--surface-2); color: var(--text); }
+    .stage.active { background: var(--accent); color: var(--accent-ink); }
+    .stage-label { font: 600 10px/1.3 "Fira Code", monospace; letter-spacing: 0.7px; text-transform: uppercase; }
+    .stage-count { font: 700 26px/1 "Fira Code", monospace; letter-spacing: -1px; }
+    .stage-note { grid-column: 1 / -1; font-size: 10px; opacity: 0.7; }
+    .stage-arrow { position: absolute; right: -7px; top: 50%; z-index: 2; width: 14px; height: 14px; transform: translateY(-50%) rotate(45deg); border-top: 1px solid var(--line); border-right: 1px solid var(--line); background: var(--bg); pointer-events: none; }
+    .stage:last-child .stage-arrow { display: none; }
+    .stage.active .stage-arrow { background: var(--accent); border-color: var(--accent); }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 14px; border: 1px solid var(--line); border-top: 0; background: var(--surface-2); }
+    .metric { min-width: 0; padding: 13px 15px 12px; border-right: 1px solid var(--line); }
+    .metric:last-child { border-right: 0; }
+    .metric-label { color: var(--faint); font: 600 9px/1.4 "Fira Code", monospace; letter-spacing: 0.7px; text-transform: uppercase; }
+    .metric-value { margin-top: 5px; font: 700 24px/1.1 "Fira Code", monospace; letter-spacing: -1px; }
+    .metric-value small { margin-left: 4px; color: var(--faint); font-size: 11px; letter-spacing: 0; }
+    .metric-bar { height: 3px; margin-top: 9px; background: var(--surface-3); }
+    .metric-bar span { display: block; height: 100%; background: var(--accent); transition: width 220ms ease; }
+    .metric:nth-child(2) .metric-bar span { background: var(--warn); }
+    .metric:nth-child(3) .metric-bar span { background: var(--crit); }
+    .metric:nth-child(4) .metric-bar span { background: var(--ok); }
+
+    .workspace { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(290px, 0.85fr); gap: 14px; margin-top: 14px; align-items: start; }
+    .panel { min-width: 0; border: 1px solid var(--line); background: var(--surface); }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 50px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+    .panel-title { margin: 0; font: 700 13px/1.2 "Fira Code", monospace; letter-spacing: 0.4px; }
+    .panel-sub { margin: 3px 0 0; color: var(--faint); font-size: 10px; }
+    .panel-tools { display: flex; align-items: center; gap: 7px; }
+    .search-field { position: relative; }
+    .search-field .icon { position: absolute; left: 9px; top: 50%; width: 14px; height: 14px; transform: translateY(-50%); color: var(--faint); }
+    .search-field input {
+      width: 190px; height: 34px; padding: 6px 10px 6px 29px;
+      border: 1px solid var(--line); border-radius: 0; outline: 0;
+      background: var(--bg); color: var(--text); font: 11px/1 "Fira Code", monospace;
+    }
+    .search-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(200,240,75,0.12); }
+
+    .bulk-bar { display: none; align-items: center; gap: 8px; padding: 9px 14px; border-bottom: 1px solid var(--line); background: rgba(200,240,75,0.06); }
+    .bulk-bar.visible { display: flex; }
+    .bulk-bar strong { color: var(--accent); font: 700 10px/1 "Fira Code", monospace; }
+    .bulk-bar .spacer { flex: 1; }
+    .mini-button { min-height: 30px; padding: 5px 9px; border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--muted); font: 600 10px/1 "Fira Code", monospace; }
+    .mini-button:hover { color: var(--text); border-color: var(--muted); }
+    .mini-button.danger:hover { color: var(--crit); border-color: var(--crit); }
+
+    .queue-scroll { overflow-x: auto; }
+    .queue-list { min-width: 620px; }
+    .queue-row {
+      display: grid; grid-template-columns: 30px 104px minmax(180px, 1fr) 92px 72px 30px;
+      align-items: center; gap: 10px; min-height: 58px; padding: 8px 14px;
+      border-bottom: 1px solid var(--line); transition: background 120ms ease;
+    }
+    .queue-row:last-child { border-bottom: 0; }
+    .queue-row:hover { background: var(--surface-2); }
+    .queue-row.focused { background: rgba(200,240,75,0.06); box-shadow: inset 2px 0 0 var(--accent); }
+    .queue-row.flash { animation: rowFlash 900ms ease; }
+    @keyframes rowFlash { 0% { background: rgba(200,240,75,0.28); } 100% { background: transparent; } }
+    .row-check { width: 17px; height: 17px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+    .ticket-id { color: var(--faint); font: 10px/1.4 "Fira Code", monospace; }
+    .ticket-title { min-width: 0; padding: 0; border: 0; background: transparent; color: var(--text); text-align: left; font-size: 12px; font-weight: 600; }
+    .ticket-title:hover { color: var(--accent); }
+    .ticket-meta { display: block; margin-top: 3px; color: var(--faint); font: 9px/1.4 "Fira Code", monospace; }
+    .category { color: var(--muted); font-size: 10px; }
+    .age { color: var(--faint); font: 10px/1 "Fira Code", monospace; text-align: right; }
+    .age.risk { color: var(--crit); }
+    .status { display: inline-flex; align-items: center; gap: 5px; padding: 3px 7px; border: 1px solid transparent; font: 700 9px/1 "Fira Code", monospace; letter-spacing: 0.3px; white-space: nowrap; }
+    .status::before { content: ""; width: 5px; height: 5px; background: currentColor; }
+    .status.menunggu { color: var(--warn); border-color: var(--warn); background: rgba(242,181,68,0.08); }
+    .status.diproses { color: var(--accent); border-color: var(--accent); background: rgba(200,240,75,0.06); }
+    .status.diteruskan { color: var(--info); border-color: var(--info); background: rgba(131,201,232,0.07); }
+    .status.selesai { color: var(--ok); border-color: var(--ok); background: rgba(123,212,156,0.07); }
+    .row-open { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid transparent; background: transparent; color: var(--faint); }
+    .row-open:hover { border-color: var(--line-strong); color: var(--accent); }
+    .empty-queue { padding: 42px 18px; color: var(--faint); text-align: center; font-size: 11px; }
+    .queue-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-top: 1px solid var(--line); color: var(--faint); font: 10px/1 "Fira Code", monospace; }
+
+    .side-stack { display: grid; gap: 14px; }
+    .inspector { position: sticky; top: 70px; }
+    .inspector-body { padding: 16px 15px; }
+    .inspector h2 { margin: 0; font: 700 17px/1.3 "Fira Sans", sans-serif; }
+    .inspector .code { color: var(--faint); font: 10px/1 "Fira Code", monospace; }
+    .inspector-tags { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-top: 11px; }
+    .tag { padding: 3px 7px; border: 1px solid var(--line-strong); color: var(--muted); font: 9px/1.4 "Fira Code", monospace; }
+    .tag.hot { border-color: var(--crit); color: var(--crit); }
+    .detail-text { margin: 16px 0 0; color: var(--muted); font-size: 11.5px; line-height: 1.65; }
+    .section-label { margin: 18px 0 8px; color: var(--faint); font: 700 9px/1 "Fira Code", monospace; letter-spacing: 0.8px; text-transform: uppercase; }
+    .steps { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+    .steps li { position: relative; padding-left: 16px; color: var(--muted); font-size: 10.5px; }
+    .steps li::before { content: ""; position: absolute; left: 0; top: 5px; width: 6px; height: 6px; background: var(--accent); }
+    .steps small { display: block; color: var(--faint); font: 9px/1.4 "Fira Code", monospace; }
+    .inspector-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 18px; }
+    .inspector-actions .primary-button, .inspector-actions .ghost-button { width: 100%; }
+
+    .distribution { padding: 14px 15px 16px; }
+    .dist-row { display: grid; grid-template-columns: 88px 1fr 28px; align-items: center; gap: 9px; margin-top: 9px; }
+    .dist-label { color: var(--muted); font-size: 10px; }
+    .dist-track { height: 6px; background: var(--surface-3); }
+    .dist-track span { display: block; height: 100%; background: var(--accent); transition: width 220ms ease; }
+    .dist-value { color: var(--faint); font: 10px/1 "Fira Code", monospace; text-align: right; }
+    .dist-foot { margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--line); color: var(--faint); font-size: 9.5px; }
+
+    .page-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--faint); font-size: 10px; }
+    .page-footer a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+    .page-footer a:hover { color: var(--accent); }
+    .text-button { min-height: 34px; padding: 5px 8px; border: 0; background: transparent; color: var(--muted); font: 10px/1 "Fira Code", monospace; text-decoration: underline; text-underline-offset: 3px; }
+    .text-button:hover { color: var(--accent); }
+
+    .layer { position: fixed; inset: 0; z-index: 100; display: grid; }
+    .layer[hidden] { display: none; }
+    .layer-scrim { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: rgba(0,0,0,0.7); }
+    .command-modal { position: relative; width: min(560px, calc(100% - 28px)); margin: 11vh auto auto; border: 1px solid var(--line-strong); background: var(--surface); box-shadow: 0 30px 90px rgba(0,0,0,0.6); }
+    .command-input-row { display: flex; align-items: center; gap: 10px; padding: 13px 14px; border-bottom: 1px solid var(--line); }
+    .command-input-row .icon { color: var(--faint); }
+    .command-input-row input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text); font: 13px/1 "Fira Code", monospace; }
+    kbd { padding: 2px 5px; border: 1px solid var(--line-strong); color: var(--faint); font: 9px/1.3 "Fira Code", monospace; }
+    .command-results { max-height: min(400px, 55vh); overflow-y: auto; padding: 6px; }
+    .command-result { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 8px 9px; border: 0; background: transparent; color: var(--text); text-align: left; }
+    .command-result:hover, .command-result.selected { background: var(--surface-3); }
+    .command-result .icon { color: var(--faint); }
+    .command-result strong { display: block; font-size: 11px; }
+    .command-result small { display: block; margin-top: 2px; color: var(--faint); font: 9px/1.3 "Fira Code", monospace; }
+    .command-result kbd { margin-left: auto; }
+    .command-empty { padding: 28px 14px; color: var(--faint); text-align: center; font-size: 11px; }
+    .command-foot { display: flex; gap: 14px; padding: 8px 14px; border-top: 1px solid var(--line); background: var(--surface-2); color: var(--faint); font: 9px/1 "Fira Code", monospace; }
+    .command-foot span { display: inline-flex; align-items: center; gap: 4px; }
+
+    .toast { position: fixed; left: 50%; bottom: 22px; z-index: 150; max-width: calc(100% - 30px); display: flex; align-items: center; gap: 8px; padding: 10px 14px; transform: translate(-50%, 18px); opacity: 0; pointer-events: none; border: 1px solid var(--accent); background: var(--surface); color: var(--text); font: 11px/1.2 "Fira Code", monospace; transition: opacity 160ms ease, transform 160ms ease; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast .icon { width: 15px; height: 15px; color: var(--accent); }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
+
+    @media (max-width: 1180px) {
+      .main { padding-left: 20px; padding-right: 20px; }
+      .queue-row { grid-template-columns: 28px 94px minmax(170px, 1fr) 78px 66px 28px; }
+      .search-field input { width: 160px; }
+    }
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 1fr; }
+      .rail { position: static; flex-direction: row; width: 100%; height: auto; padding: 9px 14px; border-right: 0; border-bottom: 1px solid var(--line); overflow-x: auto; }
+      .rail-mark { width: 34px; height: 34px; margin: 0 8px 0 0; font-size: 14px; }
+      .rail-spacer { flex: 1; }
+      .rail-status, .rail-user { display: none; }
+      .topbar { position: static; }
+      .workspace { grid-template-columns: 1fr; }
+      .inspector { position: static; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .metric:nth-child(2) { border-right: 0; }
+      .metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+    }
+    @media (max-width: 720px) {
+      .main { padding-left: 14px; padding-right: 14px; }
+      .hero { flex-direction: column; align-items: flex-start; gap: 13px; padding-top: 20px; }
+      .hero-actions { justify-content: flex-start; }
+      .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stage:nth-child(2) { border-right: 0; }
+      .stage:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .stage-arrow { display: none; }
+      .panel-head { align-items: flex-start; flex-direction: column; }
+      .panel-tools { width: 100%; }
+      .search-field { flex: 1; }
+      .search-field input { width: 100%; }
+      .clock { display: none; }
+      .page-footer { align-items: flex-start; flex-direction: column; }
+    }
+    @media (max-width: 480px) {
+      .metrics { grid-template-columns: 1fr; }
+      .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+      .metric:last-child { border-bottom: 0; }
+      .metric:nth-child(2) { border-right: 0; }
+      .console-name { font-size: 10px; }
+      .demo-tag { display: none; }
+      .topright .ghost-button { width: 36px; padding: 0; }
+      .topright .ghost-button span { display: none; }
+      .inspector-actions { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konsol</a>
+
+  <svg class="sr-only" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M4 4h16l2 10v5a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-5L4 4Z"/><path d="M2 14h6l2 3h4l2-3h6"/></symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-forward" viewBox="0 0 24 24"><path d="m15 7 6 5-6 5V7ZM3 7v10"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-command" viewBox="0 0 24 24"><path d="M9 6V5a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v14a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6Z"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.6 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></symbol>
+  </svg>
+
+  <div class="app">
+    <aside class="rail" aria-label="Navigasi konsol">
+      <div class="rail-mark" aria-hidden="true">N</div>
+      <button class="rail-button active" type="button" data-jump="queue" aria-label="Fokus ke antrean" title="Antrean"><svg class="icon" aria-hidden="true"><use href="#i-inbox"/></svg></button>
+      <button class="rail-button" type="button" data-jump="pipeline" aria-label="Fokus ke alur kerja" title="Alur kerja"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg></button>
+      <button class="rail-button" type="button" data-jump="distribution" aria-label="Fokus ke distribusi kategori" title="Distribusi"><svg class="icon" aria-hidden="true"><use href="#i-pulse"/></svg></button>
+      <div class="rail-spacer"></div>
+      <div class="rail-status" title="Sistem normal" aria-label="Sistem normal"></div>
+      <div class="rail-user" aria-label="Naya Anindita">NA</div>
+    </aside>
+
+    <main class="main" id="main">
+      <header class="topbar">
+        <div class="topline"><div class="console-name">THARRA <span>/</span> NIGHT DESK</div><span class="demo-tag">DATA DEMO</span></div>
+        <div class="topright">
+          <span class="clock" id="clock" aria-label="Waktu saat ini">--:--:--</span>
+          <button class="ghost-button" id="commandButton" type="button"><svg class="icon" aria-hidden="true"><use href="#i-command"/></svg><span>Cari · ⌘K</span></button>
+          <button class="primary-button" id="simulateButton" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg> Surat masuk</button>
+        </div>
+      </header>
+
+      <section class="hero" aria-labelledby="heroTitle">
+        <div>
+          <h1 id="heroTitle">Meja malam, Naya.</h1>
+          <p><strong id="heroLead">5 surat</strong> menunggu keputusan. Alur kerja di bawah ini berubah mengikuti surat yang kamu proses.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="ghost-button" id="resetButton" type="button"><svg class="icon" aria-hidden="true"><use href="#i-reset"/></svg> Reset demo</button>
+          <a class="ghost-button" href="https://zanqy.github.io/preview/tharra-dashboard/" target="_blank" rel="noopener">Bandingkan versi kertas ↗</a>
+        </div>
+      </section>
+
+      <section class="pipeline" id="pipeline" aria-label="Alur kerja aspirasi">
+        <button class="stage" type="button" data-stage="semua"><span class="stage-label">Semua</span><span class="stage-count" id="stageAll">0</span><span class="stage-note">_seluruh arsip aktif_</span><span class="stage-arrow" aria-hidden="true"></span></button>
+        <button class="stage active" type="button" data-stage="menunggu"><span class="stage-label">Masuk</span><span class="stage-count" id="stageMenunggu">0</span><span class="stage-note">belum dibuka</span><span class="stage-arrow" aria-hidden="true"></span></button>
+        <button class="stage" type="button" data-stage="diproses"><span class="stage-label">Ditinjau</span><span class="stage-count" id="stageDiproses">0</span><span class="stage-note">sedang dikerjakan</span><span class="stage-arrow" aria-hidden="true"></span></button>
+        <button class="stage" type="button" data-stage="diteruskan"><span class="stage-label">Diteruskan</span><span class="stage-count" id="stageDiteruskan">0</span><span class="stage-note">ke divisi lain</span><span class="stage-arrow" aria-hidden="true"></span></button>
+      </section>
+
+      <section class="metrics" aria-label="Indikator yang dihitung dari data contoh">
+        <div class="metric"><div class="metric-label">Total dalam sistem</div><div class="metric-value" id="metricTotal">0</div><div class="metric-bar"><span id="barTotal" style="width:0%"></span></div></div>
+        <div class="metric"><div class="metric-label">Menunggu keputusan</div><div class="metric-value" id="metricPending">0</div><div class="metric-bar"><span id="barPending" style="width:0%"></span></div></div>
+        <div class="metric"><div class="metric-label">Prioritas tinggi</div><div class="metric-value" id="metricRisk">0</div><div class="metric-bar"><span id="barRisk" style="width:0%"></span></div></div>
+        <div class="metric"><div class="metric-label">Rata-rata umur</div><div class="metric-value" id="metricAge">0<small>jam</small></div><div class="metric-bar"><span id="barAge" style="width:0%"></span></div></div>
+      </section>
+
+      <div class="workspace">
+        <section class="panel" id="queue" aria-labelledby="queueTitle">
+          <div class="panel-head">
+            <div><h2 class="panel-title" id="queueTitle">ANTREAN AKTIF</h2><p class="panel-sub" id="queueSub">Menampilkan semua surat</p></div>
+            <div class="panel-tools">
+              <label class="search-field"><span class="sr-only">Cari surat</span><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><input id="queueSearch" type="search" placeholder="Cari kode atau isi..." autocomplete="off" /></label>
+            </div>
+          </div>
+          <div class="bulk-bar" id="bulkBar"><strong id="bulkCount">0 dipilih</strong><span class="spacer"></span><button class="mini-button" id="bulkProcess" type="button">Proses</button><button class="mini-button" id="bulkForward" type="button">Teruskan</button><button class="mini-button danger" id="bulkDone" type="button">Selesai</button></div>
+          <div class="queue-scroll"><div class="queue-list" id="queueList"></div></div>
+          <div class="queue-foot"><span id="queueFoot">0 surat ditampilkan</span><span>PILIH BARIS → DETAIL</span></div>
+        </section>
+
+        <div class="side-stack">
+          <section class="panel inspector" id="inspector" aria-labelledby="inspectorTitle">
+            <div class="panel-head"><div><h2 class="panel-title" id="inspectorTitle">FOKUS SURAT</h2><p class="panel-sub">Detail dan tindakan</p></div><span class="demo-tag">LIVE</span></div>
+            <div class="inspector-body" id="inspectorBody"></div>
+          </section>
+          <section class="panel" id="distribution" aria-labelledby="distTitle">
+            <div class="panel-head"><div><h2 class="panel-title" id="distTitle">DISTRIBUSI KATEGORI</h2><p class="panel-sub">Dihitung dari data yang sama</p></div></div>
+            <div class="distribution" id="distributionBody"></div>
+          </section>
+        </div>
+      </div>
+
+      <footer class="page-footer">
+        <span>Night Desk · prototipe interaksi dengan data contoh, bukan data produksi.</span>
+        <button class="text-button" id="footerReset" type="button">Kembalikan kondisi awal</button>
+      </footer>
+    </main>
+  </div>
+
+  <div class="layer" id="commandLayer" hidden>
+    <button class="layer-scrim" type="button" data-close-command aria-label="Tutup pencarian"></button>
+    <div class="command-modal" role="dialog" aria-modal="true" aria-labelledby="commandTitle">
+      <h2 class="sr-only" id="commandTitle">Pencarian cepat Night Desk</h2>
+      <div class="command-input-row"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><input id="commandInput" type="text" placeholder="Cari surat atau jalankan perintah..." aria-label="Cari surat atau jalankan perintah" role="combobox" aria-expanded="true" aria-controls="commandResults" aria-autocomplete="list" autocomplete="off" /><kbd>Esc</kbd></div>
+      <div class="command-results" id="commandResults" role="listbox" aria-label="Hasil pencarian"></div>
+      <div class="command-foot"><span><kbd>↑↓</kbd> pilih</span><span><kbd>↵</kbd> jalankan</span><span><kbd>Esc</kbd> tutup</span></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span id="toastText"></span></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const seed = [
+        { id:"ASP-2081", title:"Lorong asrama gelap mulai pukul 19.00", category:"Fasilitas", status:"menunggu", priority:"tinggi", age:6, owner:"Anonim", detail:"Lampu di dua titik lorong asrama tidak menyala saat malam. Siswa yang pulang dari kegiatan ekstrakurikuler harus lewat area tersebut tanpa penerangan.", steps:[{label:"Laporan masuk",time:"19.04"},{label:"Menunggu peninjauan",time:"19.06"}] },
+        { id:"ASP-2080", title:"Papan jadwal ujian belum diperbarui", category:"Akademik", status:"menunggu", priority:"sedang", age:4, owner:"Ketua kelas XII", detail:"Papan jadwal masih menampilkan pekan sebelumnya. Mohon jadwal ujian pekan ini ditempel ulang sebelum senin.", steps:[{label:"Laporan masuk",time:"21.12"}] },
+        { id:"ASP-2079", title:"Mic ruang rapat sering terputus", category:"Fasilitas", status:"menunggu", priority:"tinggi", age:9, owner:"Anggota OSIS", detail:"Pembicara di ujung meja tidak terdengar saat rapat. Kabel microfon perlu dicek atau diganti sebelum rapat minggu depan.", steps:[{label:"Laporan masuk",time:"16.31"}] },
+        { id:"ASP-2078", title:"Lomba poster perlu rubrik penilaian", category:"Kegiatan", status:"menunggu", priority:"rendah", age:3, owner:"Anonim", detail:"Peserta belum menerima kriteria penilaian. Rubrik yang transparan akan mengurangi pertanyaan menjelang pengumpulan karya.", steps:[{label:"Laporan masuk",time:"22.02"}] },
+        { id:"ASP-2077", title:"Air dispenser lantai atas habis", category:"Fasilitas", status:"menunggu", priority:"sedang", age:2, owner:"Siswa kelas XI", detail:"Dispenser di lantai atas tidak keluar air sejak siang. Permintaan ini mendesak karena digunakan banyak siswa saat belajar malam.", steps:[{label:"Laporan masuk",time:"22.41"}] },
+        { id:"ASP-2076", title:"Arsip approval anggota belum rapi", category:"Kegiatan", status:"diproses", priority:"sedang", age:12, owner:"Sekretaris OSIS", detail:"Daftar anggota yang sudah disetujui belum dipisahkan dari yang masih pending. Perlu dirapikan sebelum rapat evaluasi.", steps:[{label:"Laporan masuk",time:"13.20"},{label:"Dimas mulai meninjau",time:"14.05"}] },
+        { id:"ASP-2075", title:"Form aspirasi terlalu panjang di HP", category:"Akademik", status:"diproses", priority:"tinggi", age:8, owner:"Siswa kelas X", detail:"Saat dibuka di telepon, form harus di-scroll berkali-kali sampai ke tombol kirim. Bagian yang wajib diisi perlu dipringkas.", steps:[{label:"Laporan masuk",time:"17.18"},{label:"Naya meninjau",time:"18.02"}] },
+        { id:"ASP-2074", title:"Mading kelas butuh area kosong", category:"Kegiatan", status:"diproses", priority:"rendah", age:15, owner:"Anonim", detail:"Mading kelas penuh oleh pengumuman lama. Perlu area khusus untuk pengumuman minggu berjalan agar info baru tidak tertutup.", steps:[{label:"Laporan masuk",time:"10.40"},{label:"Raka meninjau",time:"11.15"}] },
+        { id:"ASP-2073", title:"Kunci ruang Pramuka sering tertukar", category:"Fasilitas", status:"diproses", priority:"sedang", age:11, owner:"Anggota ekstrakulikuler", detail:"Tiga kunci dengan bentuk mirip sering tertukar. Penanda warna atau gantungan nama akan membantu identifikasi cepat.", steps:[{label:"Laporan masuk",time:"14.02"},{label:"Salsa meninjau",time:"15.30"}] },
+        { id:"ASP-2072", title:"Permintaan material workshop desain", category:"Kegiatan", status:"diteruskan", priority:"sedang", age:20, owner:"Panitia acara", detail:"Workshop desain membutuhkan kertas gambar, spidol, dan papan pajang. Permintaan sudah diteruskan ke divisi sarana.", steps:[{label:"Laporan masuk",time:"Kemarin"},{label:"Diteruskan ke Sarana",time:"09.25"}] },
+        { id:"ASP-2071", title:"Notifikasi email balasan terlambat", category:"Akademik", status:"diteruskan", priority:"tinggi", age:26, owner:"Siswa kelas XII", detail:"Balasan aspirasi baru sampai email setelah beberapa jam. Mohon pengecekan layanan pengiriman notifikasi.", steps:[{label:"Laporan masuk",time:"Kemarin"},{label:"Diteruskan ke teknisi",time:"08.10"}] },
+        { id:"ASP-2070", title:"Meja baca perpustakaan perlu dilap", category:"Fasilitas", status:"diteruskan", priority:"rendah", age:30, owner:"Anonim", detail:"Meja baca di dekat jendela sering berdebu. Jadwal pembersihan ringan bisa ditambahkan ke rotasi piket.", steps:[{label:"Laporan masuk",time:"Kemarin"},{label:"Diteruskan ke Sarana",time:"07.55"}] },
+        { id:"ASP-2069", title:"Template pengumuman sudah lebih rapi", category:"Kegiatan", status:"selesai", priority:"rendah", age:34, owner:"Humas OSIS", detail:"Template pengumuman kini memakai satu format dengan judul, tanggal, dan kontak yang jelas.", steps:[{label:"Laporan masuk",time:"2 hari lalu"},{label:"Template diperbarui",time:"Kemarin"},{label:"Selesai",time:"08.30"}] },
+        { id:"ASP-2068", title:"Daftar piket kelas sudah dibagikan", category:"Akademik", status:"selesai", priority:"sedang", age:38, owner:"Wali kelas", detail:"Daftar piket sudah dibagikan ke grup kelas dan ditempel di pintu. Perubahan jadwal kini tercatat di satu tempat.", steps:[{label:"Laporan masuk",time:"2 hari lalu"},{label:"Daftar dibagikan",time:"Kemarin"},{label:"Selesai",time:"07.40"}] }
+      ];
+
+      const incoming = [
+        { title:"Tombol kirim aspirasi tidak merespons", category:"Akademik", priority:"tinggi", owner:"Siswa kelas XI", detail:"Tombol kirim terasa mati setelah form diisi. Halaman tidak menampilkan pesan sukses maupun error, sehingga siswa ragu apakah laporan terkirim.", steps:[{label:"Laporan masuk",time:"Baru saja"}] },
+        { title:"Kursi depan aula perlu diganti", category:"Fasilitas", priority:"sedang", owner:"Panitia acara", detail:"Satu kursi di baris depan patah pada bagian kaki. Perlu diganti sebelum acara sekolah minggu depan.", steps:[{label:"Laporan masuk",time:"Baru saja"}] },
+        { title:"Usulan tema diskusi bulan depan", category:"Kegiatan", priority:"rendah", owner:"Anggota OSIS", detail:"Tema diskusi bulan depan bisa mengangkat kebiasaan belajar di asrama dan cara mengelola waktu menjelang ujian.", steps:[{label:"Laporan masuk",time:"Baru saja"}] }
+      ];
+
+      let tickets = structuredClone(seed);
+      const state = { stage:"menunggu", query:"", focusId:"ASP-2081", checked:new Set(), commandIndex:0, incomingIndex:0 };
+      const $ = (s, root=document) => root.querySelector(s);
+      const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
+      const icon = name => `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+      const stageLabels = { menunggu:"Belum dibuka", diproses:"Ditinjau", diteruskan:"Diteruskan", selesai:"Selesai" };
+
+      const esc = v => String(v).replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+
+      function toast(message) {
+        $("#toastText").textContent = message;
+        $("#toast").classList.add("show");
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => $("#toast").classList.remove("show"), 2400);
+      }
+
+      function counts() {
+        return {
+          total: tickets.length,
+          menunggu: tickets.filter(t => t.status === "menunggu").length,
+          diproses: tickets.filter(t => t.status === "diproses").length,
+          diteruskan: tickets.filter(t => t.status === "diteruskan").length,
+          selesai: tickets.filter(t => t.status === "selesai").length,
+          risk: tickets.filter(t => t.priority === "tinggi" && t.status !== "selesai").length,
+          avgAge: Math.round(tickets.reduce((sum,t) => sum + t.age, 0) / (tickets.length || 1))
+        };
+      }
+
+      function filteredTickets() {
+        const q = state.query.trim().toLowerCase();
+        return tickets.filter(t => (state.stage === "semua" || t.status === state.stage) && (!q || `${t.id} ${t.title} ${t.category} ${t.detail}`.toLowerCase().includes(q)));
+      }
+
+      function renderPipeline(c) {
+        $("#stageAll").textContent = c.total;
+        $("#stageMenunggu").textContent = c.menunggu;
+        $("#stageDiproses").textContent = c.diproses;
+        $("#stageDiteruskan").textContent = c.diteruskan;
+        $$(".stage").forEach(b => b.classList.toggle("active", b.dataset.stage === state.stage));
+      }
+
+      function renderMetrics(c) {
+        $("#metricTotal").textContent = c.total;
+        $("#metricPending").textContent = c.menunggu;
+        $("#metricRisk").textContent = c.risk;
+        $("#metricAge").innerHTML = `${c.avgAge}<small>jam</small>`;
+        $("#barTotal").style.width = `${Math.min(100, c.total * 5)}%`;
+        $("#barPending").style.width = `${c.total ? (c.menunggu / c.total) * 100 : 0}%`;
+        $("#barRisk").style.width = `${c.total ? (c.risk / c.total) * 100 : 0}%`;
+        $("#barAge").style.width = `${Math.min(100, c.avgAge * 4)}%`;
+        $("#heroLead").textContent = `${c.menunggu} surat`;
+      }
+
+      function renderQueue() {
+        const rows = filteredTickets();
+        $("#queueSub").textContent = state.stage === "semua" ? "Menampilkan seluruh arsip" : `Status: ${stageLabels[state.stage]}`;
+        $("#queueFoot").textContent = `${rows.length} surat ditampilkan`;
+        $("#queueList").innerHTML = rows.length ? rows.map(t => `<div class="queue-row ${t.id === state.focusId ? "focused" : ""}" data-id="${t.id}">
+          <input class="row-check" type="checkbox" data-check="${t.id}" aria-label="Pilih ${esc(t.id)}" ${state.checked.has(t.id) ? "checked" : ""} />
+          <span class="ticket-id">${esc(t.id)}</span>
+          <button class="ticket-title" type="button" data-open="${t.id}">${esc(t.title)}<span class="ticket-meta">${esc(t.owner)} · prioritas ${esc(t.priority)}</span></button>
+          <span class="category">${esc(t.category)}</span>
+          <span class="age ${t.age >= 20 && t.status !== "selesai" ? "risk" : ""}">${t.age} jam</span>
+          <span class="status ${t.status}">${stageLabels[t.status]}</span>
+          <button class="row-open" type="button" data-open="${t.id}" aria-label="Buka detail ${esc(t.id)}">${icon("arrow")}</button>
+        </div>`).join("") : `<div class="empty-queue">Tidak ada surat pada filter ini. Coba tahap lain atau kata kunci berbeda.</div>`;
+        renderBulk();
+      }
+
+      function renderBulk() {
+        const n = state.checked.size;
+        $("#bulkBar").classList.toggle("visible", n > 0);
+        $("#bulkCount").textContent = `${n} dipilih`;
+        $("#bulkProcess").disabled = n === 0;
+        $("#bulkForward").disabled = n === 0;
+        $("#bulkDone").disabled = n === 0;
+      }
+
+      function renderInspector() {
+        const t = tickets.find(item => item.id === state.focusId);
+        if (!t) {
+          $("#inspectorBody").innerHTML = `<p class="detail-text">Pilih surat dari antrean untuk melihat detail dan tindak lanjutnya.</p>`;
+          return;
+        }
+        const actions = t.status === "selesai"
+          ? `<button class="ghost-button" type="button" data-act="reopen">${icon("undo")} Buka lagi</button><button class="primary-button" type="button" data-act="noop" disabled>Selesai</button>`
+          : `<button class="ghost-button" type="button" data-act="forward">${icon("forward")} Teruskan</button><button class="primary-button" type="button" data-act="done">${icon("check")} Selesai</button>`;
+        $("#inspectorBody").innerHTML = `
+          <h2>${esc(t.title)}</h2>
+          <div class="code">${esc(t.id)} · ${esc(t.owner)} · ${t.age} jam</div>
+          <div class="inspector-tags"><span class="status ${t.status}">${stageLabels[t.status]}</span><span class="tag">${esc(t.category)}</span>${t.priority === "tinggi" && t.status !== "selesai" ? `<span class="tag hot">PRIORITAS TINGGI</span>` : ""}</div>
+          <p class="detail-text">${esc(t.detail)}</p>
+          <p class="section-label">Jejak tindak lanjut</p>
+          <ul class="steps">${t.steps.map(s => `<li>${esc(s.label)}<small>${esc(s.time)}</small></li>`).join("")}</ul>
+          <div class="inspector-actions">${actions}</div>`;
+      }
+
+      function renderDistribution() {
+        const categories = ["Fasilitas", "Akademik", "Kegiatan"];
+        const values = categories.map(cat => tickets.filter(t => t.category === cat).length);
+        const max = Math.max(1, ...values);
+        $("#distributionBody").innerHTML = categories.map((cat, i) => `<div class="dist-row"><span class="dist-label">${cat}</span><div class="dist-track"><span style="width:${(values[i] / max) * 100}%"></span></div><span class="dist-value">${values[i]}</span></div>`).join("") + `<div class="dist-foot">Total ${tickets.length} surat · ${values.reduce((a,b)=>a+b,0)} masuk ke tiga kategori utama.</div>`;
+      }
+
+      function renderAll() {
+        const c = counts();
+        renderPipeline(c);
+        renderMetrics(c);
+        renderQueue();
+        renderInspector();
+        renderDistribution();
+      }
+
+      function setStatus(ids, status, label) {
+        ids.forEach(id => {
+          const t = tickets.find(item => item.id === id);
+          if (!t) return;
+          t.status = status;
+          t.steps.push({ label, time:"Baru saja" });
+        });
+        state.checked.clear();
+        renderAll();
+        toast(`${ids.length} surat ${label.toLowerCase()}.`);
+      }
+
+      function addIncoming() {
+        const template = incoming[state.incomingIndex % incoming.length];
+        state.incomingIndex += 1;
+        const id = `ASP-${2082 + state.incomingIndex - 1}`;
+        const ticket = { id, ...structuredClone(template), status:"menunggu", age:0 };
+        tickets.unshift(ticket);
+        state.stage = "menunggu";
+        state.query = "";
+        $("#queueSearch").value = "";
+        state.focusId = id;
+        renderAll();
+        const row = $(`[data-id="${id}"]`);
+        if (row) row.classList.add("flash");
+        toast(`${id} masuk ke antrean.`);
+      }
+
+      function resetDemo() {
+        tickets = structuredClone(seed);
+        state.stage = "menunggu";
+        state.query = "";
+        state.focusId = "ASP-2081";
+        state.checked.clear();
+        state.incomingIndex = 0;
+        $("#queueSearch").value = "";
+        renderAll();
+        toast("Kondisi awal dikembalikan.");
+      }
+
+      function commandItems() {
+        const ticketItems = tickets.map(t => ({ type:"ticket", id:t.id, title:t.title, meta:`${t.id} · ${stageLabels[t.status]}`, icon:"inbox" }));
+        return [
+          { type:"action", id:"incoming", title:"Simulasikan surat masuk", meta:"Tambah satu laporan ke antrean", icon:"plus" },
+          { type:"stage", id:"menunggu", title:"Fokus tahap masuk", meta:"Filter antrean", icon:"inbox" },
+          { type:"stage", id:"diproses", title:"Fokus tahap ditinjau", meta:"Filter antrean", icon:"pulse" },
+          { type:"stage", id:"diteruskan", title:"Fokus tahap diteruskan", meta:"Filter antrean", icon:"forward" },
+          { type:"action", id:"reset", title:"Reset data demo", meta:"Kembalikan kondisi awal", icon:"reset" },
+          ...ticketItems
+        ];
+      }
+
+      function renderCommand() {
+        const q = $("#commandInput").value.trim().toLowerCase();
+        const items = commandItems().filter(i => `${i.title} ${i.meta}`.toLowerCase().includes(q)).slice(0, 9);
+        state.commandIndex = Math.min(state.commandIndex, Math.max(0, items.length - 1));
+        $("#commandResults").innerHTML = items.length ? items.map((i,idx) => `<button class="command-result ${idx === state.commandIndex ? "selected" : ""}" type="button" role="option" aria-selected="${idx === state.commandIndex}" data-cmd="${idx}">${icon(i.icon)}<span><strong>${esc(i.title)}</strong><small>${esc(i.meta)}</small></span><kbd>↵</kbd></button>`).join("") : `<div class="command-empty">Tidak ada hasil yang cocok.</div>`;
+      }
+
+      function openCommand() {
+        $("#commandLayer").hidden = false;
+        $("#commandInput").value = "";
+        state.commandIndex = 0;
+        renderCommand();
+        $("#commandInput").focus();
+      }
+      function closeCommand() { $("#commandLayer").hidden = true; }
+
+      function runCommand(index) {
+        const q = $("#commandInput").value.trim().toLowerCase();
+        const items = commandItems().filter(i => `${i.title} ${i.meta}`.toLowerCase().includes(q)).slice(0, 9);
+        const item = items[index];
+        if (!item) return;
+        closeCommand();
+        if (item.type === "ticket") { state.focusId = item.id; state.stage = "semua"; $("#queueSearch").value = ""; state.query = ""; renderAll(); }
+        if (item.type === "stage") { state.stage = item.id; renderAll(); }
+        if (item.type === "action" && item.id === "incoming") addIncoming();
+        if (item.type === "action" && item.id === "reset") resetDemo();
+      }
+
+      function initEvents() {
+        document.addEventListener("click", event => {
+          const stageButton = event.target.closest("[data-stage]");
+          if (stageButton) { state.stage = stageButton.dataset.stage; renderQueue(); renderPipeline(counts()); }
+          const openButton = event.target.closest("[data-open]");
+          if (openButton) { state.focusId = openButton.dataset.open; renderQueue(); renderInspector(); }
+          const actButton = event.target.closest("[data-act]");
+          if (actButton && actButton.dataset.act !== "noop") {
+            const t = tickets.find(item => item.id === state.focusId);
+            if (!t) return;
+            if (actButton.dataset.act === "done") setStatus([t.id], "selesai", "Ditandai selesai");
+            if (actButton.dataset.act === "forward") setStatus([t.id], "diteruskan", "Diteruskan ke divisi");
+            if (actButton.dataset.act === "reopen") setStatus([t.id], "menunggu", "Dibuka kembali");
+          }
+          if (event.target.closest("[data-close-command]")) closeCommand();
+          const cmd = event.target.closest("[data-cmd]");
+          if (cmd) runCommand(Number(cmd.dataset.cmd));
+        });
+
+        document.addEventListener("change", event => {
+          const check = event.target.closest("[data-check]");
+          if (!check) return;
+          if (check.checked) state.checked.add(check.dataset.check); else state.checked.delete(check.dataset.check);
+          renderBulk();
+        });
+
+        $("#queueSearch").addEventListener("input", event => { state.query = event.target.value; renderQueue(); });
+        $("#bulkProcess").addEventListener("click", () => setStatus([...state.checked], "diproses", "Diproses"));
+        $("#bulkForward").addEventListener("click", () => setStatus([...state.checked], "diteruskan", "Diteruskan"));
+        $("#bulkDone").addEventListener("click", () => setStatus([...state.checked], "selesai", "Diselesaikan"));
+        $("#simulateButton").addEventListener("click", addIncoming);
+        $("#resetButton").addEventListener("click", resetDemo);
+        $("#footerReset").addEventListener("click", resetDemo);
+        $("#commandButton").addEventListener("click", openCommand);
+
+        $("#commandInput").addEventListener("input", () => { state.commandIndex = 0; renderCommand(); });
+        $("#commandInput").addEventListener("keydown", event => {
+          const count = commandItems().filter(i => `${i.title} ${i.meta}`.toLowerCase().includes($("#commandInput").value.trim().toLowerCase())).slice(0,9).length;
+          if (event.key === "ArrowDown") { event.preventDefault(); state.commandIndex = Math.min(Math.max(0,count-1), state.commandIndex+1); renderCommand(); }
+          if (event.key === "ArrowUp") { event.preventDefault(); state.commandIndex = Math.max(0, state.commandIndex-1); renderCommand(); }
+          if (event.key === "Enter") { event.preventDefault(); runCommand(state.commandIndex); }
+          if (event.key === "Escape") closeCommand();
+        });
+
+        $$("[data-jump]").forEach(button => button.addEventListener("click", () => {
+          $$("[data-jump]").forEach(item => item.classList.toggle("active", item === button));
+          document.getElementById(button.dataset.jump)?.scrollIntoView({ behavior:"smooth", block:"start" });
+        }));
+
+        document.addEventListener("keydown", event => {
+          const tag = document.activeElement?.tagName;
+          const typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+          if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); $("#commandLayer").hidden ? openCommand() : closeCommand(); }
+          if (event.key === "/" && !typing && $("#commandLayer").hidden) { event.preventDefault(); openCommand(); }
+          if (event.key === "Escape" && !$("#commandLayer").hidden) closeCommand();
+        });
+      }
+
+      function tickClock() {
+        $("#clock").textContent = new Intl.DateTimeFormat("id-ID", { hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false }).format(new Date());
+      }
+
+      function init() {
+        renderAll();
+        initEvents();
+        tickClock();
+        setInterval(tickClock, 1000);
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
