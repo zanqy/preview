@@ -78,7 +78,7 @@ body.unlocked .card .seek,body.unlocked .card .vrange,body.unlocked .card .durbo
 .card.source{opacity:.22;filter:grayscale(.5)}
 .card.slot{border-color:var(--coral)!important;background:rgba(255,118,84,.1)!important;transform:scale(.975)}
 .card.slot::after{content:'LEPAS DI SINI';position:absolute;left:50%;top:-13px;transform:translateX(-50%);padding:3px 9px;border-radius:5px;background:var(--coral);color:#180B07;font:700 8px 'IBM Plex Mono',monospace;letter-spacing:.12em;white-space:nowrap;z-index:4}
-.ghost{position:fixed;z-index:100;pointer-events:none;border-radius:14px;border:1px solid var(--coral);box-shadow:0 30px 70px rgba(0,0,0,.75),0 0 0 1px rgba(255,118,84,.5);overflow:hidden;transform-origin:50% 30%;opacity:.98}
+.ghost{transition:none!important;position:fixed;z-index:100;pointer-events:none;border-radius:14px;border:1px solid var(--coral);box-shadow:0 30px 70px rgba(0,0,0,.75),0 0 0 1px rgba(255,118,84,.5);overflow:hidden;transform-origin:50% 30%;opacity:.98}
 .ghost::before{content:'⠿  DIPEGANG';position:absolute;left:50%;top:0;transform:translate(-50%,-100%);padding:4px 10px;border-radius:6px 6px 0 0;background:var(--coral);color:#180B07;font:700 8px 'IBM Plex Mono',monospace;letter-spacing:.14em;white-space:nowrap}
 .scroll-zone{position:fixed;left:0;right:0;height:82px;z-index:8;pointer-events:none;opacity:0;transition:opacity .2s}
 .scroll-zone.top{top:0;background:linear-gradient(180deg,rgba(255,118,84,.24),transparent)}
@@ -174,8 +174,13 @@ function setLock(state){
   document.body.classList.toggle('unlocked',unlocked);
   lockLabel.textContent=unlocked?'TERBUKA':'KUNCI';
   clearInterval(lockTimer);
-  if(unlocked){remain=8;countdown.textContent=remain+'s';lockTimer=setInterval(()=>{remain--;countdown.textContent=remain+'s';if(remain<=0)setLock(false)},1000);}
+  if(unlocked){remain=8;countdown.textContent=remain+'s';startCount();}
   else{toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1600);}
+}
+function startCount(){
+  clearInterval(lockTimer);
+  if(!unlocked||dragging)return;
+  lockTimer=setInterval(()=>{if(dragging)return;remain--;countdown.textContent=remain+'s';if(remain<=0)setLock(false)},1000);
 }
 lockBtn.addEventListener('pointerdown',e=>{
   lockBtn.classList.add('holding');
@@ -196,6 +201,7 @@ function startDrag(card,e){
   document.body.style.touchAction='none';document.body.classList.add('drag-active');
   startX=e.clientX;startY=e.clientY;pointerX=e.clientX;pointerY=e.clientY;
   scrollRAF=requestAnimationFrame(autoScroll);
+  clearInterval(lockTimer);countdown.textContent='—';
 }
 function commit(source,target){
   const before=new Map([...grid.children].map(el=>[el.dataset.id,el.getBoundingClientRect()]));
@@ -258,9 +264,10 @@ function endDrag(){
   if(dest&&moved&&dest!==moved)commit(moved,dest);
   if(moved){moved.classList.remove('source');moved.classList.add('settled');setTimeout(()=>moved.classList.remove('settled'),520);}
   dragging=false;dropTarget=null;
+  if(unlocked){remain=8;countdown.textContent=remain+'s';startCount();}
 }
-grid.addEventListener('pointerup',endDrag);
-grid.addEventListener('pointercancel',endDrag);
+window.addEventListener('pointerup',endDrag);
+window.addEventListener('pointercancel',endDrag);
 setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('id-ID',{hour12:false})},1000);
 render();
 </script>
