@@ -84,6 +84,7 @@ body.editing .card{animation:lift .34s cubic-bezier(.2,.8,.2,1) both;animation-d
 .ghost::before{content:'⠿  DIPINDAHKAN';position:absolute;left:50%;top:-1px;transform:translate(-50%,-100%);padding:4px 10px;border-radius:6px 6px 0 0;background:var(--coral);color:#180B07;font:700 8px 'IBM Plex Mono',monospace;letter-spacing:.14em;white-space:nowrap}
 .card.settled{animation:settle .46s cubic-bezier(.2,1.4,.4,1)}
 @keyframes settle{0%{transform:scale(1.055)}55%{transform:scale(.975)}100%{transform:scale(1)}}
+.insert-line{position:fixed;z-index:99;width:4px;border-radius:2px;background:var(--coral);box-shadow:0 0 16px rgba(255,118,84,.85);pointer-events:none;display:none}
 .toast{position:fixed;left:50%;bottom:112px;transform:translate(-50%,16px) scale(.96);padding:11px 19px;border:1px solid var(--mint);border-radius:999px;background:#101A12;color:var(--mint);font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.16em;opacity:0;pointer-events:none;transition:all .32s cubic-bezier(.2,1.3,.4,1);z-index:20}
 .toast.show{opacity:1;transform:translate(-50%,0) scale(1)}
 .transport{position:fixed;left:0;right:0;bottom:0;z-index:5;background:#101410;border-top:1px solid var(--line);padding:14px 30px 18px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;box-shadow:0 -18px 40px rgba(0,0,0,.45)}
@@ -118,6 +119,7 @@ body.editing .card{animation:lift .34s cubic-bezier(.2,.8,.2,1) both;animation-d
   </div>
   <div class="grid" id="grid"></div>
 </main>
+<div class="insert-line" id="insertLine"></div>
 <div class="toast" id="toast">POSISI TERKUNCI</div>
 <footer class="transport">
   <div class="now"><div class="lbl">ON AIR</div><div class="nm">— belum ada lagu —</div><div class="ar">pilih kartu untuk memulai</div><div class="meter"><span></span></div></div>
@@ -136,7 +138,8 @@ const tracks=[
  {t:'Cadangan',a:'instrumental',src:'DOWNLOAD',dur:'2:15',vol:60,fout:3,fin:0,seed:51}
 ];
 const grid=document.getElementById('grid'), toast=document.getElementById('toast'), btn=document.getElementById('editBtn');
-let editing=false, dragging=null, ghost=null, startX=0, startY=0, lastTarget=null, order=tracks.map((_,i)=>i);
+let editing=false, dragging=null, ghost=null, startX=0, startY=0, lastTarget=null, dropTarget=null, order=tracks.map((_,i)=>i);
+const line=document.getElementById('insertLine');
 function bars(seed){let s=seed,o='';for(let i=0;i<44;i++){s=(s*1103515245+12345)&0x7fffffff;o+=`<i style="height:${12+((s>>7)%68)}%"></i>`}return o}
 function makeCard(idx,pos){
   const c=tracks[idx], el=document.createElement('article');
@@ -209,16 +212,25 @@ grid.addEventListener('pointermove',e=>{
   const stack=document.elementsFromPoint(e.clientX,e.clientY);
   const target=stack.map(x=>x.closest?.('.card')).find(c=>c&&c!==dragging&&!c.classList.contains('ghost'));
   if(lastTarget&&lastTarget!==target)lastTarget.classList.remove('slot');
-  if(target){target.classList.add('slot');lastTarget=target;flipSwap(dragging,target);}
+  dropTarget=target||null;
+  if(target){
+    target.classList.add('slot'); lastTarget=target;
+    const r=target.getBoundingClientRect();
+    line.style.display='block';
+    line.style.left=(e.clientX<r.left+r.width/2?r.left-4:r.right)+'px';
+    line.style.top=r.top+'px'; line.style.height=r.height+'px';
+  } else line.style.display='none';
 });
 function endDrag(){
   if(!dragging)return;
-  const moved=dragging;
+  const moved=dragging, dest=dropTarget;
   if(ghost){ghost.remove();ghost=null;}
-  moved.classList.remove('source');
+  line.style.display='none';
   if(lastTarget){lastTarget.classList.remove('slot');lastTarget=null;}
+  if(dest&&dest!==moved)flipSwap(moved,dest);
+  moved.classList.remove('source');
   moved.classList.add('settled'); setTimeout(()=>moved.classList.remove('settled'),500);
-  dragging=null;
+  dropTarget=null; dragging=null;
 }
 grid.addEventListener('pointerup',endDrag);
 grid.addEventListener('pointercancel',endDrag);
