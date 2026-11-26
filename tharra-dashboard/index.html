@@ -535,14 +535,17 @@
       .panel-head { gap: 10px; }
     }
     @media (max-width: 480px) {
-      .kpi-grid { grid-template-columns: 1fr; }
-      .metric { border-right: 0; border-bottom: 1px solid var(--line); }
-      .metric:last-child { border-bottom: 0; }
-      .metric:nth-child(2) { border-right: 0; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .metric { padding: 13px 12px; border-bottom: 0; }
+      .metric:nth-child(odd) { border-right: 1px solid var(--line); }
+      .metric:nth-child(even) { border-right: 0; }
+      .metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .metric-value { font-size: 24px; letter-spacing: -1px; }
+      .metric-label { font-size: 9px; letter-spacing: 0.5px; }
       .search-trim { display: none; }
       .search-trigger { flex: 0 0 40px; width: 40px; min-width: 40px; justify-content: center; padding: 0; }
       .search-trigger kbd { display: none; }
-      .heading-actions .button { flex: 1; }
+      .heading-actions .button { flex: 1; white-space: nowrap; padding-left: 10px; padding-right: 10px; }
       .panel-body, .activity-panel, .priority-panel { padding-left: 16px; padding-right: 16px; }
       .queue-head { padding-left: 16px; padding-right: 16px; }
       .drawer-foot { flex-wrap: wrap; }
