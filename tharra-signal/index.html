@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Tharra Signal — papan ringkasan aspirasi OSIS dengan data contoh." />
+  <title>Tharra Signal — Papan Aspirasi OSIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f5f4ef;
+      --surface: #fffefa;
+      --ink: #151515;
+      --muted: #585852;
+      --faint: #74746c;
+      --line: #cbc9c0;
+      --line-dark: #8e8d84;
+      --red: #e23b28;
+      --blue: #2f5bd7;
+      --green: #2e7d4f;
+      --amber: #b36a0b;
+      --font-display: "Playfair Display", Georgia, serif;
+      --font-body: "Inter", system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 64px; overflow-x: hidden; }
+    body { margin: 0; min-width: 320px; overflow-x: hidden; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 14px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    button:not(:disabled) { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .45; }
+    a { color: inherit; }
+    svg { display: block; }
+    .icon { width: 17px; height: 17px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .mono { font-family: var(--font-mono); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: fixed; top: 10px; left: 10px; z-index: 200; padding: 9px 13px; transform: translateY(-160%); background: var(--red); color: #fff; font-weight: 700; }
+    .skip-link:focus { transform: translateY(0); }
+    :focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+    ::selection { background: var(--red); color: #fff; }
+
+    .masthead { border-top: 8px solid var(--ink); border-bottom: 1px solid var(--ink); background: var(--paper); }
+    .masthead-inner { max-width: 1360px; margin: 0 auto; padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .brand { display: flex; align-items: baseline; gap: 10px; white-space: nowrap; }
+    .brand strong { font: 800 14px/1 var(--font-mono); letter-spacing: 1.4px; }
+    .brand span { font: 500 11px/1 var(--font-mono); color: var(--faint); }
+    .mast-nav { display: flex; align-items: center; gap: 22px; }
+    .mast-nav a { font: 600 11px/1 var(--font-mono); letter-spacing: .4px; text-transform: uppercase; border-bottom: 2px solid transparent; padding: 6px 0; }
+    .mast-nav a:hover { border-color: var(--red); color: var(--red); }
+    .mast-meta { display: flex; align-items: center; gap: 10px; font: 11px/1 var(--font-mono); color: var(--muted); }
+    .demo-pill { padding: 4px 8px; background: var(--red); color: #fff; font-weight: 700; letter-spacing: .8px; }
+
+    .wrap { max-width: 1360px; margin: 0 auto; padding: 0 28px 40px; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; align-items: end; padding: 42px 0 30px; border-bottom: 2px solid var(--ink); }
+    .kicker { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; font: 700 10px/1 var(--font-mono); letter-spacing: 1.4px; text-transform: uppercase; color: var(--red); }
+    .kicker::before { content: ""; width: 28px; height: 2px; background: var(--red); }
+    h1 { margin: 0; max-width: 880px; font: 600 clamp(40px, 5.5vw, 76px)/.98 var(--font-display); letter-spacing: -2px; text-wrap: balance; }
+    h1 em { color: var(--red); font-style: italic; }
+    .hero p { max-width: 620px; margin: 18px 0 0; color: var(--muted); font-size: 13px; }
+    .hero p strong { color: var(--ink); }
+    .hero-actions { display: flex; align-items: center; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 8px 13px; border: 1px solid var(--ink); background: transparent; color: var(--ink); font: 700 11px/1 var(--font-mono); letter-spacing: .3px; transition: background 140ms ease, color 140ms ease, transform 140ms ease; }
+    .btn:hover { transform: translateY(-1px); background: var(--ink); color: #fff; }
+    .btn.red { background: var(--red); border-color: var(--red); color: #fff; }
+    .btn.red:hover { background: #c32d1c; }
+    .btn .icon { width: 15px; height: 15px; }
+
+    .signal-card { border: 2px solid var(--ink); background: var(--surface); padding: 18px; }
+    .signal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--line); font: 700 10px/1 var(--font-mono); letter-spacing: .8px; text-transform: uppercase; }
+    .signal-head span:last-child { color: var(--red); }
+    .signal-number { margin: 14px 0 0; font: 700 78px/.9 var(--font-mono); letter-spacing: -5px; }
+    .signal-number small { font-size: 20px; letter-spacing: -1px; color: var(--faint); }
+    .signal-caption { margin-top: 8px; color: var(--muted); font-size: 11px; }
+    .signal-track { display: flex; gap: 3px; margin-top: 16px; }
+    .signal-track span { flex: 1; height: 7px; background: var(--line); }
+    .signal-track span.on { background: var(--red); }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(290px, .75fr); gap: 28px; margin-top: 28px; }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--ink); }
+    .section-title { display: flex; align-items: baseline; gap: 11px; margin: 0; font: 700 18px/1.2 var(--font-mono); letter-spacing: -.2px; }
+    .section-title b { color: var(--red); font-size: 12px; }
+    .section-note { color: var(--faint); font: 10px/1 var(--font-mono); }
+    .priority-list { margin: 0; padding: 0; list-style: none; }
+    .priority-row { display: grid; grid-template-columns: 46px minmax(0,1fr) auto; gap: 14px; align-items: start; padding: 16px 0; border-bottom: 1px solid var(--line); }
+    .priority-num { font: 700 28px/1 var(--font-display); color: var(--red); }
+    .priority-main button { display: block; max-width: 100%; padding: 0; border: 0; background: transparent; text-align: left; font: 600 16px/1.35 var(--font-body); }
+    .priority-main button:hover { color: var(--red); }
+    .priority-main small { display: block; margin-top: 5px; color: var(--faint); font: 10px/1.4 var(--font-mono); }
+    .priority-actions { display: flex; gap: 6px; align-items: center; }
+    .icon-btn { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--line); background: transparent; color: var(--muted); }
+    .icon-btn:hover { border-color: var(--ink); color: var(--ink); background: var(--surface); }
+
+    .side-section { margin-bottom: 28px; }
+    .stat-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .stat-row span:first-child { color: var(--muted); font-size: 11px; }
+    .stat-row strong { font: 700 26px/1 var(--font-mono); }
+    .stat-row strong.red { color: var(--red); }
+    .bars { margin-top: 20px; }
+    .bars-title { font: 700 10px/1 var(--font-mono); letter-spacing: .8px; text-transform: uppercase; color: var(--faint); }
+    .bar-row { display: grid; grid-template-columns: 34px 1fr 22px; gap: 8px; align-items: center; margin-top: 10px; }
+    .bar-label { font: 10px/1 var(--font-mono); color: var(--muted); }
+    .bar-track { height: 12px; background: #e5e3da; }
+    .bar-track span { display: block; height: 100%; background: var(--ink); transition: width 220ms ease; }
+    .bar-row.today .bar-track span { background: var(--red); }
+    .bar-value { font: 10px/1 var(--font-mono); text-align: right; color: var(--muted); }
+    .bars-foot { margin: 12px 0 0; font-size: 10px; color: var(--faint); }
+    .activity-list { margin: 12px 0 0; padding: 0; list-style: none; }
+    .activity-list li { display: grid; grid-template-columns: 6px 1fr; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+    .activity-list li::before { content: ""; width: 6px; height: 6px; margin-top: 6px; background: var(--red); }
+    .activity-list small { display: block; color: var(--faint); font: 9px/1.4 var(--font-mono); }
+
+    .archive { margin-top: 34px; }
+    .archive-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .filter-btn { min-height: 34px; padding: 6px 10px; border: 1px solid var(--line); background: transparent; font: 600 10px/1 var(--font-mono); }
+    .filter-btn:hover { border-color: var(--ink); }
+    .filter-btn.active { border-color: var(--ink); background: var(--ink); color: #fff; }
+    .search-field { position: relative; }
+    .search-field input { width: 200px; height: 34px; padding: 6px 10px 6px 28px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); outline: 0; font: 11px/1 var(--font-mono); }
+    .search-field input:focus { border-color: var(--red); box-shadow: 0 0 0 2px rgba(226,59,40,.12); }
+    .search-field .icon { position: absolute; left: 8px; top: 50%; width: 14px; height: 14px; transform: translateY(-50%); color: var(--faint); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; min-width: 680px; border-collapse: collapse; }
+    th { padding: 10px 12px; border-bottom: 1px solid var(--line-dark); text-align: left; font: 700 9px/1 var(--font-mono); letter-spacing: .8px; text-transform: uppercase; color: var(--muted); }
+    td { padding: 12px; border-bottom: 1px solid var(--line); font-size: 11.5px; vertical-align: middle; }
+    tbody tr:hover { background: var(--surface); }
+    .row-title { padding: 0; border: 0; background: transparent; text-align: left; font-weight: 600; color: var(--ink); }
+    .row-title:hover { color: var(--red); }
+    .row-code { display: block; margin-top: 3px; color: var(--faint); font: 9px/1 var(--font-mono); }
+    .status { display: inline-block; padding: 3px 8px; border: 1px solid var(--line-dark); font: 700 9px/1.4 var(--font-mono); white-space: nowrap; }
+    .status.menunggu { color: var(--red); border-color: var(--red); }
+    .status.diproses { color: var(--amber); border-color: var(--amber); }
+    .status.diteruskan { color: var(--blue); border-color: var(--blue); }
+    .status.selesai { color: var(--green); border-color: var(--green); }
+    .empty-table { padding: 38px 12px; text-align: center; color: var(--faint); font-size: 11px; }
+    .table-foot { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; color: var(--faint); font: 10px/1 var(--font-mono); }
+
+    .page-footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 34px; padding-top: 14px; border-top: 2px solid var(--ink); color: var(--faint); font-size: 10px; }
+    .page-footer a { text-decoration: underline; text-underline-offset: 3px; }
+    .page-footer a:hover { color: var(--red); }
+    .text-btn { min-height: 34px; padding: 5px 8px; border: 0; background: transparent; color: var(--muted); font: 10px/1 var(--font-mono); text-decoration: underline; text-underline-offset: 3px; }
+    .text-btn:hover { color: var(--red); }
+
+    .layer { position: fixed; inset: 0 auto 0 0; z-index: 100; display: grid; width: 100vw; }
+    .layer[hidden] { display: none; }
+    .scrim { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: rgba(21,21,21,.52); }
+    .detail {
+      position: relative; width: min(620px, calc(100vw - 28px)); max-height: calc(100vh - 80px); margin: 40px auto;
+      overflow-y: auto; border: 3px solid var(--ink); background: var(--surface); box-shadow: 12px 12px 0 var(--ink);
+    }
+    .detail-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 2px solid var(--ink); }
+    .detail-head strong { font: 700 11px/1 var(--font-mono); letter-spacing: 1px; }
+    .detail-body { padding: 22px 24px 24px; }
+    .detail-body h2 { margin: 0; font: 600 30px/1.15 var(--font-display); letter-spacing: -.5px; }
+    .detail-code { margin-top: 8px; color: var(--faint); font: 10px/1 var(--font-mono); }
+    .detail-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 14px; }
+    .detail-text { margin: 18px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.7; }
+    .detail-label { margin: 20px 0 8px; font: 700 10px/1 var(--font-mono); letter-spacing: .8px; text-transform: uppercase; color: var(--faint); }
+    .detail-steps { margin: 0; padding: 0; list-style: none; }
+    .detail-steps li { position: relative; padding-left: 16px; margin-top: 8px; color: var(--muted); font-size: 11px; }
+    .detail-steps li::before { content: ""; position: absolute; left: 0; top: 5px; width: 6px; height: 6px; background: var(--red); }
+    .detail-steps small { display: block; color: var(--faint); font: 9px/1.3 var(--font-mono); }
+    .detail-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+
+    .toast { position: fixed; left: 28px; bottom: 24px; z-index: 150; max-width: calc(100% - 56px); padding: 11px 15px; border-left: 4px solid var(--red); background: var(--ink); color: #fff; font: 11px/1.3 var(--font-mono); opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity 160ms ease, transform 160ms ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    html.presentation h1 { font-size: clamp(56px, 7vw, 96px); }
+    html.presentation .priority-main button { font-size: 19px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    @media (max-width: 1080px) {
+      .hero { grid-template-columns: 1fr; gap: 24px; }
+      .signal-card { max-width: 420px; }
+      .layout { grid-template-columns: 1fr; }
+      .side-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    }
+    @media (max-width: 760px) {
+      .masthead-inner { padding: 11px 16px; }
+      .mast-nav { display: none; }
+      .wrap { padding: 0 16px 32px; }
+      .hero { padding-top: 30px; }
+      h1 { letter-spacing: -1.2px; }
+      .side-grid { grid-template-columns: 1fr; gap: 0; }
+      .archive-tools { align-items: stretch; }
+      .search-field { flex: 1; }
+      .search-field input { width: 100%; }
+      .detail { margin: 16px auto; max-height: calc(100vh - 32px); }
+      .detail-body { padding: 18px; }
+      .detail-body h2 { font-size: 25px; }
+      .page-footer { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 480px) {
+      .brand span { display: none; }
+      .mast-meta { font-size: 9px; }
+      .hero-actions .btn { flex: 1; }
+      .priority-row { grid-template-columns: 34px minmax(0,1fr); }
+      .priority-actions { grid-column: 2; }
+      .priority-num { font-size: 22px; }
+      .signal-number { font-size: 62px; }
+      .archive-tools .filter-btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke papan</a>
+
+  <svg class="sr-only" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-type" viewBox="0 0 24 24"><path d="M4 7V5h16v2M12 5v14m-4 0h8"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  </svg>
+
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="brand"><strong>THARRA SIGNAL</strong><span>papan aspirasi OSIS</span></div>
+      <nav class="mast-nav" aria-label="Navigasi papan"><a href="#prioritas">Prioritas</a><a href="#ringkasan">Ringkasan</a><a href="#arsip">Arsip</a></nav>
+      <div class="mast-meta"><span id="dateLabel">—</span><span class="demo-pill">DATA DEMO</span></div>
+    </div>
+  </header>
+
+  <main class="wrap" id="main">
+    <section class="hero" aria-labelledby="heroTitle">
+      <div>
+        <div class="kicker">Laporan pagi · edisi contoh</div>
+        <h1 id="heroTitle">Ada <em id="heroCount">4 sinyal</em> yang perlu dijawab hari ini.</h1>
+        <p><strong id="heroLead">4 surat</strong> belum dibuka. Buka satu per satu, tentukan arahnya, lalu biarkan arsipnya bercerita.</p>
+        <div class="hero-actions">
+          <button class="btn red" id="addBtn" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg> Tambah contoh</button>
+          <button class="btn" id="typeBtn" type="button" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-type"/></svg> Mode presentasi</button>
+          <button class="btn" id="resetBtn" type="button">Reset papan</button>
+        </div>
+      </div>
+      <aside class="signal-card" aria-label="Ringkasan sinyal utama">
+        <div class="signal-head"><span>Sinyal hari ini</span><span>LIVE</span></div>
+        <div class="signal-number" id="signalNumber">4<small>/12</small></div>
+        <p class="signal-caption">Surat menunggu dibuka dari <span id="signalTotal">12</span> arsip dalam papan.</p>
+        <div class="signal-track" id="signalTrack" aria-hidden="true"></div>
+      </aside>
+    </section>
+
+    <div class="layout">
+      <section id="prioritas" aria-labelledby="priorityTitle">
+        <div class="section-head"><h2 class="section-title" id="priorityTitle"><b>01</b> Sinyal prioritas</h2><span class="section-note">klik untuk membuka</span></div>
+        <ol class="priority-list" id="priorityList"></ol>
+      </section>
+
+      <div class="side-grid">
+        <section id="ringkasan" class="side-section" aria-labelledby="summaryTitle">
+          <div class="section-head"><h2 class="section-title" id="summaryTitle"><b>02</b> Ringkasan</h2></div>
+          <div class="stat-row"><span>Surat diproses</span><strong id="statProcess">0</strong></div>
+          <div class="stat-row"><span>Diteruskan ke divisi</span><strong id="statForward">0</strong></div>
+          <div class="stat-row"><span>Selesai dibalas</span><strong class="red" id="statDone">0</strong></div>
+          <div class="bars">
+            <div class="bars-title">Arsip masuk per hari</div>
+            <div id="bars"></div>
+            <p class="bars-foot" id="barsFoot">Dihitung dari tanggal pada data contoh.</p>
+          </div>
+        </section>
+
+        <section class="side-section" aria-labelledby="activityTitle">
+          <div class="section-head"><h2 class="section-title" id="activityTitle"><b>03</b> Jejak tim</h2></div>
+          <ul class="activity-list">
+            <li><div><strong>Raka</strong> menandai ASP-2069 selesai.<small>12 menit lalu</small></div></li>
+            <li><div><strong>Salsa</strong> meneruskan laporan fasilitas.<small>34 menit lalu</small></div></li>
+            <li><div><strong>Dimas</strong> meninjau form aspirasi.<small>1 jam lalu</small></div></li>
+          </ul>
+        </section>
+      </div>
+    </div>
+
+    <section class="archive" id="arsip" aria-labelledby="archiveTitle">
+      <div class="section-head">
+        <h2 class="section-title" id="archiveTitle"><b>04</b> Arsip terbaru</h2>
+        <div class="archive-tools">
+          <button class="filter-btn active" type="button" data-filter="semua">Semua</button>
+          <button class="filter-btn" type="button" data-filter="menunggu">Belum dibuka</button>
+          <button class="filter-btn" type="button" data-filter="diproses">Diproses</button>
+          <button class="filter-btn" type="button" data-filter="selesai">Selesai</button>
+          <label class="search-field"><span class="sr-only">Cari arsip</span><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><input id="searchInput" type="search" placeholder="Cari judul atau kode..." autocomplete="off" /></label>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <caption class="sr-only">Daftar arsip aspirasi terbaru</caption>
+          <thead><tr><th scope="col">Surat</th><th scope="col">Kategori</th><th scope="col">Status</th><th scope="col">Masuk</th><th scope="col"><span class="sr-only">Aksi</span></th></tr></thead>
+          <tbody id="archiveBody"></tbody>
+        </table>
+      </div>
+      <div class="table-foot"><span id="tableFoot">0 surat ditampilkan</span><span>TEKAN / UNTUK FOKUS CARI</span></div>
+    </section>
+
+    <footer class="page-footer">
+      <span>Tharra Signal · prototipe dengan data contoh, bukan data produksi.</span>
+      <span><a href="https://zanqy.github.io/preview/tharra-dashboard/" target="_blank" rel="noopener">Versi kertas</a> · <a href="https://zanqy.github.io/preview/tharra-night-desk/" target="_blank" rel="noopener">Versi malam</a> · <button class="text-btn" id="footerReset" type="button">Reset</button></span>
+    </footer>
+  </main>
+
+  <div class="layer" id="detailLayer" hidden>
+    <button class="scrim" type="button" data-close aria-label="Tutup detail"></button>
+    <section class="detail" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="detail-head"><strong>LEMBAR SURAT</strong><button class="icon-btn" type="button" data-close aria-label="Tutup detail"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+      <div class="detail-body" id="detailBody"></div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"><span id="toastText"></span></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const seed = [
+        { id:"ASP-3012", title:"Lampu tangga depan tidak menyala", category:"Fasilitas", status:"menunggu", priority:"tinggi", day:0, time:"08.12", owner:"Anonim", detail:"Tangga depan area utama gelap sejak kemarin. Siswa yang datang lebih awal harus menuruni tangga tanpa penerangan.", steps:[{label:"Laporan diterima",time:"08.12"}] },
+        { id:"ASP-3011", title:"Jadwal piket kelas belum diperbarui", category:"Akademik", status:"menunggu", priority:"sedang", day:1, time:"07.40", owner:"Ketua kelas XI", detail:"Papan piket masih memakai jadwal pekan lalu. Mohon jadwal terbaru ditempel sebelum pelajaran dimulai.", steps:[{label:"Laporan diterima",time:"07.40"}] },
+        { id:"ASP-3010", title:"Mic aula perlu dicek sebelum rapat", category:"Fasilitas", status:"menunggu", priority:"tinggi", day:2, time:"09.05", owner:"Panitia OSIS", detail:"Suara microfon terputus-putus di bagian tengah aula. Perlu pengecekan kabel sebelum rapat besar.", steps:[{label:"Laporan diterima",time:"09.05"}] },
+        { id:"ASP-3009", title:"Usulan rubrik lomba poster", category:"Kegiatan", status:"menunggu", priority:"rendah", day:3, time:"10.28", owner:"Siswa kelas X", detail:"Peserta belum menerima kriteria penilaian. Rubrik sederhana akan membuat hasil lebih transparan.", steps:[{label:"Laporan diterima",time:"10.28"}] },
+        { id:"ASP-3008", title:"Form aspirasi terlalu panjang di HP", category:"Akademik", status:"diproses", priority:"tinggi", day:2, time:"11.14", owner:"Siswa kelas XII", detail:"Field wajib tersebar terlalu jauh. Tombol kirim baru terlihat setelah scroll panjang.", steps:[{label:"Laporan diterima",time:"11.14"},{label:"Sedang ditinjau",time:"13.02"}] },
+        { id:"ASP-3007", title:"Mading kelas butuh area baru", category:"Kegiatan", status:"diproses", priority:"sedang", day:4, time:"08.55", owner:"Anonim", detail:"Pengumuman lama menutupi info minggu ini. Perlu kolom khusus untuk pengumuman aktif.", steps:[{label:"Laporan diterima",time:"08.55"},{label:"Sedang ditinjau",time:"10.20"}] },
+        { id:"ASP-3006", title:"Kunci ruang ekstrakurikuler tertukar", category:"Fasilitas", status:"diproses", priority:"sedang", day:5, time:"14.31", owner:"Anggota OSIS", detail:"Tiga kunci memiliki bentuk mirip. Penanda warna akan mengurangi tertukar saat kegiatan.", steps:[{label:"Laporan diterima",time:"14.31"},{label:"Sedang ditinjau",time:"15.10"}] },
+        { id:"ASP-3005", title:"Permintaan kertas workshop desain", category:"Kegiatan", status:"diteruskan", priority:"sedang", day:3, time:"09.47", owner:"Panitia acara", detail:"Workshop membutuhkan kertas gambar tambahan. Permintaan sudah dikirim ke divisi sarana.", steps:[{label:"Laporan diterima",time:"09.47"},{label:"Diteruskan ke Sarana",time:"11.30"}] },
+        { id:"ASP-3004", title:"Notifikasi email balasan terlambat", category:"Akademik", status:"diteruskan", priority:"tinggi", day:1, time:"16.02", owner:"Siswa kelas XI", detail:"Balasan aspirasi baru sampai setelah beberapa jam. Perlu pengecekan layanan email.", steps:[{label:"Laporan diterima",time:"16.02"},{label:"Diteruskan ke teknisi",time:"17.15"}] },
+        { id:"ASP-3003", title:"Dispenser lantai atas kosong", category:"Fasilitas", status:"diteruskan", priority:"sedang", day:0, time:"15.20", owner:"Anonim", detail:"Dispenser tidak mengeluarkan air sejak siang. Permintaan ini mendesak menjelang belajar malam.", steps:[{label:"Laporan diterima",time:"15.20"},{label:"Diteruskan ke Sarana",time:"16.00"}] },
+        { id:"ASP-3002", title:"Template pengumuman lebih rapi", category:"Kegiatan", status:"selesai", priority:"rendah", day:6, time:"13.40", owner:"Humas OSIS", detail:"Template kini memakai satu format dengan judul, tanggal, dan kontak yang jelas.", steps:[{label:"Laporan diterima",time:"13.40"},{label:"Template diperbarui",time:"14.30"},{label:"Selesai",time:"15.00"}] },
+        { id:"ASP-3001", title:"Daftar piket sudah dibagikan", category:"Akademik", status:"selesai", priority:"sedang", day:5, time:"10.08", owner:"Wali kelas", detail:"Daftar piket sudah dibagikan dan ditempel di pintu kelas. Perubahan kini tercatat di satu tempat.", steps:[{label:"Laporan diterima",time:"10.08"},{label:"Dibagikan ke kelas",time:"11.00"},{label:"Selesai",time:"11.20"}] }
+      ];
+
+      const samples = [
+        { title:"Kursi depan aula perlu diganti", category:"Fasilitas", priority:"tinggi", owner:"Panitia acara", detail:"Satu kursi di baris depan patah pada kaki kursi. Perlu diganti sebelum acara sekolah minggu depan.", steps:[{label:"Laporan diterima",time:"Baru saja"}] },
+        { title:"Tambahan area diskusi di perpustakaan", category:"Kegiatan", priority:"sedang", owner:"Siswa kelas XI", detail:"Ruang diskusi kecil bisa membantu kelompok belajar tanpa mengganggu pembaca di area utama.", steps:[{label:"Laporan diterima",time:"Baru saja"}] },
+        { title:"Pedoman penulisan laporan kegiatan", category:"Akademik", priority:"rendah", owner:"Anggota OSIS", detail:"Pedoman singkat akan membantu panitia membuat laporan dengan struktur yang konsisten.", steps:[{label:"Laporan diterima",time:"Baru saja"}] }
+      ];
+
+      let tickets = structuredClone(seed);
+      const state = { filter:"semua", query:"", sampleIndex:0, focusId:null };
+      const $ = s => document.querySelector(s);
+      const $$ = s => Array.from(document.querySelectorAll(s));
+      const labels = { menunggu:"Belum dibuka", diproses:"Diproses", diteruskan:"Diteruskan", selesai:"Selesai" };
+      const days = ["Sen","Sel","Rab","Kam","Jum","Sab","Min"];
+      const esc = v => String(v).replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+
+      function toast(text) {
+        $("#toastText").textContent = text;
+        $("#toast").classList.add("show");
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => $("#toast").classList.remove("show"), 2400);
+      }
+
+      function visibleTickets() {
+        const q = state.query.trim().toLowerCase();
+        return tickets.filter(t => (state.filter === "semua" || t.status === state.filter) && (!q || `${t.id} ${t.title} ${t.category} ${t.detail}`.toLowerCase().includes(q)));
+      }
+
+      function renderHero() {
+        const pending = tickets.filter(t => t.status === "menunggu").length;
+        $("#heroCount").textContent = `${pending} sinyal`;
+        $("#heroLead").textContent = `${pending} surat`;
+        $("#signalNumber").innerHTML = `${pending}<small>/${tickets.length}</small>`;
+        $("#signalTotal").textContent = tickets.length;
+        $("#signalTrack").innerHTML = tickets.map(t => `<span class="${t.status === "menunggu" ? "on" : ""}"></span>`).join("");
+        $("#statProcess").textContent = tickets.filter(t => t.status === "diproses").length;
+        $("#statForward").textContent = tickets.filter(t => t.status === "diteruskan").length;
+        $("#statDone").textContent = tickets.filter(t => t.status === "selesai").length;
+      }
+
+      function renderPriority() {
+        const items = tickets.filter(t => ["menunggu","diproses"].includes(t.status)).slice(0, 3);
+        $("#priorityList").innerHTML = items.map((t,i) => `<li class="priority-row">
+          <span class="priority-num">0${i+1}</span>
+          <div class="priority-main"><button type="button" data-open="${t.id}">${esc(t.title)}</button><small>${esc(t.id)} · ${esc(t.category)} · ${esc(labels[t.status])}</small></div>
+          <div class="priority-actions"><button class="icon-btn" type="button" data-open="${t.id}" aria-label="Buka ${esc(t.id)}"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
+        </li>`).join("");
+      }
+
+      function renderBars() {
+        const values = days.map((_, i) => tickets.filter(t => t.day === i).length);
+        const max = Math.max(1, ...values);
+        $("#bars").innerHTML = values.map((v,i) => `<div class="bar-row ${i === 0 ? "today" : ""}"><span class="bar-label">${days[i]}</span><div class="bar-track"><span style="width:${(v/max)*100}%"></span></div><span class="bar-value">${v}</span></div>`).join("");
+        $("#barsFoot").textContent = `Jumlah per hari: ${values.join(", ")} · total ${values.reduce((a,b)=>a+b,0)} surat.`;
+      }
+
+      function renderTable() {
+        const rows = visibleTickets();
+        $("#archiveBody").innerHTML = rows.length ? rows.map(t => `<tr>
+          <td><button class="row-title" type="button" data-open="${t.id}">${esc(t.title)}<span class="row-code">${esc(t.id)} · ${esc(t.owner)}</span></button></td>
+          <td>${esc(t.category)}</td>
+          <td><span class="status ${t.status}">${labels[t.status]}</span></td>
+          <td>${esc(t.time)}</td>
+          <td><button class="icon-btn" type="button" data-open="${t.id}" aria-label="Buka ${esc(t.id)}"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button></td>
+        </tr>`).join("") : `<tr><td class="empty-table" colspan="5">Tidak ada arsip yang cocok dengan filter ini.</td></tr>`;
+        $("#tableFoot").textContent = `${rows.length} surat ditampilkan dari ${tickets.length} arsip`;
+      }
+
+      function renderAll() { renderHero(); renderPriority(); renderBars(); renderTable(); }
+
+      function openDetail(id) {
+        const t = tickets.find(item => item.id === id);
+        if (!t) return;
+        state.focusId = id;
+        $("#detailBody").innerHTML = `
+          <h2 id="detailTitle">${esc(t.title)}</h2>
+          <div class="detail-code">${esc(t.id)} · ${esc(t.category)} · ${esc(t.time)} · ${esc(t.owner)}</div>
+          <div class="detail-tags"><span class="status ${t.status}">${labels[t.status]}</span>${t.priority === "tinggi" && t.status !== "selesai" ? '<span class="status menunggu">PRIORITAS TINGGI</span>' : ""}</div>
+          <p class="detail-text">${esc(t.detail)}</p>
+          <p class="detail-label">Jejak surat</p>
+          <ul class="detail-steps">${t.steps.map(s => `<li>${esc(s.label)}<small>${esc(s.time)}</small></li>`).join("")}</ul>
+          <div class="detail-actions">
+            ${t.status !== "diproses" ? '<button class="btn" type="button" data-act="diproses">Proses</button>' : ""}
+            ${t.status !== "diteruskan" ? '<button class="btn" type="button" data-act="diteruskan">Teruskan</button>' : ""}
+            ${t.status !== "selesai" ? '<button class="btn red" type="button" data-act="selesai">Tandai selesai</button>' : '<button class="btn" type="button" data-act="menunggu">Buka kembali</button>'}
+          </div>`;
+        $("#detailLayer").hidden = false;
+      }
+
+      function closeDetail() { $("#detailLayer").hidden = true; state.focusId = null; }
+
+      function updateStatus(status) {
+        const t = tickets.find(item => item.id === state.focusId);
+        if (!t) return;
+        t.status = status;
+        t.steps.push({ label: status === "selesai" ? "Ditandai selesai" : status === "diteruskan" ? "Diteruskan ke divisi" : status === "diproses" ? "Mulai diproses" : "Dibuka kembali", time:"Baru saja" });
+        closeDetail();
+        renderAll();
+        toast(`${t.id} → ${labels[status]}.`);
+      }
+
+      function addSample() {
+        const sample = structuredClone(samples[state.sampleIndex % samples.length]);
+        state.sampleIndex += 1;
+        const id = `ASP-${3013 + state.sampleIndex - 1}`;
+        tickets.unshift({ id, ...sample, status:"menunggu", day:0, time:"Baru saja" });
+        state.filter = "menunggu";
+        state.query = "";
+        $("#searchInput").value = "";
+        $$("[data-filter]").forEach(b => b.classList.toggle("active", b.dataset.filter === "menunggu"));
+        renderAll();
+        toast(`${id} masuk ke papan.`);
+      }
+
+      function reset() {
+        tickets = structuredClone(seed);
+        state.filter = "semua";
+        state.query = "";
+        state.sampleIndex = 0;
+        $("#searchInput").value = "";
+        $$("[data-filter]").forEach(b => b.classList.toggle("active", b.dataset.filter === "semua"));
+        renderAll();
+        toast("Papan kembali ke kondisi awal.");
+      }
+
+      function init() {
+        $("#dateLabel").textContent = new Intl.DateTimeFormat("id-ID", { day:"numeric", month:"long", year:"numeric" }).format(new Date());
+        renderAll();
+        document.addEventListener("click", event => {
+          const open = event.target.closest("[data-open]");
+          if (open) openDetail(open.dataset.open);
+          const act = event.target.closest("[data-act]");
+          if (act) updateStatus(act.dataset.act);
+          if (event.target.closest("[data-close]")) closeDetail();
+          const filter = event.target.closest("[data-filter]");
+          if (filter) {
+            state.filter = filter.dataset.filter;
+            $$("[data-filter]").forEach(b => b.classList.toggle("active", b === filter));
+            renderTable();
+          }
+        });
+        $("#searchInput").addEventListener("input", e => { state.query = e.target.value; renderTable(); });
+        $("#addBtn").addEventListener("click", addSample);
+        $("#resetBtn").addEventListener("click", reset);
+        $("#footerReset").addEventListener("click", reset);
+        $("#typeBtn").addEventListener("click", () => {
+          const on = document.documentElement.classList.toggle("presentation");
+          $("#typeBtn").setAttribute("aria-pressed", String(on));
+          toast(on ? "Mode presentasi aktif." : "Mode presentasi mati.");
+        });
+        document.addEventListener("keydown", event => {
+          if (event.key === "Escape" && !$("#detailLayer").hidden) closeDetail();
+          if (event.key === "/" && document.activeElement?.tagName !== "INPUT") { event.preventDefault(); $("#searchInput").focus(); }
+        });
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
