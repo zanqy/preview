@@ -18,7 +18,7 @@
       --line-strong: #4d5d50;
       --text: #edf3ec;
       --muted: #a4b1a6;
-      --faint: #748276;
+      --faint: #829083;
       --accent: #c8f04b;
       --accent-ink: #10150f;
       --warn: #f2b544;
@@ -127,10 +127,11 @@
     .stage.active { background: var(--accent); color: var(--accent-ink); }
     .stage-label { font: 600 10px/1.3 "Fira Code", monospace; letter-spacing: 0.7px; text-transform: uppercase; }
     .stage-count { font: 700 26px/1 "Fira Code", monospace; letter-spacing: -1px; }
-    .stage-note { grid-column: 1 / -1; font-size: 10px; opacity: 0.7; }
+    .stage-note { grid-column: 1 / -1; color: var(--faint); font-size: 10px; }
     .stage-arrow { position: absolute; right: -7px; top: 50%; z-index: 2; width: 14px; height: 14px; transform: translateY(-50%) rotate(45deg); border-top: 1px solid var(--line); border-right: 1px solid var(--line); background: var(--bg); pointer-events: none; }
     .stage:last-child .stage-arrow { display: none; }
     .stage.active .stage-arrow { background: var(--accent); border-color: var(--accent); }
+    .stage.active .stage-note { color: var(--accent-ink); opacity: 0.75; }
 
     .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 14px; border: 1px solid var(--line); border-top: 0; background: var(--surface-2); }
     .metric { min-width: 0; padding: 13px 15px 12px; border-right: 1px solid var(--line); }
@@ -354,7 +355,7 @@
       </section>
 
       <section class="pipeline" id="pipeline" aria-label="Alur kerja aspirasi">
-        <button class="stage" type="button" data-stage="semua"><span class="stage-label">Semua</span><span class="stage-count" id="stageAll">0</span><span class="stage-note">_seluruh arsip aktif_</span><span class="stage-arrow" aria-hidden="true"></span></button>
+        <button class="stage" type="button" data-stage="semua"><span class="stage-label">Semua</span><span class="stage-count" id="stageAll">0</span><span class="stage-note">seluruh arsip aktif</span><span class="stage-arrow" aria-hidden="true"></span></button>
         <button class="stage active" type="button" data-stage="menunggu"><span class="stage-label">Masuk</span><span class="stage-count" id="stageMenunggu">0</span><span class="stage-note">belum dibuka</span><span class="stage-arrow" aria-hidden="true"></span></button>
         <button class="stage" type="button" data-stage="diproses"><span class="stage-label">Ditinjau</span><span class="stage-count" id="stageDiproses">0</span><span class="stage-note">sedang dikerjakan</span><span class="stage-arrow" aria-hidden="true"></span></button>
         <button class="stage" type="button" data-stage="diteruskan"><span class="stage-label">Diteruskan</span><span class="stage-count" id="stageDiteruskan">0</span><span class="stage-note">ke divisi lain</span><span class="stage-arrow" aria-hidden="true"></span></button>
