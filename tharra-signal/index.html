@@ -53,6 +53,7 @@
     .mast-nav a:hover { border-color: var(--red); color: var(--red); }
     .mast-meta { display: flex; align-items: center; gap: 10px; font: 11px/1 var(--font-mono); color: var(--muted); }
     .demo-pill { padding: 4px 8px; background: var(--red); color: #fff; font-weight: 700; letter-spacing: .8px; }
+    .mobile-nav { display: none; }
 
     .wrap { max-width: 1360px; margin: 0 auto; padding: 0 28px 40px; }
     .hero { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; align-items: end; padding: 42px 0 30px; border-bottom: 2px solid var(--ink); }
@@ -63,7 +64,7 @@
     .hero p { max-width: 620px; margin: 18px 0 0; color: var(--muted); font-size: 13px; }
     .hero p strong { color: var(--ink); }
     .hero-actions { display: flex; align-items: center; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 8px 13px; border: 1px solid var(--ink); background: transparent; color: var(--ink); font: 700 11px/1 var(--font-mono); letter-spacing: .3px; transition: background 140ms ease, color 140ms ease, transform 140ms ease; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 8px 13px; border: 1px solid var(--ink); background: transparent; color: var(--ink); font: 700 11px/1 var(--font-mono); letter-spacing: .3px; white-space: nowrap; transition: background 140ms ease, color 140ms ease, transform 140ms ease; }
     .btn:hover { transform: translateY(-1px); background: var(--ink); color: #fff; }
     .btn.red { background: var(--red); border-color: var(--red); color: #fff; }
     .btn.red:hover { background: #c32d1c; }
@@ -84,6 +85,8 @@
     .section-title { display: flex; align-items: baseline; gap: 11px; margin: 0; font: 700 18px/1.2 var(--font-mono); letter-spacing: -.2px; }
     .section-title b { color: var(--red); font-size: 12px; }
     .section-note { color: var(--faint); font: 10px/1 var(--font-mono); }
+    .section-link { display: inline-block; margin-top: 14px; color: var(--muted); font: 700 10px/1 var(--font-mono); text-decoration: underline; text-underline-offset: 4px; }
+    .section-link:hover { color: var(--red); }
     .priority-list { margin: 0; padding: 0; list-style: none; }
     .priority-row { display: grid; grid-template-columns: 46px minmax(0,1fr) auto; gap: 14px; align-items: start; padding: 16px 0; border-bottom: 1px solid var(--line); }
     .priority-num { font: 700 28px/1 var(--font-display); color: var(--red); }
@@ -184,6 +187,9 @@
     @media (max-width: 760px) {
       .masthead-inner { padding: 11px 16px; }
       .mast-nav { display: none; }
+      .mobile-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+      .mobile-nav a { flex: 1; padding: 9px 4px; text-align: center; font: 700 9px/1 var(--font-mono); letter-spacing: .5px; text-transform: uppercase; }
+      .mobile-nav a + a { border-left: 1px solid var(--line); }
       .wrap { padding: 0 16px 32px; }
       .hero { padding-top: 30px; }
       h1 { letter-spacing: -1.2px; }
@@ -199,9 +205,10 @@
     @media (max-width: 480px) {
       .brand span { display: none; }
       .mast-meta { font-size: 9px; }
-      .hero-actions .btn { flex: 1; }
-      .priority-row { grid-template-columns: 34px minmax(0,1fr); }
-      .priority-actions { grid-column: 2; }
+      .hero-actions .btn { flex: 0 0 auto; }
+      .priority-row { grid-template-columns: 30px minmax(0, 1fr) 32px; gap: 10px; }
+      .priority-actions { grid-column: auto; }
+      .icon-btn { width: 32px; height: 32px; }
       .priority-num { font-size: 22px; }
       .signal-number { font-size: 62px; }
       .archive-tools .filter-btn { flex: 1; }
@@ -225,9 +232,13 @@
       <nav class="mast-nav" aria-label="Navigasi papan"><a href="#prioritas">Prioritas</a><a href="#ringkasan">Ringkasan</a><a href="#arsip">Arsip</a></nav>
       <div class="mast-meta"><span id="dateLabel">—</span><span class="demo-pill">DATA DEMO</span></div>
     </div>
-  </header>
+    </header>
 
-  <main class="wrap" id="main">
+    <nav class="mobile-nav" aria-label="Navigasi bagian papan">
+    <a href="#prioritas">Prioritas</a><a href="#ringkasan">Ringkasan</a><a href="#arsip">Arsip</a>
+    </nav>
+
+    <main class="wrap" id="main">
     <section class="hero" aria-labelledby="heroTitle">
       <div>
         <div class="kicker">Laporan pagi · edisi contoh</div>
@@ -249,8 +260,9 @@
 
     <div class="layout">
       <section id="prioritas" aria-labelledby="priorityTitle">
-        <div class="section-head"><h2 class="section-title" id="priorityTitle"><b>01</b> Sinyal prioritas</h2><span class="section-note">klik untuk membuka</span></div>
+        <div class="section-head"><h2 class="section-title" id="priorityTitle"><b>01</b> Sinyal prioritas</h2><span class="section-note" id="priorityNote">klik untuk membuka</span></div>
         <ol class="priority-list" id="priorityList"></ol>
+        <a class="section-link" href="#arsip">Lihat arsip lengkap →</a>
       </section>
 
       <div class="side-grid">
@@ -260,7 +272,7 @@
           <div class="stat-row"><span>Diteruskan ke divisi</span><strong id="statForward">0</strong></div>
           <div class="stat-row"><span>Selesai dibalas</span><strong class="red" id="statDone">0</strong></div>
           <div class="bars">
-            <div class="bars-title">Arsip masuk per hari</div>
+            <div class="bars-title" id="barsTitle">Arsip masuk per hari</div>
             <div id="bars"></div>
             <p class="bars-foot" id="barsFoot">Dihitung dari tanggal pada data contoh.</p>
           </div>
@@ -372,7 +384,9 @@
       }
 
       function renderPriority() {
-        const items = tickets.filter(t => ["menunggu","diproses"].includes(t.status)).slice(0, 3);
+        const pendingCount = tickets.filter(t => t.status === "menunggu").length;
+        const items = tickets.filter(t => t.status === "menunggu").slice(0, 4);
+        $("#priorityNote").textContent = `${items.length} dari ${pendingCount} sinyal teratas`;
         $("#priorityList").innerHTML = items.map((t,i) => `<li class="priority-row">
           <span class="priority-num">0${i+1}</span>
           <div class="priority-main"><button type="button" data-open="${t.id}">${esc(t.title)}</button><small>${esc(t.id)} · ${esc(t.category)} · ${esc(labels[t.status])}</small></div>
@@ -383,7 +397,9 @@
       function renderBars() {
         const values = days.map((_, i) => tickets.filter(t => t.day === i).length);
         const max = Math.max(1, ...values);
-        $("#bars").innerHTML = values.map((v,i) => `<div class="bar-row ${i === 0 ? "today" : ""}"><span class="bar-label">${days[i]}</span><div class="bar-track"><span style="width:${(v/max)*100}%"></span></div><span class="bar-value">${v}</span></div>`).join("");
+        const todayIndex = (new Date().getDay() + 6) % 7;
+        $("#barsTitle").textContent = `Arsip masuk per hari · merah = ${days[todayIndex]}`;
+        $("#bars").innerHTML = values.map((v,i) => `<div class="bar-row ${i === todayIndex ? "today" : ""}"><span class="bar-label">${days[i]}</span><div class="bar-track"><span style="width:${(v/max)*100}%"></span></div><span class="bar-value">${v}</span></div>`).join("");
         $("#barsFoot").textContent = `Jumlah per hari: ${values.join(", ")} · total ${values.reduce((a,b)=>a+b,0)} surat.`;
       }
 
