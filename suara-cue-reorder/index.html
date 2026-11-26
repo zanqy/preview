@@ -70,6 +70,10 @@ kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-
 .card.slot::after{content:'LEPAS DI SINI';position:absolute;left:50%;top:-13px;transform:translateX(-50%);padding:3px 9px;border-radius:5px;background:var(--coral);color:#180B07;font:700 8px 'IBM Plex Mono',monospace;letter-spacing:.12em;white-space:nowrap;z-index:4}
 .ghost{position:fixed;z-index:100;pointer-events:none;border-radius:14px;border:1px solid var(--coral);box-shadow:0 30px 70px rgba(0,0,0,.75),0 0 0 1px rgba(255,118,84,.5),0 0 34px rgba(255,118,84,.16);overflow:hidden;transform-origin:50% 30%;opacity:.98}
 .ghost::before{content:'⠿  DIPEGANG';position:absolute;left:50%;top:0;transform:translate(-50%,-100%);padding:4px 10px;border-radius:6px 6px 0 0;background:var(--coral);color:#180B07;font:700 8px 'IBM Plex Mono',monospace;letter-spacing:.14em;white-space:nowrap}
+.scroll-zone{position:fixed;left:0;right:0;height:82px;z-index:8;pointer-events:none;opacity:0;transition:opacity .2s}
+.scroll-zone.top{top:0;background:linear-gradient(180deg,rgba(255,118,84,.24),transparent)}
+.scroll-zone.bot{bottom:0;background:linear-gradient(0deg,rgba(255,118,84,.24),transparent)}
+body.drag-active .scroll-zone{opacity:1}
 .insert-line{position:fixed;z-index:99;width:4px;border-radius:2px;background:var(--coral);box-shadow:0 0 16px rgba(255,118,84,.85);pointer-events:none;display:none}
 .card.settled{animation:settle .48s cubic-bezier(.2,1.4,.4,1)}
 @keyframes settle{0%{transform:scale(1.055)}55%{transform:scale(.975)}100%{transform:scale(1)}}
@@ -106,6 +110,7 @@ kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-
   </div>
   <div class="grid" id="grid"></div>
 </main>
+<div class="scroll-zone top"></div><div class="scroll-zone bot"></div>
 <div class="insert-line" id="insertLine"></div>
 <div class="toast" id="toast">POSISI TERKUNCI</div>
 <footer class="transport">
@@ -126,6 +131,7 @@ const tracks=[
 ];
 const grid=document.getElementById('grid'), line=document.getElementById('insertLine'), toast=document.getElementById('toast');
 let order=tracks.map((_,i)=>i), pressTimer=null, pressing=null, dragging=false, ghost=null;
+let pointerX=0, pointerY=0, scrollRAF=0;
 let startX=0, startY=0, lastTarget=null, dropTarget=null;
 function bars(seed){let s=seed,o='';for(let i=0;i<44;i++){s=(s*1103515245+12345)&0x7fffffff;o+=`<i style="height:${12+((s>>7)%68)}%"></i>`}return o}
 function makeCard(idx,pos){
@@ -155,6 +161,9 @@ function lift(card,e){
   ghost.style.left=r.left+'px'; ghost.style.top=r.top+'px';
   document.body.appendChild(ghost);
   document.body.style.touchAction='none';
+  document.body.classList.add('drag-active');
+  pointerX=e.clientX; pointerY=e.clientY;
+  scrollRAF=requestAnimationFrame(autoScroll);
 }
 function commit(source,target){
   const before=new Map([...grid.children].map(el=>[el.dataset.id,el.getBoundingClientRect()]));
@@ -179,24 +188,37 @@ grid.addEventListener('pointerdown',e=>{
   pressTimer=setTimeout(()=>lift(card,e),420);
   e.preventDefault();
 });
-grid.addEventListener('pointermove',e=>{
-  if(pressing&&!dragging){
-    if(Math.hypot(e.clientX-startX,e.clientY-startY)>12){clearTimeout(pressTimer);pressing.classList.remove('pressing');pressing=null;}
-    return;
-  }
-  if(!dragging||!ghost)return;
-  ghost.style.transform=`translate(${e.clientX-startX}px,${e.clientY-startY}px) scale(1.05) rotate(-1.2deg)`;
-  const stack=document.elementsFromPoint(e.clientX,e.clientY);
-  const target=stack.map(x=>x.closest?.('.card')).find(c=>c&&c!==pressing&&!c.classList.contains('ghost'));
+function updateTargetAt(x,y){
+  const stack=document.elementsFromPoint(x,y);
+  const target=stack.map(el=>el.closest?.('.card')).find(c=>c&&c!==pressing&&!c.classList.contains('ghost'));
   if(lastTarget&&lastTarget!==target)lastTarget.classList.remove('slot');
   dropTarget=target||null;
   if(target){
     target.classList.add('slot');lastTarget=target;
     const r=target.getBoundingClientRect();
     line.style.display='block';
-    line.style.left=(e.clientX<r.left+r.width/2?r.left-4:r.right)+'px';
+    line.style.left=(x<r.left+r.width/2?r.left-4:r.right)+'px';
     line.style.top=r.top+'px';line.style.height=r.height+'px';
   } else line.style.display='none';
+}
+function autoScroll(){
+  if(!dragging){scrollRAF=0;return;}
+  const zone=90, max=15;
+  let dy=0;
+  if(pointerY<zone) dy=-max*(1-Math.max(0,pointerY)/zone);
+  else if(pointerY>innerHeight-zone) dy=max*(1-Math.max(0,innerHeight-pointerY)/zone);
+  if(dy){window.scrollBy(0,dy);updateTargetAt(pointerX,pointerY);}
+  scrollRAF=requestAnimationFrame(autoScroll);
+}
+grid.addEventListener('pointermove',e=>{
+  if(pressing&&!dragging){
+    if(Math.hypot(e.clientX-startX,e.clientY-startY)>12){clearTimeout(pressTimer);pressing.classList.remove('pressing');pressing=null;}
+    return;
+  }
+  if(!dragging||!ghost)return;
+  pointerX=e.clientX;pointerY=e.clientY;
+  ghost.style.transform=`translate(${e.clientX-startX}px,${e.clientY-startY}px) scale(1.05) rotate(-1.2deg)`;
+  updateTargetAt(e.clientX,e.clientY);
   e.preventDefault();
 });
 function endDrag(){
@@ -206,6 +228,7 @@ function endDrag(){
   const moved=pressing,dest=dropTarget;
   if(ghost){ghost.remove();ghost=null;}
   line.style.display='none';document.body.style.touchAction='';
+  cancelAnimationFrame(scrollRAF);scrollRAF=0;document.body.classList.remove('drag-active');
   if(lastTarget){lastTarget.classList.remove('slot');lastTarget=null;}
   if(dest&&dest!==moved)commit(moved,dest);
   moved.classList.remove('source');
