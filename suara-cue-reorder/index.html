@@ -12,40 +12,32 @@
 *{margin:0;padding:0;box-sizing:border-box}html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;display:flex;flex-direction:column;min-height:100vh;overflow-x:hidden}
 button,input,select{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
 .topbar{display:flex;align-items:center;gap:20px;padding:15px 30px 13px;border-bottom:1px solid var(--line);background:#0E110E;flex-wrap:wrap}
 .brand{display:flex;align-items:baseline;gap:14px}.brand h1{font-family:'Fraunces',Georgia,serif;font-size:28px;font-weight:600;letter-spacing:-.04em;line-height:1}
 .brand .tag{font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.24em;color:var(--muted)}
 .status{display:flex;align-items:center;gap:9px;padding:8px 14px;border:1px solid var(--line);border-radius:999px;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:var(--muted);background:var(--surface);min-width:170px}
 .status .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px rgba(124,224,180,.55);flex:none}
-.edit-btn{display:flex;align-items:center;gap:9px;padding:10px 15px;border:1px solid var(--mint);border-radius:8px;color:var(--mint);font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.12em;white-space:nowrap;transition:transform .12s,background .16s,color .16s}
-.edit-btn:active{transform:scale(.96)}
-.edit-btn .ico{font-size:13px;line-height:1;transition:transform .3s}
-body.editing .edit-btn{background:var(--mint);color:#0B0D0B}
-body.editing .edit-btn .ico{transform:rotate(90deg)}
+.modehint{display:flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid rgba(124,224,180,.4);border-radius:8px;color:var(--mint);font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;white-space:nowrap}
+.modehint .g{font-size:14px;animation:wobble 1.8s ease-in-out infinite}
+@keyframes wobble{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
 .top-spacer{flex:1}.output{display:flex;align-items:center;gap:10px;font:500 11px 'IBM Plex Mono',monospace;color:var(--muted);letter-spacing:.1em}
 .output select{appearance:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font:500 11px 'IBM Plex Mono',monospace}
 .clock{font:500 12px 'IBM Plex Mono',monospace;color:var(--muted);letter-spacing:.1em}
 main{flex:1;padding:16px 30px 138px}
-.palets{display:flex;align-items:center;gap:8px;overflow-x:auto;padding:4px 0 12px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+.palets{display:flex;gap:8px;overflow-x:auto;padding:4px 0 13px;margin-bottom:14px;border-bottom:1px solid var(--line)}
 .palet{padding:9px 15px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--muted);font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.12em;white-space:nowrap;flex:none}
 .palet.on{border-color:var(--coral);color:var(--ink);background:#211914}
-.hint{display:none;align-items:center;gap:10px;margin:10px 0 14px;padding:10px 14px;border:1px dashed rgba(124,224,180,.5);border-radius:9px;background:rgba(124,224,180,.06);color:var(--mint);font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.08em;transition:opacity .2s}
-body.editing .hint{display:flex;animation:hintIn .3s ease both}
-@keyframes hintIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
-.hint .grip{font-size:15px;animation:wobble 1.6s ease-in-out infinite}
-@keyframes wobble{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
 .sec-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px;flex-wrap:wrap}
 .sec-head h2{font:600 13px 'IBM Plex Mono',monospace;letter-spacing:.22em;text-transform:uppercase}
 .sec-head p{font:400 10px 'IBM Plex Mono',monospace;color:var(--muted);letter-spacing:.06em}
 .sec-actions{display:flex;gap:8px}.add{padding:10px 14px;border:1px solid var(--mint);border-radius:8px;color:var(--mint);font:600 11px 'IBM Plex Mono',monospace}
 .add.alt{border-color:var(--line);color:var(--muted)}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 15px 13px;min-height:326px;display:flex;flex-direction:column;user-select:none;touch-action:pan-y;will-change:transform}
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 15px 13px;min-height:326px;display:flex;flex-direction:column;user-select:none;touch-action:pan-y;will-change:transform;transition:border-color .18s,background .18s,box-shadow .18s,transform .18s,opacity .18s}
+.card:hover{border-color:#556150}
 .card.onair{border-color:var(--coral);background:#211914;box-shadow:0 0 0 1px rgba(255,118,84,.25),0 12px 34px rgba(255,118,84,.09)}
 .card-top{display:flex;align-items:center;gap:8px;margin-bottom:11px}
-.grip{display:none;width:22px;height:22px;place-items:center;border:1px solid rgba(124,224,180,.45);border-radius:5px;color:var(--mint);font:600 13px 'IBM Plex Mono',monospace;line-height:1;cursor:grab;transition:background .15s,transform .15s}
-.grip:hover{background:rgba(124,224,180,.18);transform:scale(1.08)}
+.grip{width:22px;height:22px;display:grid;place-items:center;border-radius:5px;color:var(--muted);font:600 13px 'IBM Plex Mono',monospace}
 .num{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.08em}.card.onair .num{color:var(--coral)}
 .badge{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.14em;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:3px 6px}
 .dur{margin-left:auto;font:500 10px 'IBM Plex Mono',monospace;color:var(--muted)}
@@ -69,22 +61,18 @@ body.editing .hint{display:flex;animation:hintIn .3s ease both}
 .play{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);border-radius:8px;padding:9px 12px;font:700 11px 'IBM Plex Mono',monospace}
 .card.onair .play{background:var(--coral);color:#160C08}
 kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-radius:3px;padding:1px 4px;opacity:.65}
-/* edit mode */
-body.editing .card{touch-action:none}
-body.editing .card{border-style:dashed;border-color:rgba(124,224,180,.55);background:#141A15;cursor:default}
-body.editing .card.onair{border-color:var(--coral);background:#211914}
-body.editing .grip{display:grid}
-body.editing .card .seek,body.editing .card .vrange,body.editing .card .durbox,body.editing .card .play{opacity:.32;pointer-events:none}
-body.editing .card{animation:lift .34s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 35ms)}
-@keyframes lift{from{transform:translateY(7px) scale(.985);opacity:.75}to{transform:none;opacity:1}}
-.card.source{opacity:.28!important;filter:grayscale(.6)}
+/* long press feedback */
+.card.pressing{border-color:var(--coral)!important;transform:scale(.99)}
+.card.pressing::before{content:'';position:absolute;left:0;bottom:0;height:4px;background:var(--coral);border-radius:0 0 13px 13px;animation:charge .42s linear forwards}
+@keyframes charge{from{width:0}to{width:100%}}
+.card.source{opacity:.22;filter:grayscale(.5);border-style:dashed;border-color:var(--coral)}
 .card.slot{border-color:var(--coral)!important;background:rgba(255,118,84,.08)!important;transform:scale(.975)}
 .card.slot::after{content:'LEPAS DI SINI';position:absolute;left:50%;top:-13px;transform:translateX(-50%);padding:3px 9px;border-radius:5px;background:var(--coral);color:#180B07;font:700 8px 'IBM Plex Mono',monospace;letter-spacing:.12em;white-space:nowrap;z-index:4}
-.ghost{position:fixed;z-index:100;pointer-events:none;border-radius:14px;border:1px solid var(--coral);box-shadow:0 26px 60px rgba(0,0,0,.7),0 0 0 1px rgba(255,118,84,.45);overflow:hidden;transform-origin:50% 20%;opacity:.96}
-.ghost::before{content:'⠿  DIPINDAHKAN';position:absolute;left:50%;top:-1px;transform:translate(-50%,-100%);padding:4px 10px;border-radius:6px 6px 0 0;background:var(--coral);color:#180B07;font:700 8px 'IBM Plex Mono',monospace;letter-spacing:.14em;white-space:nowrap}
-.card.settled{animation:settle .46s cubic-bezier(.2,1.4,.4,1)}
-@keyframes settle{0%{transform:scale(1.055)}55%{transform:scale(.975)}100%{transform:scale(1)}}
+.ghost{position:fixed;z-index:100;pointer-events:none;border-radius:14px;border:1px solid var(--coral);box-shadow:0 30px 70px rgba(0,0,0,.75),0 0 0 1px rgba(255,118,84,.5),0 0 34px rgba(255,118,84,.16);overflow:hidden;transform-origin:50% 30%;opacity:.98}
+.ghost::before{content:'⠿  DIPEGANG';position:absolute;left:50%;top:0;transform:translate(-50%,-100%);padding:4px 10px;border-radius:6px 6px 0 0;background:var(--coral);color:#180B07;font:700 8px 'IBM Plex Mono',monospace;letter-spacing:.14em;white-space:nowrap}
 .insert-line{position:fixed;z-index:99;width:4px;border-radius:2px;background:var(--coral);box-shadow:0 0 16px rgba(255,118,84,.85);pointer-events:none;display:none}
+.card.settled{animation:settle .48s cubic-bezier(.2,1.4,.4,1)}
+@keyframes settle{0%{transform:scale(1.055)}55%{transform:scale(.975)}100%{transform:scale(1)}}
 .toast{position:fixed;left:50%;bottom:112px;transform:translate(-50%,16px) scale(.96);padding:11px 19px;border:1px solid var(--mint);border-radius:999px;background:#101A12;color:var(--mint);font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.16em;opacity:0;pointer-events:none;transition:all .32s cubic-bezier(.2,1.3,.4,1);z-index:20}
 .toast.show{opacity:1;transform:translate(-50%,0) scale(1)}
 .transport{position:fixed;left:0;right:0;bottom:0;z-index:5;background:#101410;border-top:1px solid var(--line);padding:14px 30px 18px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;box-shadow:0 -18px 40px rgba(0,0,0,.45)}
@@ -104,16 +92,15 @@ body.editing .card{animation:lift .34s cubic-bezier(.2,.8,.2,1) both;animation-d
 <header class="topbar">
   <div class="brand"><h1>Suara.</h1><span class="tag">CUE DESK</span></div>
   <div class="status"><span class="dot"></span><span>SIAP</span></div>
-  <button class="edit-btn" id="editBtn"><span class="ico">⠿</span><span id="editLabel">ATUR POSISI</span></button>
+  <div class="modehint"><span class="g">⠿</span> TAHAN KARTU · GESER · LEPAS</div>
   <div class="top-spacer"></div>
   <div class="output"><span>OUTPUT</span><select><option>Speaker Laptop</option><option>USB Audio Device</option></select></div>
   <div class="clock" id="clock">00:00:00</div>
 </header>
 <main>
   <div class="palets"><button class="palet on">UTAMA</button><button class="palet">SAMBUTAN</button><button class="palet">MC</button><button class="palet">+ PALET</button></div>
-  <div class="hint"><span class="grip">⠿</span> TARIK KARTU UNTUK BERTUKAR POSISI · TEKAN SELESAI UNTUK MENGUNCI</div>
   <div class="sec-head">
-    <h2 id="paletTitle">Papan Lagu — UTAMA</h2>
+    <h2>Papan Lagu — UTAMA</h2>
     <p>1–8 PILIH · ↑↓ VOLUME · X JEDA/LANJUT · L LOOP · M MUTE</p>
     <div class="sec-actions"><button class="add alt">+ PILIH FILE</button><button class="add">+ FOLDER</button></div>
   </div>
@@ -137,15 +124,15 @@ const tracks=[
  {t:'Lagu Penutup',a:'orkestra · penutup',src:'MUSIC',dur:'3:36',vol:90,fout:5,fin:3,seed:43},
  {t:'Cadangan',a:'instrumental',src:'DOWNLOAD',dur:'2:15',vol:60,fout:3,fin:0,seed:51}
 ];
-const grid=document.getElementById('grid'), toast=document.getElementById('toast'), btn=document.getElementById('editBtn');
-let editing=false, dragging=null, ghost=null, startX=0, startY=0, lastTarget=null, dropTarget=null, order=tracks.map((_,i)=>i);
-const line=document.getElementById('insertLine');
+const grid=document.getElementById('grid'), line=document.getElementById('insertLine'), toast=document.getElementById('toast');
+let order=tracks.map((_,i)=>i), pressTimer=null, pressing=null, dragging=false, ghost=null;
+let startX=0, startY=0, lastTarget=null, dropTarget=null;
 function bars(seed){let s=seed,o='';for(let i=0;i<44;i++){s=(s*1103515245+12345)&0x7fffffff;o+=`<i style="height:${12+((s>>7)%68)}%"></i>`}return o}
 function makeCard(idx,pos){
   const c=tracks[idx], el=document.createElement('article');
-  el.className='card'; el.dataset.id=idx; el.style.setProperty('--i',pos);
+  el.className='card'; el.dataset.id=idx;
   el.innerHTML=`
-    <div class="card-top"><span class="grip" title="Geser">⠿</span><span class="num">${String(pos+1).padStart(2,'0')}</span>
+    <div class="card-top"><span class="grip">⠿</span><span class="num">${String(pos+1).padStart(2,'0')}</span>
       <span class="badge">${c.src}</span><span class="dur">${c.dur}</span></div>
     <div class="title">${c.t}</div><div class="artist">${c.a}</div>
     <div class="wave" aria-hidden="true">${bars(c.seed)}</div>
@@ -157,80 +144,74 @@ function makeCard(idx,pos){
     <div class="card-foot"><span class="card-state">SIAP</span><button class="play">PUTAR <kbd>${pos+1}</kbd></button></div>`;
   return el;
 }
-function render(){
-  grid.innerHTML='';
-  order.forEach((idx,pos)=>grid.appendChild(makeCard(idx,pos)));
-}
-function renumber(){
-  [...grid.children].forEach((el,pos)=>{
-    el.style.setProperty('--i',pos);
-    el.querySelector('.num').textContent=String(pos+1).padStart(2,'0');
-    el.querySelector('.play kbd').textContent=String(pos+1);
-  });
-}
-function flipSwap(source,target){
-  const before=new Map([...grid.children].map(el=>[el.dataset.id,el.getBoundingClientRect()]));
-  const si=[...grid.children].indexOf(source), ti=[...grid.children].indexOf(target);
-  if(si<0||ti<0||si===ti)return;
-  const tmp=order[si]; order[si]=order[ti]; order[ti]=tmp;
-  grid.insertBefore(source, ti>si?target.nextSibling:target);
-  renumber();
-  for(const el of grid.children){
-    const old=before.get(el.dataset.id); if(!old)continue;
-    const now=el.getBoundingClientRect(), dx=old.left-now.left, dy=old.top-now.top;
-    if(Math.abs(dx)<1&&Math.abs(dy)<1)continue;
-    el.style.transition='none'; el.style.transform=`translate(${dx}px,${dy}px)`;
-    requestAnimationFrame(()=>{el.style.transition='transform .27s cubic-bezier(.2,.85,.25,1)';el.style.transform='';});
-  }
-}
-btn.addEventListener('click',()=>{
-  editing=!editing;
-  document.body.classList.toggle('editing',editing);
-  document.getElementById('editLabel').textContent=editing?'SELESAI · KUNCI':'ATUR POSISI';
-  if(!editing){
-    toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1700);
-    [...grid.children].forEach(el=>el.classList.remove('source','slot','settled'));
-  }
-});
-grid.addEventListener('pointerdown',e=>{
-  if(!editing)return;
-  const card=e.target.closest('.card');
-  if(!card)return;
+function render(){grid.innerHTML='';order.forEach((idx,pos)=>grid.appendChild(makeCard(idx,pos)))}
+function renumber(){[...grid.children].forEach((el,pos)=>{el.querySelector('.num').textContent=String(pos+1).padStart(2,'0');el.querySelector('.play kbd').textContent=String(pos+1)})}
+function lift(card,e){
+  dragging=true; pressTimer=null;
+  card.classList.remove('pressing'); card.classList.add('source');
   const r=card.getBoundingClientRect();
   ghost=card.cloneNode(true);
   ghost.className='card ghost'; ghost.style.width=r.width+'px'; ghost.style.height=r.height+'px';
   ghost.style.left=r.left+'px'; ghost.style.top=r.top+'px';
   document.body.appendChild(ghost);
-  startX=e.clientX; startY=e.clientY;
-  dragging=card; card.classList.add('source');
+  document.body.style.touchAction='none';
+}
+function commit(source,target){
+  const before=new Map([...grid.children].map(el=>[el.dataset.id,el.getBoundingClientRect()]));
+  const si=[...grid.children].indexOf(source), ti=[...grid.children].indexOf(target);
+  if(si<0||ti<0||si===ti)return;
+  const tmp=order[si];order[si]=order[ti];order[ti]=tmp;
+  grid.insertBefore(source,ti>si?target.nextSibling:target);
+  renumber();
+  for(const el of grid.children){
+    const old=before.get(el.dataset.id); if(!old)continue;
+    const now=el.getBoundingClientRect(),dx=old.left-now.left,dy=old.top-now.top;
+    if(Math.abs(dx)<1&&Math.abs(dy)<1)continue;
+    el.style.transition='none';el.style.transform=`translate(${dx}px,${dy}px)`;
+    requestAnimationFrame(()=>{el.style.transition='transform .28s cubic-bezier(.2,.85,.25,1)';el.style.transform=''});
+  }
+}
+grid.addEventListener('pointerdown',e=>{
+  const card=e.target.closest('.card'); if(!card||dragging)return;
+  pressing=card; startX=e.clientX; startY=e.clientY;
+  card.classList.add('pressing');
   try{grid.setPointerCapture(e.pointerId)}catch{}
+  pressTimer=setTimeout(()=>lift(card,e),420);
   e.preventDefault();
 });
 grid.addEventListener('pointermove',e=>{
+  if(pressing&&!dragging){
+    if(Math.hypot(e.clientX-startX,e.clientY-startY)>12){clearTimeout(pressTimer);pressing.classList.remove('pressing');pressing=null;}
+    return;
+  }
   if(!dragging||!ghost)return;
-  ghost.style.transform=`translate(${e.clientX-startX}px,${e.clientY-startY}px) scale(1.045) rotate(-1.2deg)`;
+  ghost.style.transform=`translate(${e.clientX-startX}px,${e.clientY-startY}px) scale(1.05) rotate(-1.2deg)`;
   const stack=document.elementsFromPoint(e.clientX,e.clientY);
-  const target=stack.map(x=>x.closest?.('.card')).find(c=>c&&c!==dragging&&!c.classList.contains('ghost'));
+  const target=stack.map(x=>x.closest?.('.card')).find(c=>c&&c!==pressing&&!c.classList.contains('ghost'));
   if(lastTarget&&lastTarget!==target)lastTarget.classList.remove('slot');
   dropTarget=target||null;
   if(target){
-    target.classList.add('slot'); lastTarget=target;
+    target.classList.add('slot');lastTarget=target;
     const r=target.getBoundingClientRect();
     line.style.display='block';
     line.style.left=(e.clientX<r.left+r.width/2?r.left-4:r.right)+'px';
-    line.style.top=r.top+'px'; line.style.height=r.height+'px';
+    line.style.top=r.top+'px';line.style.height=r.height+'px';
   } else line.style.display='none';
+  e.preventDefault();
 });
 function endDrag(){
-  if(!dragging)return;
-  const moved=dragging, dest=dropTarget;
+  clearTimeout(pressTimer);pressTimer=null;
+  if(pressing){pressing.classList.remove('pressing');}
+  if(!dragging){pressing=null;return;}
+  const moved=pressing,dest=dropTarget;
   if(ghost){ghost.remove();ghost=null;}
-  line.style.display='none';
+  line.style.display='none';document.body.style.touchAction='';
   if(lastTarget){lastTarget.classList.remove('slot');lastTarget=null;}
-  if(dest&&dest!==moved)flipSwap(moved,dest);
+  if(dest&&dest!==moved)commit(moved,dest);
   moved.classList.remove('source');
-  moved.classList.add('settled'); setTimeout(()=>moved.classList.remove('settled'),500);
-  dropTarget=null; dragging=null;
+  moved.classList.add('settled');setTimeout(()=>moved.classList.remove('settled'),520);
+  toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1600);
+  dragging=false;dropTarget=null;pressing=null;
 }
 grid.addEventListener('pointerup',endDrag);
 grid.addEventListener('pointercancel',endDrag);
