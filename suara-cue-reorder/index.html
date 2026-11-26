@@ -70,6 +70,7 @@ body.editing .hint{display:flex;animation:hintIn .3s ease both}
 .card.onair .play{background:var(--coral);color:#160C08}
 kbd{font:600 9px 'IBM Plex Mono',monospace;border:1px solid currentColor;border-radius:3px;padding:1px 4px;opacity:.65}
 /* edit mode */
+body.editing .card{touch-action:none}
 body.editing .card{border-style:dashed;border-color:rgba(124,224,180,.55);background:#141A15;cursor:default}
 body.editing .card.onair{border-color:var(--coral);background:#211914}
 body.editing .grip{display:grid}
@@ -135,7 +136,7 @@ const tracks=[
  {t:'Cadangan',a:'instrumental',src:'DOWNLOAD',dur:'2:15',vol:60,fout:3,fin:0,seed:51}
 ];
 const grid=document.getElementById('grid'), toast=document.getElementById('toast'), btn=document.getElementById('editBtn');
-let editing=false, dragging=null, ghost=null, offX=0, offY=0, lastTarget=null, order=tracks.map((_,i)=>i);
+let editing=false, dragging=null, ghost=null, startX=0, startY=0, lastTarget=null, order=tracks.map((_,i)=>i);
 function bars(seed){let s=seed,o='';for(let i=0;i<44;i++){s=(s*1103515245+12345)&0x7fffffff;o+=`<i style="height:${12+((s>>7)%68)}%"></i>`}return o}
 function makeCard(idx,pos){
   const c=tracks[idx], el=document.createElement('article');
@@ -190,21 +191,21 @@ btn.addEventListener('click',()=>{
 });
 grid.addEventListener('pointerdown',e=>{
   if(!editing)return;
-  const grip=e.target.closest('.grip'), card=e.target.closest('.card');
-  if(!card||(!grip&&!e.target.closest('.card-top')))return;
+  const card=e.target.closest('.card');
+  if(!card)return;
   const r=card.getBoundingClientRect();
   ghost=card.cloneNode(true);
   ghost.className='card ghost'; ghost.style.width=r.width+'px'; ghost.style.height=r.height+'px';
   ghost.style.left=r.left+'px'; ghost.style.top=r.top+'px';
   document.body.appendChild(ghost);
-  offX=e.clientX-r.left; offY=e.clientY-r.top;
+  startX=e.clientX; startY=e.clientY;
   dragging=card; card.classList.add('source');
-  try{card.setPointerCapture(e.pointerId)}catch{}
+  try{grid.setPointerCapture(e.pointerId)}catch{}
   e.preventDefault();
 });
 grid.addEventListener('pointermove',e=>{
   if(!dragging||!ghost)return;
-  ghost.style.transform=`translate(${e.clientX-offX-dragging.getBoundingClientRect().left}px,${e.clientY-offY-dragging.getBoundingClientRect().top}px) scale(1.045) rotate(-1.2deg)`;
+  ghost.style.transform=`translate(${e.clientX-startX}px,${e.clientY-startY}px) scale(1.045) rotate(-1.2deg)`;
   const stack=document.elementsFromPoint(e.clientX,e.clientY);
   const target=stack.map(x=>x.closest?.('.card')).find(c=>c&&c!==dragging&&!c.classList.contains('ghost'));
   if(lastTarget&&lastTarget!==target)lastTarget.classList.remove('slot');
